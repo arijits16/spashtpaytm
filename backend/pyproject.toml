@@ -15,6 +15,10 @@ dependencies = [
   "psycopg[binary]==3.2.12",
   "python-multipart==0.0.20",
   "httpx==0.28.1",
+  # Auth: firebase-admin is the primary verifier; google-auth is the fallback
+  # path for machines with no service-account credentials (plan section 13).
+  "firebase-admin==7.7.0",
+  "google-auth==2.62.0",
 ]
 
 [project.optional-dependencies]

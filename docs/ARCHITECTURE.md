@@ -21,6 +21,7 @@ flowchart LR
 
   subgraph API["FastAPI :8000"]
     HEALTH["/api/health"]
+    AUTH["/api/me<br/>token verify + upsert"]
     ENGINE["Journey engine<br/>(phase 4)"]
     TRUST["Trust layer<br/>(phase 5)"]
     AI["Sarvam clients<br/>(phases 6-7)"]
@@ -28,11 +29,12 @@ flowchart LR
 
   DB[("PostgreSQL 16<br/>:5433 → container 5432")]
   SARVAM["Sarvam APIs<br/>Saaras · Bulbul · 105B · Doc AI"]
-  FB["Firebase Auth<br/>(phase 1)"]
+  FB["Firebase Auth<br/>Google sign-in"]
 
   UI --> PROXY
   DASH --> PROXY
-  PROXY --> HEALTH & ENGINE & TRUST & AI
+  PROXY --> HEALTH & AUTH & ENGINE & TRUST & AI
+  AUTH --> DB
   ENGINE --> DB
   TRUST --> DB
   AI -.-> SARVAM
@@ -76,6 +78,8 @@ sequenceDiagram
 | Receipts/consents/audit/attempts are append-only | `forbid_update_delete()` triggers _(phase 2)_ |
 | Every voice action has a tap/type alternative | `TurnResponse.quickReplies` + cards _(phase 4)_ |
 | No PII in logs | `app/logging.py` — root-logger filter ✅ |
+| Admin access is allowlist-only, never client-set | `auth/users.py` + `deps.current_admin` ✅ |
+| A real token always outranks the demo header | `deps.current_user` + `lib/api.ts` ✅ |
 | Never deploy publicly; concept label always visible | `ConceptRibbon` ✅ |
 
 ## Ports
@@ -86,3 +90,27 @@ sequenceDiagram
 | 8000 | FastAPI |
 | 5433 | Postgres on the host (5432 inside the container — see DECISIONS D-004) |
 | 8080 | Adminer |
+
+## Sign-in flow (phase 1)
+
+```mermaid
+sequenceDiagram
+  participant B as Browser
+  participant FB as Firebase Auth
+  participant V as Vite :5173
+  participant A as FastAPI
+  participant P as Postgres
+
+  B->>FB: signInWithPopup(Google)
+  FB-->>B: ID token (onAuthStateChanged)
+  B->>V: GET /api/me  (Authorization: Bearer <token>)
+  V->>A: same
+  A->>FB: verify signature / issuer / audience / expiry
+  FB-->>A: claims
+  A->>P: upsert user, recompute is_admin from the allowlist
+  A-->>B: {displayName, email, photoUrl, preferredLanguage, personaId, isAdmin}
+```
+
+The dev fallback replaces the first three steps with an `X-Demo-User: sunita`
+header, which the backend honours only when `DEMO_AUTH=true` **and**
+`APP_ENV=dev`. A real bearer token always wins, on both sides.

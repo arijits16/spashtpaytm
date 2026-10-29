@@ -27,8 +27,10 @@ _REDACTIONS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b"), "[EMAIL]"),
     # Bearer tokens / long opaque secrets
     (re.compile(r"\bBearer\s+[\w\-._~+/]+=*", re.IGNORECASE), "Bearer [TOKEN]"),
-    # A bare 6-digit run is treated as an OTP
-    (re.compile(r"(?<!\d)\d{6}(?!\d)"), "[OTP]"),
+    # A standalone 6-digit run is treated as an OTP. The guards exclude word
+    # characters AND hyphens so UUIDs (user_id, journey_id) survive intact -
+    # those ids are how we trace a failure during the demo.
+    (re.compile(r"(?<![\w-])\d{6}(?![\w-])"), "[OTP]"),
 )
 
 # Log record attributes that are not part of our structured payload.

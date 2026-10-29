@@ -13,9 +13,21 @@ type TokenProvider = () => Promise<string | null>;
 
 let tokenProvider: TokenProvider = () => Promise.resolve(null);
 
-/** Phase 1 installs the Firebase token provider here. */
+/** The AuthProvider installs the Firebase `getIdToken()` call here. */
 export function setAuthTokenProvider(provider: TokenProvider): void {
   tokenProvider = provider;
+}
+
+/**
+ * Dev-only demo persona, sent as `X-Demo-User`.
+ *
+ * The backend honours it only when DEMO_AUTH=true and APP_ENV=dev. Pass null to
+ * clear it. A real bearer token always takes precedence, on both sides.
+ */
+let demoUser: string | null = null;
+
+export function setDemoUser(persona: string | null): void {
+  demoUser = persona;
 }
 
 /** An error carrying the HTTP status, so callers can branch on 401/403/409. */
@@ -48,7 +60,11 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
   if (body !== undefined) headers.set("Content-Type", "application/json");
 
   const token = await tokenProvider();
-  if (token) headers.set("Authorization", `Bearer ${token}`);
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  } else if (demoUser) {
+    headers.set("X-Demo-User", demoUser);
+  }
 
   const response = await fetch(`${BASE_URL}${path}`, {
     method,
@@ -93,3 +109,25 @@ export interface Health {
 
 export const getHealth = (signal?: AbortSignal): Promise<Health> =>
   apiFetch<Health>("/health", signal ? { signal } : {});
+
+// --- me ----------------------------------------------------------------------
+
+export type Lang = "mr-IN" | "hi-IN" | "en-IN";
+
+/** Mirror of the backend `MeResponse` (plan 8.1). Kept in sync by hand. */
+export interface Me {
+  id: string;
+  email: string | null;
+  displayName: string | null;
+  photoUrl: string | null;
+  preferredLanguage: Lang;
+  personaId: string | null;
+  isAdmin: boolean;
+}
+
+export const getMe = (signal?: AbortSignal): Promise<Me> =>
+  apiFetch<Me>("/me", signal ? { signal } : {});
+
+/** Update the profile. Today only the language is user-editable. */
+export const updateMe = (patch: { preferredLanguage: Lang }): Promise<Me> =>
+  apiFetch<Me>("/me", { method: "PATCH", body: patch });

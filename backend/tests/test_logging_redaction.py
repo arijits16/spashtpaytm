@@ -28,6 +28,21 @@ def test_redact_removes_personal_data(raw: str, must_not_contain: str, must_cont
     assert must_contain in cleaned
 
 
+def test_redact_keeps_uuids_intact() -> None:
+    """Regression: a 6-digit run inside a UUID was being replaced with [OTP],
+    which made user_id / journey_id untraceable in the demo logs."""
+    uuid = "9a2814-9636-4c66-9bb5-392db7c725f1"
+
+    assert redact(f"user_id={uuid}") == f"user_id={uuid}"
+    assert redact("journey 123456-abcd-7890") == "journey 123456-abcd-7890"
+
+
+def test_redact_still_catches_a_standalone_otp() -> None:
+    """The UUID fix must not weaken the actual OTP rule."""
+    assert "[OTP]" in redact("the otp is 482913")
+    assert "[OTP]" in redact("Demo OTP: 482913.")
+
+
 def test_redact_keeps_loan_facts_readable() -> None:
     """Rupee amounts and rates are product facts, not PII - they must survive."""
     cleaned = redact("EMI 4,600 for 12 months, total 55,200 at 18.67%")

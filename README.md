@@ -20,8 +20,9 @@ answered, which anyone can verify and nobody can quietly edit.
 
 ## Status
 
-**Phase 0 of 12 complete** — scaffold, Docker Postgres, FastAPI health endpoint,
-React shell. See [`docs/PROGRESS.md`](docs/PROGRESS.md).
+**Phase 1 of 12 complete** — scaffold, Docker Postgres, FastAPI, React shell, and
+Firebase Google sign-in with backend token verification. See
+[`docs/PROGRESS.md`](docs/PROGRESS.md).
 
 The full specification is [`docs/BUILD_PLAN.md`](docs/BUILD_PLAN.md). Design
 decisions and deviations are in [`docs/DECISIONS.md`](docs/DECISIONS.md).
@@ -53,8 +54,19 @@ On Windows, or without `make`, every target has an identical npm script:
 npm run setup && npm run db-up && npm run migrate && npm run dev
 ```
 
-Then open **http://localhost:5173** — you should see `Backend: OK · DB: OK`
-inside the phone frame, and an empty dashboard at **/dashboard**.
+Then open **http://localhost:5173**. You will be sent to `/login`; sign in with
+Google, or tap **Continue as demo user** (needs no network). The signed-in home
+shows your profile and `Backend: OK · DB: OK`. Admins also get **/dashboard**.
+
+### Signing in
+
+| Path | Needs | Notes |
+|---|---|---|
+| Continue with Google | `VITE_FIREBASE_*` in `frontend/.env`, internet | The real flow |
+| Continue as demo user | `DEMO_AUTH=true` + `VITE_DEMO_AUTH=true` | Dev only, offline, signs in as persona `sunita` |
+
+`/dashboard` additionally requires the signed-in email to be in
+`DASHBOARD_ADMIN_EMAILS` (`backend/.env`, comma-separated).
 
 ### Commands
 

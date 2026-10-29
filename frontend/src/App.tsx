@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router";
+import { AuthProvider } from "@/lib/auth";
 import { router } from "@/routes";
 
 /**
@@ -20,7 +21,11 @@ const queryClient = new QueryClient({
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      {/* AuthProvider sits inside QueryClientProvider: it uses the API client,
+          and pages below it use both. */}
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

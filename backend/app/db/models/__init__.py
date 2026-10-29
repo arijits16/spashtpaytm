@@ -1,5 +1,9 @@
 """ORM models.
 
-Importing this package must import every model module, so that `Base.metadata`
-is complete for Alembic autogenerate. Tables arrive in phases 1 and 2.
+Importing this package imports every model module, so `Base.metadata` is
+complete for Alembic autogenerate. More tables arrive in phase 2.
 """
+
+from app.db.models.user import User
+
+__all__ = ["User"]

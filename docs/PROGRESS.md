@@ -8,7 +8,7 @@ One line per phase. Tick a box only when its acceptance criteria in
 | Phase | What | Status |
 |---|---|---|
 | 0 | Project folder, Docker Postgres, FastAPI health, Vite React shell | ✅ done — 2026-10-29 |
-| 1 | Firebase Google login, token verification, `users` table, demo auth | ⬜ not started |
+| 1 | Firebase Google login, token verification, `users` table, demo auth | ✅ done — 2026-10-30 |
 | 2 | Schema, append-only triggers, seed data, loan math, sample KFS PDFs | ⬜ not started |
 | 3 | Paytm-style home, profile drawer, concept guardrails, PWA | ⬜ not started |
 | 4 | Deterministic Spasht journey, server-driven UI, consent lock | ⬜ not started |
@@ -42,3 +42,38 @@ home screen (phase 3). `make seed`, `keys`, `eval`, `tts-cache`, `demo-reset` an
 - `backend/requirements.lock` is a `pip freeze` snapshot for reproducibility; the
   authoritative pins live in `backend/pyproject.toml`.
 - Postgres is on host port **5433**, not 5432 — see `DECISIONS.md` D-004.
+
+---
+
+## Phase 1 — done (2026-10-30)
+
+- [x] Google login works on the laptop; `/api/me` returns name, email, photo,
+      `preferredLanguage` and `isAdmin`
+- [x] Refreshing the page keeps the user signed in; Logout works
+- [x] Protected routes return 401 without a token; `/dashboard` refuses non-admins
+      (403 from the backend guard, explanatory screen on the frontend)
+- [x] Demo auth works with no internet (`X-Demo-User`, dev-only)
+- [x] Auth tests use a mocked token verifier
+- [x] `make lint` clean; `make test` 45 backend + 10 frontend
+- [x] No console errors in the browser
+
+**Built:** `users` table + migration `0002_users` (with a language CHECK
+constraint), `auth/firebase.py` (two verification paths), `auth/demo.py`,
+`auth/users.py` (upsert + allowlist), `deps.py` (`current_user` / `current_admin`),
+`GET`/`PATCH /api/me`; frontend `lib/firebase.ts`, `lib/auth.tsx`,
+`lib/authContext.ts`, `lib/env.ts`, `lib/guards.tsx`, `LoginPage`, signed-in home.
+
+### Bugs found and fixed during the phase
+- Demo sign-in while a real Google session was live left the real identity active
+  behind a `Session: demo` badge (DECISIONS D-016).
+- The OTP log-redaction rule was mangling UUIDs, so `user_id` / `journey_id` were
+  untraceable in logs (DECISIONS D-020). Regression tests added.
+
+### Known issues / carried forward
+- No component tests for `AuthProvider` or the guards yet (DECISIONS D-021);
+  `@testing-library/react` is deferred to phase 11.
+- `DEMO_AUTH=true` / `VITE_DEMO_AUTH=true` are enabled in the local `.env` files
+  so the offline fallback is always one tap away. `.env.example` keeps them
+  `false`.
+- Google sign-in is verified as far as the OAuth handler and a real session; the
+  team should still run it on a phone in phase 12.
