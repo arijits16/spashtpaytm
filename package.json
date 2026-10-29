@@ -16,6 +16,7 @@
     "dev-web": "npm --prefix frontend run dev",
     "test": "node scripts/run.mjs backend python -m pytest && npm --prefix frontend run test",
     "lint": "node scripts/run.mjs backend python -m ruff check . && node scripts/run.mjs backend python -m ruff format --check . && npm --prefix frontend run typecheck && npm --prefix frontend run lint",
+    "sarvam-smoke": "node scripts/run.mjs backend python scripts/sarvam_smoke.py",
     "format": "node scripts/run.mjs backend python -m ruff check --fix . && node scripts/run.mjs backend python -m ruff format . && npm --prefix frontend run lint:fix",
     "eval": "echo \"eval lands in phase 7\"",
     "tts-cache": "echo \"tts-cache lands in phase 6\"",

@@ -5,7 +5,7 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 .PHONY: help setup db-up db-down migrate seed keys dev dev-api dev-web test lint \
-        format eval tts-cache demo-reset tunnel clean
+        format eval tts-cache demo-reset tunnel clean sarvam-smoke
 
 # Pinned to 3.12: the system default (3.15) has no reliable wheels for
 # psycopg/pydantic-core. Override with `make PYTHON=python3.11 setup`.
@@ -90,6 +90,9 @@ lint: ## Lint and typecheck everything
 format: ## Auto-fix formatting and lint issues
 	@cd backend && .venv/bin/python -m ruff check --fix . && .venv/bin/python -m ruff format .
 	@cd frontend && npm run lint:fix
+
+sarvam-smoke: ## Check the Sarvam key and the TTS/STT/LLM endpoints
+	@cd backend && .venv/bin/python scripts/sarvam_smoke.py
 
 eval: ## Run the LLM eval suite (phase 7)
 	@echo "eval lands in phase 7"
