@@ -1,0 +1,1 @@
+"""Spasht backend application package."""

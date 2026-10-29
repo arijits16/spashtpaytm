@@ -1,0 +1,44 @@
+# Local dev infrastructure for Spasht.
+# Synthetic data only - never point this at anything real.
+name: spasht
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: spasht-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: spasht
+      POSTGRES_PASSWORD: spasht
+      POSTGRES_DB: spasht
+      # Deterministic collation so ORDER BY in tests matches CI.
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      # Host port is 5433 by default: a native postgres already owns 5432 on the
+      # dev machine and would shadow this container. Override with POSTGRES_HOST_PORT.
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
+    volumes:
+      - spasht-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spasht -d spasht"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+
+  adminer:
+    image: adminer:5
+    container_name: spasht-adminer
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+      ADMINER_DESIGN: dracula
+    ports:
+      - "8080:8080"
+
+volumes:
+  spasht-pgdata:
+    name: spasht-pgdata

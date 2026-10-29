@@ -1,0 +1,44 @@
+# --- dependencies / build output ---
+node_modules/
+dist/
+dist-ssr/
+build/
+*.tsbuildinfo
+.vite/
+
+# --- python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- secrets: NEVER commit ---
+.env
+.env.*
+!.env.example
+backend/secrets/
+*.pem
+*.key
+*service-account*.json
+
+# --- generated caches / artefacts ---
+backend/.cache/
+backend/app/assets/kfs/*.pdf
+
+# --- reference screenshots (personal data, look-matching only) ---
+docs/reference/
+
+# --- os / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.log
+npm-debug.log*

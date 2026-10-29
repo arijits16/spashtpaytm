@@ -1,0 +1,146 @@
+/*
+ * Spasht design tokens - build plan section 5.2.
+ *
+ * Tailwind v4 reads its theme from CSS, so `@theme` IS the config (there is no
+ * tailwind.config.ts). Every token is also a plain CSS variable, so components
+ * can use either `bg-card` or `var(--card)`.
+ */
+@import "tailwindcss";
+
+/* Self-hosted fonts. Devanagari must render on every screen, so it is loaded
+   up front rather than lazily. */
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "@fontsource/noto-sans-devanagari/400.css";
+@import "@fontsource/noto-sans-devanagari/500.css";
+@import "@fontsource/noto-sans-devanagari/700.css";
+
+@theme {
+  /* --- surfaces --- */
+  --color-bg: #f3f4f6;
+  --color-card: #ffffff;
+
+  /* --- brand blues (our own navy palette, not Paytm logo artwork) --- */
+  --color-navy: #002e6e;
+  --color-navy-icon: #0f3d86;
+  --color-sky: #00baf2;
+  --color-link: #1f6feb;
+  --color-icon-line: #1d5bd0;
+
+  /* --- text --- */
+  --color-text-1: #1c1c1e;
+  --color-text-2: #3a3a3c;
+  --color-text-3: #6b7280;
+
+  /* --- accents --- */
+  --color-offer-strip: #d6f1fa;
+  --color-promo-red: #d32f2f;
+  --color-badge-new: #ffe14d;
+  --color-alert-pink: #fdecec;
+
+  /* --- semantic --- */
+  --color-success: #12b76a;
+  --color-danger: #d92d20;
+  --color-warning: #f79009;
+
+  /* --- profile completion tiles --- */
+  --color-tile-blue: #1565e5;
+  --color-tile-green: #0b6b4f;
+  --color-tile-raspberry: #b0275a;
+  --color-tile-navy: #1e3a7a;
+
+  /* --- type (section 5.2) --- */
+  --font-sans:
+    "Inter", "Noto Sans Devanagari", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --text-section: 20px;
+  --text-section--line-height: 26px;
+  --text-tile: 13px;
+  --text-tile--line-height: 16px;
+  --text-chip: 13px;
+  --text-chip--line-height: 16px;
+  --text-body: 15px;
+  --text-body--line-height: 22px;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+
+  /* --- breakpoints ---
+     `frame` is the 500px threshold from plan 5.8: at or above it the phone
+     routes render inside the desktop bezel, below it they go full screen. */
+  --breakpoint-frame: 500px;
+
+  /* --- shape --- */
+  --radius-card: 20px;
+  --radius-banner: 16px;
+
+  /* --- spacing (section 5.2) --- */
+  --spacing-screen: 14px;
+  --spacing-cardgap: 12px;
+  --spacing-cardpad: 18px;
+  --spacing-icontile: 56px;
+
+  /* --- elevation: cards are flat on grey; only the Scan QR pill floats --- */
+  --shadow-qr-pill: 0 8px 24px rgba(0, 46, 110, 0.35);
+}
+
+/* Gradients are not `@theme` values (they are not colours), so they live as
+   plain custom properties on :root. */
+:root {
+  --navy-grad: linear-gradient(180deg, #1a4fa6 0%, #0b3a82 100%);
+  --login-grad: linear-gradient(180deg, #e6f6fd 0%, #ffffff 50%, #e6f6fd 100%);
+  --spasht-grad: linear-gradient(135deg, #002e6e 0%, #00baf2 100%);
+
+  color-scheme: light;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    /* The viewer paints its own ground, so the background is explicit. */
+    background-color: var(--color-bg);
+    color: var(--color-text-1);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    /* No pull-to-refresh bounce inside the phone frame during the demo. */
+    overscroll-behavior-y: none;
+  }
+
+  /* Devanagari needs a touch more leading than Latin at the same size. */
+  :lang(mr),
+  :lang(hi) {
+    line-height: 1.6;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  /* Visible focus for keyboard users (accessibility, phase 11). */
+  :focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /* iOS standalone safe areas - used by PhoneFrame / SafeArea. */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}

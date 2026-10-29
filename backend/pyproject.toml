@@ -1,0 +1,72 @@
+[project]
+name = "spasht-backend"
+version = "0.1.0"
+description = "Spasht - voice-first loan clarity co-pilot (concept demo for Paytm Build for India AI Hackathon)"
+requires-python = ">=3.11,<3.14"
+
+# Versions are pinned exactly: this is demoed live and must not drift.
+dependencies = [
+  "fastapi==0.121.2",
+  "uvicorn[standard]==0.38.0",
+  "pydantic==2.12.4",
+  "pydantic-settings==2.13.0",
+  "sqlalchemy==2.0.45",
+  "alembic==1.17.1",
+  "psycopg[binary]==3.2.12",
+  "python-multipart==0.0.20",
+  "httpx==0.28.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==9.0.1",
+  "pytest-asyncio==1.3.0",
+  "ruff==0.15.1",
+]
+
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+# ----------------------------- ruff -----------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["alembic/versions"]
+
+[tool.ruff.lint]
+select = [
+  "E", "W",   # pycodestyle
+  "F",        # pyflakes
+  "I",        # isort
+  "B",        # bugbear
+  "UP",       # pyupgrade
+  "ASYNC",    # async gotchas
+  "BLE",      # blind except - must be justified with a noqa reason
+  "S",        # bandit (security)
+  "C4",       # comprehensions
+  "SIM",      # simplify
+  "RUF",
+]
+ignore = [
+  "E501",  # line length is handled by the formatter
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests may use assert and hard-coded demo values.
+"tests/**" = ["S101", "S105", "S106"]
+"scripts/**" = ["S101"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+# ----------------------------- pytest -----------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-q --strict-markers"
+filterwarnings = ["error::DeprecationWarning:app.*"]

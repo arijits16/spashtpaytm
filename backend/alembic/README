@@ -1,0 +1,10 @@
+Alembic migrations for Spasht.
+
+The database URL is read from app.config (backend/.env), not alembic.ini.
+
+  make migrate                       # upgrade to head
+  cd backend && .venv/bin/alembic revision --autogenerate -m "add x"
+  cd backend && .venv/bin/alembic downgrade -1
+
+Append-only tables (receipts, consents, audit_log, teachback_attempts) get their
+forbid_update_delete() triggers in the phase-2 migration.
