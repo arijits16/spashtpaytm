@@ -83,6 +83,10 @@ class Settings(BaseSettings):
     rescue_idle_seconds: int = 60
     contact_window: str = "09:00-18:00"
 
+    # The background loop. Off under pytest, where a tick running against the
+    # same database would raise tasks underneath assertions that counted them.
+    rescue_agent_enabled: bool = True
+
     @field_validator("database_url")
     @classmethod
     def _require_psycopg_driver(cls, value: str) -> str:

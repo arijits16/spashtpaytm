@@ -93,6 +93,17 @@ final class JourneyViewModel {
         }
     }
 
+    /// Seed the screen from a response the caller already holds.
+    ///
+    /// Used by the rescue resume (phase 10): `POST /rescue/{id}/accept` already
+    /// answered with the journey's current step, so re-fetching it would be a
+    /// second round trip for the same bytes - and a visible delay between
+    /// answering the call and seeing where you were.
+    func adopt(_ response: TurnResponse) {
+        apply(response)
+        phase = .idle
+    }
+
     /// Re-fetch the current step without advancing it.
     func refresh() async {
         guard let journeyId = response?.journeyId else { return }

@@ -264,3 +264,37 @@ GoogleSignIn are allowed as iOS packages.
    general-purpose scanner.
 7. **A free Apple Personal Team expires after 7 days,** so the app must be
    reinstalled the night before the event.
+
+---
+
+## 14. Rescue agent (phase 10)
+
+The rescue agent is the one feature that can reach *out* to a customer, so it is
+the one with a hard "when not to" rule rather than only an authorisation rule.
+
+**Done**
+- **Ownership, not visibility.** `GET /rescue/pending` selects only tasks whose
+  journey has `user_id = caller`; accept and decline join through `journeys`
+  with the same predicate in the query, and answer **404** for anyone else's
+  task (§13.2). There is no code path on which another customer's task is
+  loaded into memory.
+- **Three contact gates, re-checked on every poll** (D-044): DND first and
+  unconditionally, then `consent_callbacks`, then `CONTACT_WINDOW` evaluated in
+  IST. A task that fails them is still created, with `contact_window_ok = false`
+  and a reason, so the dashboard can explain the silence.
+- **One task per journey, ever** — enforced by a `NOT EXISTS` in the scheduler's
+  query — and declining closes the task server-side, so nobody is rung twice
+  about the same application.
+- **Rate limited** on all three routes (the `turn` bucket, 60 / min / user); a
+  15 s poll uses four of them.
+- **No personal data on the wire or in the audit row.** The call carries the
+  template line, the step and the task id; `audit_log.data` carries the idle
+  seconds and the decision reason.
+- **Nothing is dialled.** The call is an in-app screen labelled
+  "Concept demo · simulated call" (D-043).
+
+**Residual risk**
+- `CONTACT_WINDOW` is a single window in IST, with no per-customer timezone and
+  no holiday calendar. For a demo with synthetic personas in Maharashtra that is
+  honest; a real deployment would need both, plus the national DND registry
+  rather than a column.

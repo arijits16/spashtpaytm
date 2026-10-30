@@ -142,3 +142,49 @@ One line per phase. Tick a box only when its acceptance criteria in
 - The running backend caches settings: `backend/.env` changes (`APP_VERSION`,
   the new allowlist entry) need a backend restart to take effect.
 - No component tests for the website's `AuthProvider` yet (D-021 still stands).
+
+## Phase 10 — Rescue Agent — done (2026-10-30)
+
+**Acceptance criteria**
+
+- [x] Demo control → a task is raised within one tick (15 s) → `GET /rescue/pending`
+      returns the call → Accept answers with the **same step** the customer
+      stopped on. Asserted end to end over HTTP in
+      `tests/test_rescue.py::test_the_call_arrives_and_accept_resumes_the_exact_step`.
+- [x] Outside the contact window no call appears, and the task still exists with
+      `contact_window_ok = false` and a reason the dashboard shows.
+- [ ] The on-device half of the first criterion (the incoming-call view, Accept,
+      the spoken line) is built and compiles, but has not been watched on a
+      Simulator: taps cannot be driven from the command line here (D-042).
+      Needs one manual run through Xcode's ▶.
+
+**Built**
+
+- **Backend:** `api/rescue.py` — `GET /rescue/pending`, `POST /rescue/{id}/accept`,
+  `POST /rescue/{id}/decline`, all owner-scoped (404 for anyone else) and rate
+  limited; the scheduler loop started from the app lifespan and cancelled on
+  shutdown (`RESCUE_AGENT_ENABLED`).
+- **iOS:** `RescueService` (15 s foreground poll), `IncomingCallView`,
+  `CallAudioPlayer`, and `JourneyView(resumed:)` so Accept lands on the stored
+  step with no extra round trip.
+- **Website:** already shipped in phase 9 — the rescue tasks page and the
+  "Create an abandoned journey" control. Left untouched.
+- **Docs:** D-043 (simulated call), D-044 (window re-checked at poll time),
+  D-045 (SSE published from the loop).
+
+**Bugs found in the inherited scheduler**
+
+- `find_stalled` filtered out already-handled journeys *after* the 50-row batch
+  limit, so once the fifty oldest stalled journeys had tasks the loop never
+  reached a new one — the demo control would create a journey and the phone
+  would never ring. The exclusion is now a `NOT EXISTS` in the query.
+- `create_task` published `rescue.created` from the worker thread (D-045).
+
+**Carried forward**
+
+- `ruff format --check` fails on three files untouched by this phase
+  (`evals/run.py`, `scripts/tts_cache.py`, `tests/test_number_guard.py`) — they
+  were already unformatted at `615f080`.
+- `make tts-cache` has not been re-run, so `rescue_call` may be a cache miss
+  until it is. The call still works: the caption is on screen and `audioUrl`
+  is nullable by design.

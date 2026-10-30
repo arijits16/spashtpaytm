@@ -13,9 +13,36 @@ struct HomeView: View {
     let auth: AuthService
     let me: Me
 
+    @Environment(\.scenePhase) private var scenePhase
+
     @State private var showsDrawer = false
     @State private var conceptSubject: String?
     @State private var path: [Route] = []
+
+    // --- the rescue agent (phase 10) ---
+    //
+    // It lives here rather than in `RootView` because answering a call has to
+    // open the journey, and the home screen is what owns navigation. Polling
+    // only while this screen exists also means it only runs when somebody is
+    // signed in.
+    @State private var rescue = RescueService()
+    @State private var callAudio = CallAudioPlayer()
+    @State private var rescueScreen: RescueScreen?
+
+    /// What the rescue agent is currently showing full-screen. One piece of
+    /// state rather than two `fullScreenCover` modifiers, which SwiftUI does
+    /// not reliably present side by side.
+    private enum RescueScreen: Identifiable {
+        case incoming(RescueCall)
+        case resumed(TurnResponse)
+
+        var id: String {
+            switch self {
+            case .incoming(let call): return "call:\(call.taskId)"
+            case .resumed(let response): return "journey:\(response.journeyId)"
+            }
+        }
+    }
 
     /// Shown once per install (§5.3 item 16).
     @AppStorage(HomeConfig.tooltipSeenKey) private var tooltipSeen = false
@@ -159,6 +186,69 @@ struct HomeView: View {
                 conceptSubject = nil
                 path.append(.spasht)
             }
+        }
+        // --- the rescue agent (phase 10) ---
+        .task { rescue.start() }
+        .onChange(of: scenePhase) { _, phase in
+            // Foreground only (§12). A loop polling from the background would
+            // be battery rudeness in exchange for a screen that cannot be
+            // shown from there anyway.
+            if phase == .active {
+                rescue.start()
+            } else {
+                rescue.stop()
+                callAudio.stop()
+            }
+        }
+        .onChange(of: rescue.call) { _, call in
+            guard let call else { return }
+            rescueScreen = .incoming(call)
+        }
+        .fullScreenCover(item: $rescueScreen) { screen in
+            switch screen {
+            case .incoming(let call):
+                IncomingCallView(
+                    call: call,
+                    isWorking: rescue.isWorking,
+                    onAccept: { accept(call) },
+                    onDecline: { decline(call) }
+                )
+            case .resumed(let response):
+                // Wrapped in its own stack: the journey pushes the KFS viewer,
+                // and a cover has no navigation of its own.
+                NavigationStack {
+                    JourneyView(auth: auth, language: response.language, resumed: response)
+                }
+            }
+        }
+    }
+
+    // MARK: - Rescue
+
+    /// Answer: speak the line, then show the step the customer stopped on.
+    ///
+    /// The audio starts before the resume call so the call *sounds* answered
+    /// immediately; `play` returns once playback has begun, not when the line
+    /// has finished, so the journey screen is not held back by it.
+    private func accept(_ call: RescueCall) {
+        Task {
+            await callAudio.play(path: call.audioUrl)
+
+            if let response = await rescue.accept(call) {
+                rescueScreen = .resumed(response)
+            } else {
+                // The resume failed. The journey is untouched and still
+                // reachable from the Loan tile, so the call simply closes.
+                rescueScreen = nil
+            }
+        }
+    }
+
+    private func decline(_ call: RescueCall) {
+        Task {
+            callAudio.stop()
+            await rescue.decline(call)
+            rescueScreen = nil
         }
     }
 

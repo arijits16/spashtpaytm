@@ -12,6 +12,10 @@ struct JourneyView: View {
     let auth: AuthService
     let language: Language
 
+    /// A screen the caller already has, shown instead of starting a journey.
+    /// Set by the rescue resume (phase 10); nil on the normal path.
+    let resumed: TurnResponse?
+
     @Environment(\.dismiss) private var dismiss
     @State private var model: JourneyViewModel
     @State private var typing = false
@@ -21,9 +25,10 @@ struct JourneyView: View {
     @State private var muted = false
     @FocusState private var draftFocused: Bool
 
-    init(auth: AuthService, language: Language) {
+    init(auth: AuthService, language: Language, resumed: TurnResponse? = nil) {
         self.auth = auth
         self.language = language
+        self.resumed = resumed
         _model = State(initialValue: JourneyViewModel(auth: auth))
     }
 
@@ -57,6 +62,12 @@ struct JourneyView: View {
         }
         .navigationBarHidden(true)
         .task {
+            // A rescue accept already carries the step the customer stopped on,
+            // so adopt it rather than asking again (phase 10).
+            if model.response == nil, let resumed {
+                model.adopt(resumed)
+                return
+            }
             // Safe to call on every appearance: `POST /journeys` returns the
             // active journey rather than starting a second one (§8.2), which is
             // what makes relaunch-and-resume work with no extra code.

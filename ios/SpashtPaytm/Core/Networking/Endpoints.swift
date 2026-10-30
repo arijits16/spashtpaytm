@@ -59,4 +59,10 @@ enum Endpoints {
     static func rescueAccept(_ taskId: UUID) -> String {
         "/api/rescue/\(taskId.uuidString.lowercased())/accept"
     }
+
+    /// `POST /api/rescue/{taskId}/decline` — closes the task so the phone is
+    /// never rung twice about the same application.
+    static func rescueDecline(_ taskId: UUID) -> String {
+        "/api/rescue/\(taskId.uuidString.lowercased())/decline"
+    }
 }

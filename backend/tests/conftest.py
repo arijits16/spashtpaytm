@@ -86,6 +86,25 @@ def _no_live_ai(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     monkeypatch.setattr("app.journey.understand.demo_mode_active", lambda _settings: True)
     monkeypatch.setattr("app.journey.polish.demo_mode_active", lambda _settings: True)
     monkeypatch.setattr("app.voice.turns.demo_mode_active", lambda _settings: True)
+    monkeypatch.setattr("app.api.rescue.demo_mode_active", lambda _settings: True)
+    yield
+
+
+@pytest.fixture(autouse=True)
+def _no_rescue_loop(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
+    """Keep the rescue agent's background loop out of the suite.
+
+    `create_app`'s lifespan starts it, and a loop ticking against the same
+    database would raise tasks underneath assertions that counted them - and
+    mark test journeys abandoned while a test was still using them.
+    """
+    import app.main as main_module
+
+    monkeypatch.setattr(
+        main_module,
+        "settings",
+        main_module.settings.model_copy(update={"rescue_agent_enabled": False}),
+    )
     yield
 
 

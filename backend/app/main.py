@@ -17,6 +17,8 @@ them.
 
 from __future__ import annotations
 
+import asyncio
+import contextlib
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -34,11 +36,13 @@ from app.api import (
     ledger,
     me,
     receipts,
+    rescue,
     voice,
 )
 from app.config import settings
 from app.errors import install_error_handlers
 from app.logging import configure_logging
+from app.rescue import scheduler as rescue_scheduler
 from app.security.bodylimit import BodySizeLimitMiddleware
 from app.security.headers import SecurityHeadersMiddleware
 from app.security.request_id import RequestIdMiddleware
@@ -62,7 +66,13 @@ ALLOWED_REQUEST_HEADERS = [
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Startup / shutdown. Background jobs (rescue agent) attach here in phase 10."""
+    """Startup / shutdown, including the rescue agent's background loop.
+
+    The loop is an in-process task on the app's own event loop (plan section 4):
+    one process, no broker, and it dies with the backend rather than outliving
+    it. It is cancelled on shutdown and awaited, so a tick that is mid-query
+    finishes or rolls back instead of leaving a session open.
+    """
     configure_logging("DEBUG" if settings.is_dev else "INFO")
     log.info(
         "spasht backend starting",
@@ -74,8 +84,23 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             "demo_auth": settings.demo_auth_allowed,
         },
     )
-    yield
-    log.info("spasht backend stopped")
+
+    # Disabled in tests, where a loop ticking against the same database would
+    # create rescue tasks underneath assertions that counted them.
+    rescue_task: asyncio.Task[None] | None = None
+    if settings.rescue_agent_enabled:
+        rescue_task = asyncio.create_task(
+            rescue_scheduler.run_forever(settings), name="rescue-agent"
+        )
+
+    try:
+        yield
+    finally:
+        if rescue_task is not None:
+            rescue_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await rescue_task
+        log.info("spasht backend stopped")
 
 
 def create_app() -> FastAPI:
@@ -122,6 +147,7 @@ def create_app() -> FastAPI:
     app.include_router(receipts.router, prefix=API_PREFIX)
     app.include_router(ledger.router, prefix=API_PREFIX)
     app.include_router(dashboard.router, prefix=API_PREFIX)
+    app.include_router(rescue.router, prefix=API_PREFIX)
     app.include_router(admin.router, prefix=API_PREFIX)
 
     # Deliberately *not* under /api: it is a page a person opens, and the QR

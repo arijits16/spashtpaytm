@@ -383,3 +383,43 @@ Consequence: the login screen was verified by screenshot, and everything behind
 it was verified through the API and the test suites. Checking the signed-in
 screen visually needs Xcode's ▶ button. Installing the Simulator component is in
 the human steps.
+
+### D-043 — The rescue call is an in-app screen, not a real telephone call
+§9 describes an agent that rings a customer back. In production that call would
+be placed by a telephony provider — Exotel in India, Twilio elsewhere — which
+would dial the masked number, stream the `rescue_call` line and hand the leg to
+the journey. None of that is in this build.
+
+What is here instead: the backend raises a `rescue_tasks` row, the iPhone polls
+`GET /rescue/pending` every 15 s while in the foreground, and a full-screen
+incoming-call view appears. Accept plays the cached `rescue_call` audio and
+resumes the journey at the exact step.
+
+Why not the real thing: a telephony account needs a verified business entity, a
+DLT-registered sender and a per-minute budget, none of which a hackathon
+concept should be spending on a path that demos identically. The screen says
+"Concept demo · simulated call" and the footer says a real deployment would use
+a telephony provider, so nobody watching can mistake which it is.
+
+### D-044 — The contact window is re-checked when the phone polls, not only when the task is raised
+`rescue_tasks.contact_window_ok` records what was true at creation, because the
+dashboard has to be able to explain why a task exists and no call was placed.
+It is **not** the gate. `may_contact` runs again on every poll, so a task raised
+at 17:59 stops ringing at 18:01, and setting DND or withdrawing the consent to
+callbacks takes effect on the next poll rather than on the next task.
+
+The three conditions, in the order that respects the customer most: DND first
+and unconditionally (their own standing instruction, whatever the hour),
+then the consent to callbacks, then the clock.
+
+Declining is a server-side state change (`POST /rescue/{id}/decline` → status
+`closed`), not a client-side dismissal. A task left open would ring again
+fifteen seconds later, which is exactly the harassment the window rules exist to
+prevent.
+
+### D-045 — The rescue agent publishes its SSE events from the event loop, not from its worker thread
+`tick` is synchronous SQLAlchemy and runs in `asyncio.to_thread`, so it must not
+touch the event bus: the bus hands events to `asyncio.Queue`s owned by the main
+loop, and `put_nowait` from another thread can leave a connected dashboard
+un-woken. `tick` therefore returns the payloads it created and `run_forever`
+publishes them once the thread has finished.
