@@ -5,7 +5,7 @@
 
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
-.PHONY: help setup db-up db-down migrate seed keys dev dev-api dev-web test lint audit \
+.PHONY: help setup db-up db-down migrate seed keys dev dev-api dev-web test lint audit env-check \
         format eval tts-cache demo-reset tunnel clean sarvam-smoke secret-scan \
         contracts kfs-pdfs golden-path ios-gen ios-open ios-build ios-test ios-run ios-config ios-icon \
         test-backend test-web lint-backend lint-web
@@ -87,6 +87,9 @@ keys: ## Fill the empty secrets in backend/.env (never overwrites, never prints)
 
 secret-scan: ## Scan tracked files for anything that looks like a secret
 	@node scripts/secret-scan.mjs
+
+env-check: ## Compare each .env with its .env.example (ARGS=--fix to append)
+	@cd backend && .venv/bin/python ../scripts/env_check.py $(ARGS)
 
 audit: ## Supply-chain check (§13.12): pip-audit + npm audit
 	@echo "==> pip-audit"

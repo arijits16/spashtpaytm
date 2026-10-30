@@ -7,6 +7,9 @@ day. Four minutes on stage, and everything that has to be true before them.
 
 ## Before you leave the house
 
+- [ ] `make env-check` — every `.env` has every key its example has. This is
+      the one that catches a missing `PUBLIC_BASE_URL` before a judge scans a
+      QR code pointing at localhost.
 - [ ] `make demo-reset` — journey data wiped, ledger reset, seed reloaded.
 - [ ] `make tts-cache` — every golden-path line is pre-generated, so the
       assistant speaks instantly and a dead network cannot silence it.
@@ -22,6 +25,8 @@ day. Four minutes on stage, and everything that has to be true before them.
 - [ ] `make db-up` and `make dev` running. `GET /api/health` returns `ok`.
 - [ ] `make tunnel` up on the ngrok **static** domain, so the URL in
       `ios/Config/Secrets.xcconfig` still matches and the app needs no rebuild.
+      If the domain changed: `make ios-config` and rebuild. Never hand-edit the
+      xcconfig — `//` is a comment there, and `make ios-config` escapes it.
 - [ ] `GET /api/health` opened in Safari **on the phone** — the single fastest
       proof that the phone can reach the laptop.
 - [ ] Dashboard open on the laptop at `/dashboard`, signed in as an admin,

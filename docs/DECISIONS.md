@@ -562,3 +562,36 @@ What was considered and rejected: starting the journey eagerly from the language
 screen to pull the greeting's audio down early. It would warm one more thing and
 make the first screen a side effect of a screen the customer had not finished
 looking at.
+
+### D-054 — `make ios-config` writes the backend URL, because that is the step that breaks on the day
+Phase 13 step 1 was two files to hand-edit after reading what `make tunnel`
+printed. One of them is an xcconfig, where `//` starts a comment — so pasting
+`https://x.ngrok-free.app` silently stores `https:`, the app then cannot reach
+anything, and nothing in the resulting error names the cause. The project has
+carried a note about this since phase 0 precisely because it is so easy to hit.
+
+A note is not a fix. `make ios-config` now derives `API_BASE_URL` and
+`PUBLIC_BASE_URL` from `NGROK_DOMAIN` in `backend/.env`, escapes the slashes to
+`/$()/` with `sed`, tolerates a domain pasted with a scheme or a trailing slash,
+and **warns when `backend/.env`'s own `PUBLIC_BASE_URL` disagrees** — because
+that is the variable receipt QR codes are built from, and a mismatch means a
+judge scanning one reaches the wrong host.
+
+(The first version of the escaping used bash's `${var/a/b}` and emitted literal
+backslashes: `http:\/$()\/localhost`. Caught by looking at the file it wrote
+rather than by trusting the substitution.)
+
+### D-055 — `make env-check` compares each `.env` with its example
+A `.env` created at phase 1 is missing the keys phases 2–12 added, and the
+symptom is never "a key is missing". It is the rescue agent using a contact
+window nobody set, or a receipt QR pointing at localhost on stage.
+
+Run against this machine it immediately found six real gaps, including
+`PUBLIC_BASE_URL` and `NGROK_DOMAIN` absent from `backend/.env` (the phase 13
+failure, exactly) and `VITE_DEMO_AUTH_KEY` absent from `frontend/.env`.
+
+It prints names and never values (§13.3), and it never edits anything unless
+asked with `--fix`, which appends the missing keys **commented out**: a script
+that silently wrote live values into someone's `.env` would be the worse
+surprise. It exits 0 either way, because it is a pre-flight report and not a
+gate.

@@ -1,11 +1,17 @@
 #!/bin/bash
 # Wire the local machine's configuration into ios/Config/Secrets.xcconfig.
 #
-# Run with `make ios-config`. It does three things, all idempotent:
+# Run with `make ios-config`. It does four things, all idempotent:
 #
 #   1. creates Secrets.xcconfig from the example if it is missing;
-#   2. copies DEMO_AUTH_KEY across from backend/.env;
-#   3. copies REVERSED_CLIENT_ID out of GoogleService-Info.plist.
+#   2. derives API_BASE_URL and PUBLIC_BASE_URL from backend/.env;
+#   3. copies DEMO_AUTH_KEY across from backend/.env;
+#   4. copies REVERSED_CLIENT_ID out of GoogleService-Info.plist.
+#
+# Step 2 exists because it is the step that breaks on demo day. An xcconfig
+# treats "//" as a comment, so a hand-pasted "https://x.ngrok-free.app"
+# silently becomes "https:" and the app then cannot reach anything, with no
+# error that names the cause. This writes the "https:/$()/host" form for you.
 #
 # It NEVER prints a secret value - only which names were set (build plan 13.3).
 # Secrets.xcconfig is gitignored.
@@ -62,7 +68,55 @@ read_env() {
     sed -E 's/^[[:space:]]+|[[:space:]]+$//g'
 }
 
-# --- 2. demo key from backend/.env ------------------------------------------
+# --- 2. the backend URL ------------------------------------------------------
+#
+# Precedence: NGROK_DOMAIN (the phone demo) beats PUBLIC_BASE_URL (which may
+# still say localhost), and localhost is the fallback for the Simulator.
+
+echo "==> backend URL"
+
+# Break the "//" of a URL with an empty variable reference, which is the only
+# way to write one in an xcconfig. Done with sed rather than bash's own
+# substitution, where escaping a slash in the *replacement* leaves the
+# backslash in the output - which is how this was wrong the first time.
+escape_url() {
+  printf '%s\n' "$1" | sed -e 's|://|:/$()/|'
+}
+
+NGROK_DOMAIN="$(read_env NGROK_DOMAIN)"
+ENV_PUBLIC_URL="$(read_env PUBLIC_BASE_URL)"
+
+if [[ -n "$NGROK_DOMAIN" ]]; then
+  # Tolerate a domain pasted with a scheme, which is the common slip.
+  NGROK_DOMAIN="${NGROK_DOMAIN#https://}"
+  NGROK_DOMAIN="${NGROK_DOMAIN#http://}"
+  NGROK_DOMAIN="${NGROK_DOMAIN%/}"
+  BACKEND_URL="https://$NGROK_DOMAIN"
+  SOURCE="NGROK_DOMAIN"
+elif [[ -n "$ENV_PUBLIC_URL" ]]; then
+  BACKEND_URL="${ENV_PUBLIC_URL%/}"
+  SOURCE="PUBLIC_BASE_URL"
+else
+  BACKEND_URL="http://localhost:8000"
+  SOURCE="the default"
+fi
+
+set_key "API_BASE_URL" "$(escape_url "$BACKEND_URL")"
+set_key "PUBLIC_BASE_URL" "$(escape_url "$BACKEND_URL")"
+note "API_BASE_URL and PUBLIC_BASE_URL set to $BACKEND_URL (from $SOURCE)"
+
+if [[ "$BACKEND_URL" == http://localhost* ]]; then
+  warn "localhost works in the Simulator but not on a real iPhone."
+  warn "Set NGROK_DOMAIN in backend/.env, run 'make tunnel', then 'make ios-config'."
+fi
+
+if [[ -n "$NGROK_DOMAIN" && "$ENV_PUBLIC_URL" != "$BACKEND_URL" ]]; then
+  warn "backend/.env has PUBLIC_BASE_URL=${ENV_PUBLIC_URL:-<unset>}"
+  warn "Receipt QR codes are built from that, so a judge scanning one would"
+  warn "reach the wrong host. Set PUBLIC_BASE_URL=$BACKEND_URL and restart the backend."
+fi
+
+# --- 3. demo key from backend/.env ------------------------------------------
 
 echo "==> demo auth key"
 if [[ ! -f "$BACKEND_ENV" ]]; then
@@ -78,7 +132,7 @@ else
   fi
 fi
 
-# --- 3. Google sign-in config from the plist --------------------------------
+# --- 4. Google sign-in config from the plist --------------------------------
 
 echo "==> GoogleService-Info.plist"
 if [[ ! -f "$PLIST" ]]; then
@@ -120,7 +174,7 @@ else
   fi
 fi
 
-# --- 4. regenerate the project ----------------------------------------------
+# --- 5. regenerate the project ----------------------------------------------
 
 echo "==> regenerating the Xcode project"
 if command -v xcodegen >/dev/null 2>&1; then

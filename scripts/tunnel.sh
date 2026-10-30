@@ -48,18 +48,23 @@ cat <<EOF
 ==> tunnelling the backend (127.0.0.1:8000) over HTTPS
     The website is NOT tunnelled - it stays on http://localhost:5173.
 
-    Once ngrok is up, set these and rebuild the app:
+    Two things to do in another terminal, in this order:
 
-    ios/Config/Secrets.xcconfig
-        API_BASE_URL    = ${URL/:\/\//:\/\$()\/}
-        PUBLIC_BASE_URL = ${URL/:\/\//:\/\$()\/}
-        (xcconfig treats "//" as a comment, hence the \$() in the middle)
+    1. backend/.env
+           PUBLIC_BASE_URL=$URL
+       Receipt QR codes are built from this, so a judge scanning one on their
+       own phone reaches this host. Restart the backend afterwards.
 
-    backend/.env
-        PUBLIC_BASE_URL=$URL
-        (receipt QR codes are built from this)
+    2. make ios-config
+       Writes API_BASE_URL and PUBLIC_BASE_URL into ios/Config/Secrets.xcconfig
+       from NGROK_DOMAIN, with the "//" escaped as "/\$()/" - an xcconfig
+       treats "//" as a comment, and a hand-pasted URL silently truncates to
+       "https:" with no error that names the cause. It also regenerates the
+       Xcode project.
 
-    Then: restart the backend, run \`make ios-gen\`, and rebuild in Xcode.
+    Then rebuild in Xcode (or \`make ios-build\`) and install on the phone.
+
+    Check it from the phone's browser before you trust it:  $URL/api/health
 
 EOF
 

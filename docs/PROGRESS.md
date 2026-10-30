@@ -274,3 +274,53 @@ nothing blocked by the guard.
 - The XCUITest of the golden path. The build plan marks it optional, and the
   Simulator cannot be driven from the command line on this machine (D-042), so
   it would be a test nobody could run.
+
+## Phase 13 — iPhone device and demo-day setup — tooling done (2026-10-31)
+
+Phase 13 is mostly a human checklist: install on a physical iPhone, mirror it to
+the projector, run the golden path by voice, have a judge scan a QR code. What
+could be *built* for it was built; what needs a device and a person is listed as
+needing a device and a person.
+
+**Built**
+
+- **`make ios-config` now writes the backend URL** (D-054): `API_BASE_URL` and
+  `PUBLIC_BASE_URL` derived from `NGROK_DOMAIN`, with `//` escaped to `/$()/`,
+  a scheme or trailing slash tolerated, and a warning when `backend/.env`'s own
+  `PUBLIC_BASE_URL` disagrees — the mismatch that would send a judge's QR scan
+  to the wrong host.
+- **`make env-check`** (D-055): every `.env` compared with its example. It found
+  six real gaps on this machine, including `PUBLIC_BASE_URL` and `NGROK_DOMAIN`
+  missing from `backend/.env`.
+- **`make tunnel`** now prints the two ordered steps and the one-line check to
+  run from the phone's own browser (`<url>/api/health`) before trusting it.
+- **The demo-day checklist** is in the README and, in full, in
+  `docs/DEMO_SCRIPT.md`: before-you-leave, at-the-venue, the four-minute script,
+  the failure drills, the §16 checklist, and what to rotate afterwards.
+
+**Verified here**
+
+- The judge's-QR path, server side, end to end: with `PUBLIC_BASE_URL` set to a
+  tunnel host, a completed journey's receipt card carries
+  `https://<tunnel>/r/SP-…`, and a plain `GET` of that path returns a
+  server-rendered page showing **✓ Verified**, all four checks, the block hash
+  and no `<script>` tag. No QR encodes a `upi://` URL.
+- `make ios-config` with a static domain configured produces exactly
+  `https:/$()/spasht-demo.ngrok-free.app` in the xcconfig and warns about the
+  `PUBLIC_BASE_URL` mismatch.
+
+**Needs a device and a person (cannot be done from this machine)**
+
+- [ ] The golden path on a real iPhone over the tunnel, **by voice**, with the
+      laptop dashboard updating live. Everything it depends on is built and
+      builds; `ngrok` is not installed here (D-029) and there is no phone.
+- [ ] A judge-style QR scan from a second physical phone.
+- [ ] The backup video recorded.
+- [ ] Install through Xcode on each team iPhone (Personal Team signing,
+      Developer Mode, trust the developer) — and again within 7 days of the
+      event, because a free team's build expires.
+
+**After the event**
+
+Stop the tunnel; rotate `SARVAM_API_KEY` and `DEMO_AUTH_KEY`; remove the app
+from any non-team device.

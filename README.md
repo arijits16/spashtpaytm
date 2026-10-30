@@ -99,6 +99,7 @@ shows your profile and `Backend: OK · DB: OK`. Admins also get **/dashboard**.
 | `make format` | Auto-fix all of the above |
 | `make eval` | LLM eval suite |
 | `make audit` | `pip-audit` + `npm audit` (§13.12) |
+| `make env-check` | Compare each `.env` with its example (`ARGS=--fix` appends the missing keys) |
 | `make tts-cache` | Pre-generate the TTS audio the golden path speaks |
 | `make demo-reset` | Wipe journey data, reset the ledger and re-seed |
 | `make golden-path` | Walk the whole journey over HTTP and print every step |
@@ -136,10 +137,15 @@ make golden-path ARGS=--voice    # the utterances a customer would speak
 The full checklist is in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md). The short
 version:
 
-1. `make tunnel` (ngrok static domain) → put the URL in `backend/.env`
-   (`PUBLIC_BASE_URL`) and `ios/Config/Secrets.xcconfig` (`API_BASE_URL`), or
-   run `make ios-config`. **Write xcconfig URLs as `https:/$()/host`** — a bare
-   `//` starts a comment.
+0. `make env-check` — every `.env` compared with its example. A `.env` from an
+   earlier phase is missing the keys later phases added, and the symptom is
+   never "a key is missing" but a receipt QR pointing at localhost.
+1. Put your ngrok static domain in `backend/.env` as `NGROK_DOMAIN` and
+   `PUBLIC_BASE_URL=https://<that domain>`, then `make tunnel`, then
+   **`make ios-config`** — it writes `API_BASE_URL` and `PUBLIC_BASE_URL` into
+   `ios/Config/Secrets.xcconfig` with the `//` escaped as `/$()/` (an xcconfig
+   treats `//` as a comment, so a pasted URL silently truncates to `https:`),
+   warns if `PUBLIC_BASE_URL` disagrees, and regenerates the Xcode project.
 2. `make ios-build CONFIG=Debug` and install on each team iPhone through Xcode
    (Personal Team signing, Developer Mode on, trust the developer). A free team
    signs for **7 days**, so reinstall the night before.

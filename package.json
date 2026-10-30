@@ -32,7 +32,8 @@
     "ios-icon": "make ios-icon",
     "kfs-pdfs": "make kfs-pdfs",
     "golden-path": "make golden-path",
-    "audit": "node scripts/run.mjs backend python -m pip_audit --progress-spinner off; npm --prefix frontend audit"
+    "audit": "node scripts/run.mjs backend python -m pip_audit --progress-spinner off; npm --prefix frontend audit",
+    "env-check": "node scripts/run.mjs backend python ../scripts/env_check.py"
   },
   "devDependencies": {
     "concurrently": "9.2.5"
