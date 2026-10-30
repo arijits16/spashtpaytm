@@ -38,6 +38,11 @@ _TIMEOUTS = {
     "stt": httpx.Timeout(connect=4.0, read=20.0, write=20.0, pool=4.0),
     "tts": httpx.Timeout(connect=4.0, read=15.0, write=10.0, pool=4.0),
     "llm": httpx.Timeout(connect=4.0, read=20.0, write=10.0, pool=4.0),
+    # Offline generation (phase 11 ingestion): no customer is waiting, the
+    # offline model reasons before it answers, and the reply is a whole
+    # teach-back question in three languages. The 20 s live budget times out on
+    # it every time, which looks like a broken model rather than a tight clock.
+    "offline": httpx.Timeout(connect=10.0, read=180.0, write=30.0, pool=10.0),
     "docai": httpx.Timeout(connect=10.0, read=120.0, write=60.0, pool=10.0),
 }
 

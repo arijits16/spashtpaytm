@@ -157,6 +157,11 @@ async def complete(
     schema_name: str,
     settings: Settings,
     live: bool = True,
+    max_tokens: int = MAX_TOKENS,
+    reasoning: bool = False,
+    temperature: float = TEMPERATURE,
+    frequency_penalty: float = 0.0,
+    presence_penalty: float = 0.0,
 ) -> LlmResult:
     """One structured LLM call.
 
@@ -164,6 +169,21 @@ async def complete(
                  model and switches reasoning **off**: a reasoning pass costs
                  seconds the 4-second voice budget does not have (§10.4).
                  Offline work (phase 11 ingestion) passes False.
+    @param reasoning  Off by default, for both live and offline work. Measured:
+                 asked for one teach-back question with reasoning on, the
+                 offline model spent 3,999 reasoning tokens and returned no
+                 content at all - a truncated reply the schema then discarded.
+                 Three short sentences in three languages need no chain of
+                 thought, and §10 requires reasoning off on the live path.
+    @param frequency_penalty  Zero on the live path. Phase 11 generation sets it,
+                 because asking the model to write `{LATE_FEE}` instead of a
+                 number makes it loop on that token: measured, a prompt with no
+                 penalty produced "{LATE_FEE} {LATE_FEE} {LATE_FEE} ..." until
+                 the budget ran out. 0.6 removes it entirely.
+    @param max_tokens  300 for a live turn (§10). Phase 11 generates a whole
+                 teach-back question in three languages in one call and needs
+                 more room; a truncated reply fails the schema and is discarded,
+                 so too small a budget looks like a model that cannot comply.
 
     Raises `SarvamError` on a failure or a malformed reply. Callers always have
     a seeded fallback, so an exception here is a degradation, not an outage.
@@ -177,18 +197,23 @@ async def complete(
             {"role": "system", "content": system},
             {"role": "user", "content": user},
         ],
-        "temperature": TEMPERATURE,
-        "max_tokens": MAX_TOKENS,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "frequency_penalty": frequency_penalty,
+        "presence_penalty": presence_penalty,
         "response_format": {
             "type": "json_schema",
             "json_schema": {"name": schema_name, "schema": schema, "strict": True},
         },
     }
-    if live:
-        # §10: reasoning off for live turns.
+    if not reasoning:
+        # §10: reasoning off for live turns - and off for offline generation
+        # too, where it consumed the whole token budget before writing anything.
         body["reasoning_effort"] = None
 
-    result = await client.post_json("/v1/chat/completions", body, kind="llm")
+    # Offline work gets the generous timeout class: it reasons before it
+    # answers, and nobody is waiting on a four-second budget (§10.4).
+    result = await client.post_json("/v1/chat/completions", body, kind="llm" if live else "offline")
 
     choices = result.payload.get("choices")
     if not isinstance(choices, list) or not choices:

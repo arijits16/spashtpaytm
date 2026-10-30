@@ -423,3 +423,76 @@ touch the event bus: the bus hands events to `asyncio.Queue`s owned by the main
 loop, and `put_nowait` from another thread can leave a connected dashboard
 un-woken. `tick` therefore returns the payloads it created and `run_forever`
 publishes them once the thread has finished.
+
+### D-046 — The KFS extraction asks for strings and parses them ourselves
+The Document Intelligence schema types every field `string`, even the amounts. A
+KFS writes "INR 4,600", "18.67% (reducing balance)" and "4% of principal
+outstanding"; asking the model for a number asks it to read *and* parse, and a
+parse failure then arrives as a confident wrong figure rather than as a blank.
+
+`kfs/parse.py` does the parsing, where the rules are a dozen lines a reviewer
+can check and the failure mode is `None` → "could not read" on the dashboard for
+a human to fill in.
+
+### D-047 — Extraction falls back to `pdfplumber`, and says which engine read the document
+Document Intelligence is a remote call on venue Wi-Fi. The offline reader
+matches the label/value rows of an RBI-format KFS, so `make demo-reset` and the
+KFS library still do something real with no network (§10.6) — and two
+independent readings that agree is worth more than one confident reading.
+
+The engine is shown on every row and in the detail pane, with the offline
+reader's confidence deliberately fixed lower (0.55) than anything the model
+returns: a regex over a label is a weaker reading than a model that saw the
+page, and the dashboard sorts a human's attention by confidence.
+
+The watermark needed handling. `pdfplumber` reads the diagonal SAMPLE as stray
+one- and two-character lines, and sometimes *inside* a line ("Recovery
+practicSes"), so clause titles are matched by similarity rather than equality
+and very short lines are dropped.
+
+### D-048 — Generated teach-back text may not contain a single digit
+The model writes `{LATE_FEE}`; code fills it from the verified facts at render
+time, exactly as the seeded rows work. Enforced by rejecting any text containing
+a digit — Latin or Devanagari — rather than by relying on the Number Guard
+alone, because the guard *allows* a number that matches a fact. "Rs 50,000"
+passes the guard when the principal is 50,000, and is then quoted unchanged to
+the customer who asked for 75,000: questions are rendered per journey from
+scaled facts. A placeholder has neither problem, and survives a KFS revision.
+
+Two more validations earned their place by failing in practice:
+
+- **No placeholder more than twice in one line.** Asked to use placeholders
+  instead of numbers at temperature 0.2 with no penalty, the model looped on the
+  token: one measured run produced nine consecutive `{LATE_FEE}`s and then ran
+  out of budget. `frequency_penalty: 0.6` removed it entirely; this check
+  catches it anyway.
+- **The three languages must use the same placeholders.** One run wrote an
+  option as "your monthly payment is {EMI}" in English and "{PRINCIPAL}" in
+  Marathi — two different claims presented as one option, in a product whose
+  whole premise is that the customer understood what they agreed to.
+
+### D-049 — Reasoning is off for offline generation too
+§10 requires reasoning off for live turns. Measured, it has to be off offline as
+well: asked for one teach-back question with reasoning on, `sarvam-105b` spent
+3,999 reasoning tokens and returned **no content at all** — a truncated reply
+the schema then discarded, which looks exactly like a model that cannot follow
+instructions. Three short sentences in three languages need no chain of thought.
+
+Offline calls do get their own timeout class (180 s read): nobody is waiting on
+the four-second voice budget, and the 20 s live timeout failed every time.
+
+### D-050 — Publishing a KFS is two calls, and re-prices the offer from our own arithmetic
+`POST /admin/kfs/{id}/publish` with `confirm: false` generates the questions and
+lines, guards them and stores the proposal; `confirm: true` activates what was
+reviewed. That is the "→ review →" in the plan's "generate → guard → review →
+activate", and it is why no single action can put model-written text in front of
+a customer.
+
+Activation re-prices the offer with `loan_math.quote` rather than with the EMI
+and totals extracted from the PDF. The extracted ones were verified and are
+shown, and a disagreement is reported by the sanity checks — but the catalogue
+stores what the code computes, because that is the arithmetic a receipt is
+verified against, and the two must never be able to differ.
+
+The seeded questions are deactivated, not deleted, so `make seed` puts the demo
+back. A publish is reversible.

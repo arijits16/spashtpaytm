@@ -11,6 +11,9 @@ import type {
   CandidateResult,
   JourneyDetail,
   JourneyRow,
+  KfsDocumentDetail,
+  KfsLibraryResponse,
+  KfsPublishResponse,
   LedgerResponse,
   Overview,
   PublicKey,
@@ -102,6 +105,53 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     throw new ApiError(response.status, message, code);
   }
   return (await response.json()) as T;
+}
+
+/** The auth headers, shared by the JSON, upload and blob paths. */
+async function authHeaders(): Promise<Headers> {
+  const headers = new Headers();
+  const token = await tokenProvider();
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  } else if (demoUser && demoKey) {
+    headers.set("X-Demo-User", demoUser);
+    headers.set("X-Demo-Key", demoKey);
+  }
+  return headers;
+}
+
+/**
+ * POST a `multipart/form-data` body (the KFS upload, phase 11).
+ *
+ * `Content-Type` is deliberately not set: the browser has to add the multipart
+ * boundary, and setting it by hand produces a body FastAPI cannot parse.
+ */
+export async function apiUpload<T>(path: string, form: FormData): Promise<T> {
+  const headers = await authHeaders();
+  headers.set("Accept", "application/json");
+
+  const response = await fetch(`${BASE_URL}${path}`, { method: "POST", headers, body: form });
+  if (!response.ok) {
+    const { code, message } = await readError(response);
+    throw new ApiError(response.status, message, code);
+  }
+  return (await response.json()) as T;
+}
+
+/**
+ * Fetch binary content with the auth headers attached.
+ *
+ * Used for the KFS preview: the admin file route needs a bearer token or the
+ * demo headers, and an `<iframe src>` cannot send either - so the bytes are
+ * fetched here and handed to the iframe as an object URL.
+ */
+export async function apiBlob(path: string): Promise<Blob> {
+  const response = await fetch(`${BASE_URL}${path}`, { headers: await authHeaders() });
+  if (!response.ok) {
+    const { code, message } = await readError(response);
+    throw new ApiError(response.status, message, code);
+  }
+  return await response.blob();
 }
 
 /**
@@ -258,3 +308,39 @@ export const getPersonas = (
 
 export const switchPersona = (personaId: string): Promise<Me> =>
   apiFetch<Me>("/me/persona", { method: "POST", body: { personaId } });
+
+// --- KFS ingestion (phase 11) ------------------------------------------------
+
+export const getKfsLibrary = (signal?: AbortSignal): Promise<KfsLibraryResponse> =>
+  apiFetch<KfsLibraryResponse>("/admin/kfs", signal ? { signal } : {});
+
+export const getKfsDocument = (id: string, signal?: AbortSignal): Promise<KfsDocumentDetail> =>
+  apiFetch<KfsDocumentDetail>(`/admin/kfs/${id}`, signal ? { signal } : {});
+
+export function uploadKfs(
+  file: File,
+  offerId: string,
+  version: string,
+): Promise<KfsDocumentDetail> {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("offerId", offerId);
+  form.append("version", version);
+  return apiUpload<KfsDocumentDetail>("/admin/kfs/upload", form);
+}
+
+export const verifyKfs = (
+  id: string,
+  corrections: Record<string, string>,
+): Promise<KfsDocumentDetail> =>
+  apiFetch<KfsDocumentDetail>(`/admin/kfs/${id}/verify`, {
+    method: "POST",
+    body: { corrections },
+  });
+
+/** `confirm: false` generates and guards; `confirm: true` activates what was reviewed. */
+export const publishKfs = (id: string, confirm: boolean): Promise<KfsPublishResponse> =>
+  apiFetch<KfsPublishResponse>(`/admin/kfs/${id}/publish`, {
+    method: "POST",
+    body: { confirm },
+  });

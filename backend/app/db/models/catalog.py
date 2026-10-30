@@ -117,6 +117,23 @@ class KfsDocument(Base, TimestampMixin):
     source: Mapped[str] = mapped_column(String(20), nullable=False, server_default="seed")
     status: Mapped[str] = mapped_column(String(20), nullable=False, server_default="active")
 
+    # The raw extraction (phase 11): which engine read the file, the per-field
+    # confidence, the job id. Kept out of `facts` on purpose - `facts` is the
+    # Number Guard's allow-list, and a confidence score is not a number anybody
+    # may say to a customer.
+    extraction: Mapped[dict] = mapped_column(
+        JSONB, nullable=False, default=dict, server_default="{}"
+    )
+
+    # The publish proposal awaiting review: generated questions and explanation
+    # lines in all three languages, each with its Number Guard verdict (§11).
+    generated: Mapped[dict] = mapped_column(
+        JSONB, nullable=False, default=dict, server_default="{}"
+    )
+
+    original_filename: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    uploaded_by: Mapped[str | None] = mapped_column(String(200), nullable=True)
+
 
 class KfsClause(Base, TimestampMixin):
     """One clause of a KFS, searchable. `tsv` is maintained by a DB trigger so
@@ -143,6 +160,7 @@ class TeachbackQuestion(Base, TimestampMixin):
     """
 
     __tablename__ = "teachback_questions"
+    __table_args__ = (CheckConstraint("source IN ('seed', 'generated')", name="source"),)
 
     id: Mapped[str] = mapped_column(String(60), primary_key=True)
 
@@ -158,3 +176,11 @@ class TeachbackQuestion(Base, TimestampMixin):
     # Keywords that grade a free-form spoken answer before the LLM is asked.
     rubric: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
+
+    # 'seed' or 'generated' (phase 11). A generated set is tied to the document
+    # it was written from, so publishing a new KFS can swap the questions and a
+    # rollback can put the seeded three back.
+    source: Mapped[str] = mapped_column(String(20), nullable=False, server_default="seed")
+    kfs_document_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("kfs_documents.id", ondelete="SET NULL"), nullable=True, index=True
+    )

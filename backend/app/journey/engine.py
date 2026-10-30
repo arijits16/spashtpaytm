@@ -125,7 +125,7 @@ from app.journey.teachback import (
     kfs_lines,
 )
 from app.journey.teachback import render as render_question
-from app.journey.templates import honorific, render, render_with_facts
+from app.journey.templates import fill_question, honorific, render, render_with_facts
 from app.journey.understand_rules import (
     Intent,
     Understanding,
@@ -694,8 +694,30 @@ class Engine:
         if offer is None:
             return
         for key in self.EXPLANATION_KEYS:
-            self.messages.append(render_with_facts(key, self._language, offer.facts))
+            self.messages.append(self._explanation_line(key, offer))
         self.context.explained = list(self.EXPLANATION_KEYS)
+
+    def _explanation_line(self, key: str, offer: PricedOffer) -> str:
+        """One explanation line: the published document's, or the template's.
+
+        A KFS ingested in phase 11 carries its own explanation lines - written
+        for that document, reviewed by a human and already past the Number Guard
+        - and they are preferred when present. Everything else falls back to the
+        seeded template, so an offer whose document was never ingested, or whose
+        generated line was rejected at review, still speaks.
+
+        The line is stored with `{PLACEHOLDER}`s, exactly like a seeded one, so
+        the figures still come from this journey's facts rather than from
+        whatever the model wrote.
+        """
+        document = self._kfs_document(offer)
+        stored = ((document.generated or {}).get("explain") or {}) if document else {}
+        line = (stored.get(key) or {}).get(self._language) if isinstance(stored, dict) else None
+
+        if isinstance(line, str) and line.strip():
+            return fill_question({self._language: line}, self._language, offer.facts)
+
+        return render_with_facts(key, self._language, offer.facts)
 
     def _advance_explanation(self) -> None:
         """Leave EXPLAIN_KFS for the quiz, re-explaining first if we have not yet."""

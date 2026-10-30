@@ -28,6 +28,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import (
     admin,
+    admin_kfs,
     audio,
     dashboard,
     health,
@@ -149,6 +150,7 @@ def create_app() -> FastAPI:
     app.include_router(dashboard.router, prefix=API_PREFIX)
     app.include_router(rescue.router, prefix=API_PREFIX)
     app.include_router(admin.router, prefix=API_PREFIX)
+    app.include_router(admin_kfs.router, prefix=API_PREFIX)
 
     # Deliberately *not* under /api: it is a page a person opens, and the QR
     # code printed on a receipt is shorter for it (plan section 11.6).

@@ -395,3 +395,97 @@ export interface DashboardEvent {
   name: DashboardEventName;
   data: Record<string, unknown>;
 }
+
+// --- KFS ingestion (build plan 11, phase 11) ---------------------------------
+
+export interface KfsField {
+  key: string;
+  raw: string;
+  value: number | null;
+  confidence: number | null;
+  low: boolean;
+  required: boolean;
+}
+
+export interface KfsDocumentRow {
+  documentId: string;
+  lender: string;
+  offerId: string | null;
+  version: string;
+  status: "draft" | "verified" | "active" | "retired";
+  source: string;
+  engine: string | null;
+  sha256: string;
+  verifiedBy: string | null;
+  verifiedAt: string | null;
+  createdAt: string;
+  originalFilename: string | null;
+}
+
+/** A trilingual block as the backend stores it. */
+export type Trilingual = Record<string, string>;
+
+export interface GeneratedOption {
+  id: string;
+  correct: boolean;
+  text: Trilingual;
+}
+
+export interface GeneratedQuestion {
+  factKey: string;
+  sortOrder: number;
+  prompt: Trilingual;
+  options: GeneratedOption[];
+  reexplain: Trilingual;
+  rubric: Record<string, string[]>;
+  /** "generated" by the model, or "seeded" when it was rejected or unavailable. */
+  origin: "generated" | "seeded";
+}
+
+export interface KfsProposal {
+  engine?: string;
+  questions?: GeneratedQuestion[];
+  explain?: Record<string, Trilingual>;
+  blocked?: string[];
+}
+
+export interface KfsDocumentDetail extends KfsDocumentRow {
+  fields: KfsField[];
+  missingRequired: string[];
+  sanityProblems: string[];
+  lowConfidenceThreshold: number;
+  clauseCount: number;
+  fileUrl: string;
+  generated: KfsProposal;
+  canVerify: boolean;
+  canPublish: boolean;
+  canActivate: boolean;
+}
+
+export interface KfsOfferChoice {
+  offerId: string;
+  lender: string;
+  activeVersion: string | null;
+}
+
+export interface KfsLibraryResponse {
+  documents: KfsDocumentRow[];
+  offers: KfsOfferChoice[];
+}
+
+export interface KfsPublishResponse {
+  activated: boolean;
+  engine: string;
+  questions: GeneratedQuestion[];
+  explain: Record<string, Trilingual>;
+  blocked: string[];
+  result: {
+    documentId: string;
+    offerId: string | null;
+    version: string;
+    retired: number;
+    questions: number;
+    emi: number;
+    apr: number;
+  } | null;
+}

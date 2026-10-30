@@ -188,3 +188,44 @@ One line per phase. Tick a box only when its acceptance criteria in
 - `make tts-cache` has not been re-run, so `rescue_call` may be a cache miss
   until it is. The call still works: the caption is on screen and `audioUrl`
   is nullable by design.
+
+## Phase 11 — KFS ingestion with Sarvam Document Intelligence — done (2026-10-31)
+
+**Acceptance criteria**
+
+- [x] Bank B's KFS uploaded → facts extracted → verified (with a corrected late
+      fee) → published → **a new journey quotes the new facts and asks the
+      activated questions**. Asserted end to end over HTTP in
+      `tests/test_kfs_ingestion.py::test_upload_verify_publish_then_a_journey_uses_the_new_facts`,
+      which walks a real journey to OFFERS and TEACHBACK afterwards.
+- [x] Nothing is published without verification (a draft 422s on both publish
+      calls); uploads are admin-only (403 for a customer, 401 unauthenticated),
+      PDF-only by magic bytes, and capped at 2 MB by the body middleware.
+
+**Built**
+
+- **Backend:** `kfs/schema.py` (the inline extraction schema, 15 fields with the
+  descriptions that make them extract), `kfs/docai.py` (submit → poll →
+  results, with per-field confidence), `kfs/offline.py` (`pdfplumber`
+  fallback), `kfs/parse.py` (string → number, or `None`), `kfs/clauses.py`
+  (terms imported so phase 8's KFS Q&A works on a new document),
+  `kfs/questions.py` (trilingual generation, guarded), `kfs/ingest.py`
+  (upload/verify/propose/activate), `api/admin_kfs.py` (six routes), migration
+  `0005_kfs_ingestion`.
+- **Website:** the KFS library rebuilt — upload, the document table, extracted
+  fields with confidence beside a PDF preview, per-field correction inputs,
+  Verify, then Generate and Activate with the proposal shown for review.
+- **Engine:** `_explanation_line` prefers a published document's generated
+  lines and falls back to the seeded template.
+
+**Verified live against the real APIs** (once each, to keep credits):
+Document Intelligence read all 15 fields of Bank B's KFS; `sarvam-105b`
+generated all three questions and the three explanation lines in mr/hi/en with
+nothing blocked by the guard.
+
+**Carried forward**
+
+- The generated `explain_3` was weaker than the seeded line (it mentioned a
+  penalty without the foreclosure charge). The review step exists for exactly
+  this; the seeded lines remain the default for the seeded documents.
+- `ruff format --check` still fails on three files untouched since `615f080`.
