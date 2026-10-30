@@ -1,0 +1,108 @@
+{
+  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "version": 3,
+  "step": "CONSENT_DATA",
+  "status": "active",
+  "progress": {
+    "index": 1,
+    "total": 6,
+    "label": "माहिती",
+    "etaSeconds": 95
+  },
+  "language": "mr-IN",
+  "messages": [
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:2:a0",
+      "role": "assistant",
+      "text": "तुमची माहिती आपोआप भरण्यासाठी DigiLocker आणि तुमच्या बँकेकडून माहिती घेऊ का? नाही म्हटलं तरी चालेल.",
+      "audioUrl": null
+    }
+  ],
+  "card": {
+    "type": "consent",
+    "data": {
+      "purposes": [
+        {
+          "id": "fetch_digilocker",
+          "title": "DigiLocker मधून ओळखपत्रं",
+          "detail": "आधार, PAN आणि पत्ता — टाइप करायची गरज नाही",
+          "granted": false
+        },
+        {
+          "id": "fetch_account_aggregator",
+          "title": "बँकेची माहिती",
+          "detail": "६ महिन्यांचं स्टेटमेंट, तुमची मिळकत तपासण्यासाठी",
+          "granted": false
+        }
+      ],
+      "why": "ही माहिती फक्त हा अर्ज भरण्यासाठी वापरली जाईल. नाही म्हटलं तरी कर्ज मिळू शकतं."
+    }
+  },
+  "quickReplies": [
+    {
+      "label": "हो",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "consents",
+          "grants": {
+            "fetch_digilocker": true,
+            "fetch_account_aggregator": true
+          }
+        }
+      }
+    },
+    {
+      "label": "नको",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "consents",
+          "grants": {
+            "fetch_digilocker": false,
+            "fetch_account_aggregator": false
+          }
+        }
+      }
+    },
+    {
+      "label": "पुन्हा सांगा",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "repeat"
+        }
+      }
+    },
+    {
+      "label": "समजलं नाही",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "didnt_understand"
+        }
+      }
+    },
+    {
+      "label": "माणसाशी बोलायचं",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "request_human"
+        }
+      }
+    }
+  ],
+  "transcript": null,
+  "detectedLanguage": null,
+  "locks": {
+    "acceptEnabled": false,
+    "reason": "आधी तीन छोटे प्रश्न पूर्ण करू, मग सहमतीचं बटण सुरू होईल."
+  },
+  "demoMode": false
+}

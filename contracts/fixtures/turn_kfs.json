@@ -1,0 +1,117 @@
+{
+  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "version": 7,
+  "step": "EXPLAIN_KFS",
+  "status": "active",
+  "progress": {
+    "index": 3,
+    "total": 6,
+    "label": "समजून घ्या",
+    "etaSeconds": 45
+  },
+  "language": "mr-IN",
+  "messages": [
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:7:a0",
+      "role": "assistant",
+      "text": "तुमचा EMI दर महिन्याला ₹4,600, 12 महिने. एकूण परतफेड ₹55,200.",
+      "audioUrl": null
+    },
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:7:a1",
+      "role": "assistant",
+      "text": "EMI उशिरा भरला तर ₹500 दंड लागेल आणि CIBIL स्कोर कमी होऊ शकतो. विमा ऐच्छिक आहे, तुम्ही नाही म्हणू शकता.",
+      "audioUrl": null
+    },
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:7:a2",
+      "role": "assistant",
+      "text": "मुदतीआधी कर्ज बंद केलं तर बाकी रकमेवर 4% शुल्क लागेल. विचार बदलला तर 3 दिवसांत दंडाशिवाय कर्ज बंद करता येईल.",
+      "audioUrl": null
+    }
+  ],
+  "card": {
+    "type": "kfs",
+    "data": {
+      "offerId": "offer_a",
+      "lender": "Partner NBFC A",
+      "version": "v3.2",
+      "lines": [
+        {
+          "key": "emi",
+          "text": "दर महिन्याला ₹4,600, 12 महिने.",
+          "redFlag": false
+        },
+        {
+          "key": "total_repay",
+          "text": "एकूण परतफेड ₹55,200 (व्याज ₹5,200).",
+          "redFlag": false
+        },
+        {
+          "key": "late_fee",
+          "text": "EMI उशिरा भरला तर ₹500 दंड आणि CIBIL स्कोर कमी होऊ शकतो.",
+          "redFlag": true
+        },
+        {
+          "key": "foreclosure_pct",
+          "text": "मुदतीआधी बंद केलं तर बाकी रकमेवर 4% शुल्क.",
+          "redFlag": true
+        },
+        {
+          "key": "insurance_optional",
+          "text": "विमा ऐच्छिक आहे (₹750). नाही म्हणता येतं.",
+          "redFlag": false
+        }
+      ],
+      "pdfUrl": "/api/kfs/15b9b7e4-7c3a-4a84-ae83-8cc6de1d8cee/file",
+      "sample": true
+    }
+  },
+  "quickReplies": [
+    {
+      "label": "समजलं, पुढे",
+      "send": {
+        "type": "text",
+        "text": "हो",
+        "action": null
+      }
+    },
+    {
+      "label": "पुन्हा सांगा",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "repeat"
+        }
+      }
+    },
+    {
+      "label": "समजलं नाही",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "didnt_understand"
+        }
+      }
+    },
+    {
+      "label": "माणसाशी बोलायचं",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "request_human"
+        }
+      }
+    }
+  ],
+  "transcript": null,
+  "detectedLanguage": null,
+  "locks": {
+    "acceptEnabled": false,
+    "reason": "आधी तीन छोटे प्रश्न पूर्ण करू, मग सहमतीचं बटण सुरू होईल."
+  },
+  "demoMode": false
+}

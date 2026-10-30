@@ -1,0 +1,72 @@
+{
+  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "version": 2,
+  "step": "ASK_NEED",
+  "status": "active",
+  "progress": {
+    "index": 0,
+    "total": 6,
+    "label": "बोलो",
+    "etaSeconds": 110
+  },
+  "language": "mr-IN",
+  "messages": [
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:1:a0",
+      "role": "assistant",
+      "text": "नमस्कार! मी स्पष्ट. तुम्हाला किती रकमेचं आणि कशासाठी कर्ज हवं आहे?",
+      "audioUrl": null
+    }
+  ],
+  "card": {
+    "type": "amount",
+    "data": {
+      "chips": [
+        25000,
+        50000,
+        100000
+      ],
+      "min": 10000,
+      "max": 200000
+    }
+  },
+  "quickReplies": [
+    {
+      "label": "पुन्हा सांगा",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "repeat"
+        }
+      }
+    },
+    {
+      "label": "समजलं नाही",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "didnt_understand"
+        }
+      }
+    },
+    {
+      "label": "माणसाशी बोलायचं",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "request_human"
+        }
+      }
+    }
+  ],
+  "transcript": null,
+  "detectedLanguage": null,
+  "locks": {
+    "acceptEnabled": false,
+    "reason": "आधी तीन छोटे प्रश्न पूर्ण करू, मग सहमतीचं बटण सुरू होईल."
+  },
+  "demoMode": false
+}

@@ -1,0 +1,182 @@
+{
+  "_comment": "Teach-back question bank, verbatim from build plan 7.3. Placeholders like {LATE_FEE} are filled from the selected offer's KFS facts by journey/teachback.py - no number is ever written into this file, which is what lets one row serve every offer and keeps the Number Guard honest. A native Marathi/Hindi speaker should review the wording before the event.",
+  "questions": [
+    {
+      "id": "q_late_fee",
+      "kfs_fact_key": "late_fee",
+      "sort_order": 1,
+      "prompt": {
+        "mr-IN": "EMI उशिरा भरला तर काय होईल?",
+        "hi-IN": "अगर EMI देर से भरी, तो क्या होगा?",
+        "en-IN": "If you pay an EMI late, what happens?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "correct": true,
+          "text": {
+            "mr-IN": "₹{LATE_FEE} लेट फी लागेल आणि CIBIL स्कोर कमी होऊ शकतो",
+            "hi-IN": "₹{LATE_FEE} लेट फीस लगेगी और CIBIL स्कोर गिर सकता है",
+            "en-IN": "A ₹{LATE_FEE} late fee, and my CIBIL score can drop"
+          }
+        },
+        {
+          "id": "b",
+          "correct": false,
+          "text": {
+            "mr-IN": "काही होणार नाही",
+            "hi-IN": "कुछ नहीं होगा",
+            "en-IN": "Nothing happens"
+          }
+        },
+        {
+          "id": "c",
+          "correct": false,
+          "text": {
+            "mr-IN": "कर्ज रद्द होईल",
+            "hi-IN": "लोन रद्द हो जाएगा",
+            "en-IN": "The loan gets cancelled"
+          }
+        }
+      ],
+      "reexplain": {
+        "mr-IN": "समजा, तुम्ही EMI ठरलेल्या तारखेनंतर भरला, तर ₹{LATE_FEE} दंड लागेल आणि तुमचा CIBIL स्कोर खाली जाईल. पुढे कर्ज मिळायला अडचण येऊ शकते.",
+        "hi-IN": "मान लीजिए आपने EMI तय तारीख के बाद भरी, तो ₹{LATE_FEE} जुर्माना लगेगा और आपका CIBIL स्कोर गिरेगा। आगे लोन मिलने में मुश्किल हो सकती है।",
+        "en-IN": "Say you pay the EMI after the due date. You pay a ₹{LATE_FEE} fine and your CIBIL score falls, which makes future loans harder."
+      },
+      "rubric": {
+        "mr-IN": ["लेट फी", "दंड", "CIBIL", "सिबिल", "स्कोर", "कमी"],
+        "hi-IN": ["लेट फीस", "जुर्माना", "CIBIL", "सिबिल", "स्कोर", "गिर"],
+        "en-IN": ["late fee", "fine", "penalty", "CIBIL", "credit score", "drop"]
+      }
+    },
+    {
+      "id": "q_total_repay",
+      "kfs_fact_key": "total_repay",
+      "sort_order": 2,
+      "prompt": {
+        "mr-IN": "{TENURE} महिन्यांत एकूण किती पैसे परत करावे लागतील?",
+        "hi-IN": "{TENURE} महीनों में कुल कितना चुकाना होगा?",
+        "en-IN": "In total, how much will you repay over {TENURE} months?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "correct": true,
+          "text": { "mr-IN": "₹{TOTAL_REPAY}", "hi-IN": "₹{TOTAL_REPAY}", "en-IN": "₹{TOTAL_REPAY}" }
+        },
+        {
+          "id": "b",
+          "correct": false,
+          "text": { "mr-IN": "₹{PRINCIPAL}", "hi-IN": "₹{PRINCIPAL}", "en-IN": "₹{PRINCIPAL}" }
+        },
+        {
+          "id": "c",
+          "correct": false,
+          "text": { "mr-IN": "₹{EMI}", "hi-IN": "₹{EMI}", "en-IN": "₹{EMI}" }
+        }
+      ],
+      "reexplain": {
+        "mr-IN": "दर महिन्याला ₹{EMI}, असे {TENURE} महिने, म्हणजे एकूण ₹{TOTAL_REPAY}. यात ₹{TOTAL_INTEREST} व्याज आहे.",
+        "hi-IN": "हर महीने ₹{EMI}, ऐसे {TENURE} महीने, यानी कुल ₹{TOTAL_REPAY}। इसमें ₹{TOTAL_INTEREST} ब्याज है।",
+        "en-IN": "₹{EMI} every month for {TENURE} months makes ₹{TOTAL_REPAY} in total. That includes ₹{TOTAL_INTEREST} of interest."
+      },
+      "rubric": {
+        "mr-IN": ["{TOTAL_REPAY}", "एकूण", "परत"],
+        "hi-IN": ["{TOTAL_REPAY}", "कुल", "चुकाना"],
+        "en-IN": ["{TOTAL_REPAY}", "total", "repay"]
+      }
+    },
+    {
+      "id": "q_insurance_optional",
+      "kfs_fact_key": "insurance_optional",
+      "sort_order": 3,
+      "prompt": {
+        "mr-IN": "कर्जासोबत विमा घेणे बंधनकारक आहे का?",
+        "hi-IN": "क्या लोन के साथ बीमा लेना ज़रूरी है?",
+        "en-IN": "Is the insurance with this loan compulsory?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "correct": true,
+          "text": {
+            "mr-IN": "नाही, विमा ऐच्छिक आहे. नाही म्हणता येतं",
+            "hi-IN": "नहीं, यह ज़रूरी नहीं है, मना कर सकते हैं",
+            "en-IN": "No, it is optional. I can say no"
+          }
+        },
+        {
+          "id": "b",
+          "correct": false,
+          "text": {
+            "mr-IN": "हो, बंधनकारक आहे",
+            "hi-IN": "हाँ, ज़रूरी है",
+            "en-IN": "Yes, it is compulsory"
+          }
+        }
+      ],
+      "reexplain": {
+        "mr-IN": "विमा घ्यायचा की नाही हे पूर्णपणे तुमच्या हातात आहे. विमा न घेताही तुमचं कर्ज मंजूर होऊ शकतं.",
+        "hi-IN": "बीमा लेना या न लेना पूरी तरह आपकी मर्ज़ी है। बीमा न लेने पर भी आपका लोन मंज़ूर हो सकता है।",
+        "en-IN": "Taking insurance is completely your choice. Your loan can be approved even if you say no."
+      },
+      "rubric": {
+        "mr-IN": ["ऐच्छिक", "नाही", "मर्जी", "बंधनकारक नाही"],
+        "hi-IN": ["ज़रूरी नहीं", "वैकल्पिक", "मर्ज़ी", "मना"],
+        "en-IN": ["optional", "not compulsory", "my choice", "can say no"]
+      }
+    },
+    {
+      "_comment": "Spare. Seeded and active=false: the engine asks the first three by sort_order, and this one exists so a question that tests badly can be swapped without a migration.",
+      "id": "q_cooling_off",
+      "kfs_fact_key": "cooling_off_days",
+      "sort_order": 4,
+      "active": false,
+      "prompt": {
+        "mr-IN": "{COOLING_OFF_DAYS} दिवसांत तुमचा विचार बदलला, तर काय करू शकता?",
+        "hi-IN": "अगर {COOLING_OFF_DAYS} दिन के अंदर मन बदल जाए, तो क्या कर सकते हैं?",
+        "en-IN": "If you change your mind within {COOLING_OFF_DAYS} days, what can you do?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "correct": true,
+          "text": {
+            "mr-IN": "मुद्दल आणि तेवढ्या दिवसांचं व्याज परत करून दंडाशिवाय कर्ज बंद करू शकता",
+            "hi-IN": "मूल रकम और उतने दिनों का ब्याज लौटाकर बिना जुर्माने के लोन बंद कर सकते हैं",
+            "en-IN": "Repay the principal plus interest for those days and exit with no penalty"
+          }
+        },
+        {
+          "id": "b",
+          "correct": false,
+          "text": {
+            "mr-IN": "काहीच करू शकत नाही",
+            "hi-IN": "कुछ नहीं कर सकते",
+            "en-IN": "Nothing"
+          }
+        },
+        {
+          "id": "c",
+          "correct": false,
+          "text": {
+            "mr-IN": "मोठा दंड भरावा लागेल",
+            "hi-IN": "भारी जुर्माना देना होगा",
+            "en-IN": "Pay a big penalty"
+          }
+        }
+      ],
+      "reexplain": {
+        "mr-IN": "पहिल्या {COOLING_OFF_DAYS} दिवसांत तुम्ही मुद्दल आणि तेवढ्या दिवसांचं व्याज परत केलं, तर कोणताही दंड न भरता कर्ज बंद करता येतं.",
+        "hi-IN": "पहले {COOLING_OFF_DAYS} दिनों में आप मूल रकम और उतने दिनों का ब्याज लौटा दें, तो बिना कोई जुर्माना भरे लोन बंद कर सकते हैं।",
+        "en-IN": "In the first {COOLING_OFF_DAYS} days you can repay the principal plus interest for those days and close the loan with no penalty at all."
+      },
+      "rubric": {
+        "mr-IN": ["दंडाशिवाय", "बंद", "व्याज", "मुद्दल"],
+        "hi-IN": ["बिना जुर्माने", "बंद", "ब्याज", "मूल"],
+        "en-IN": ["no penalty", "exit", "principal", "interest"]
+      }
+    }
+  ]
+}

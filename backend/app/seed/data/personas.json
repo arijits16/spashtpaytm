@@ -1,0 +1,175 @@
+{
+  "_comment": "Synthetic personas (build plan 7.1). Every identifier here is invented but format-correct, so the UI can show a realistic masked value without holding a real one. Never copy details from docs/reference/ screenshots.",
+  "personas": [
+    {
+      "id": "sunita",
+      "full_name": "Sunita Jadhav",
+      "display_name_masked": "Sunita J.",
+      "name_local": { "mr": "सुनीता", "hi": "सुनीता", "honorific": { "mr": "ताई", "hi": "जी" } },
+      "gender": "female",
+      "age": 34,
+      "dob": "1992-04-18",
+      "city": "Mumbai",
+      "locality": "Ghatkopar West, Mumbai 400086",
+      "occupation": "Tailor",
+      "business_name": "Jadhav Tailors",
+      "language": "mr-IN",
+      "mobile_masked": "+91 98•••••210",
+      "consent_callbacks": true,
+      "dnd": false,
+      "digilocker": [
+        {
+          "doc_type": "aadhaar",
+          "issuer": "UIDAI (sample)",
+          "data": {
+            "number_masked": "XXXX XXXX 4821",
+            "name": "Sunita Jadhav",
+            "dob": "1992-04-18",
+            "gender": "F",
+            "address": "Ghatkopar West, Mumbai 400086"
+          }
+        },
+        {
+          "doc_type": "pan",
+          "issuer": "Income Tax Department (sample)",
+          "data": { "number_masked": "ABCPJ1234F", "name": "Sunita Jadhav" }
+        },
+        {
+          "doc_type": "address_proof",
+          "issuer": "Maharashtra State Electricity Board (sample)",
+          "data": {
+            "address": "Shop 14, Nehru Road, Ghatkopar West, Mumbai 400086",
+            "issued": "2026-08-01"
+          }
+        }
+      ],
+      "ckyc": {
+        "ckyc_number_masked": "XXXXXXXXXX1234",
+        "kyc_status": "verified",
+        "last_updated": "2026-06-12",
+        "data": { "registry": "CERSAI (sample)", "risk_category": "low" }
+      },
+      "aa": {
+        "fip_name": "Demo Bank",
+        "account_masked": "XXXXXX1234",
+        "existing_emi": 0,
+        "months": [
+          { "month": "2026-04-01", "credits": 27500, "debits": 21400, "avg_balance": 9800, "bounces": 0 },
+          { "month": "2026-05-01", "credits": 29800, "debits": 22900, "avg_balance": 11200, "bounces": 0 },
+          { "month": "2026-06-01", "credits": 26400, "debits": 20100, "avg_balance": 8700, "bounces": 0 },
+          { "month": "2026-07-01", "credits": 31200, "debits": 24600, "avg_balance": 12400, "bounces": 0 },
+          { "month": "2026-08-01", "credits": 27600, "debits": 21800, "avg_balance": 9600, "bounces": 0 },
+          { "month": "2026-09-01", "credits": 27900, "debits": 22200, "avg_balance": 10100, "bounces": 0 }
+        ]
+      }
+    },
+    {
+      "id": "ramesh",
+      "full_name": "Ramesh Yadav",
+      "display_name_masked": "Ramesh Y.",
+      "name_local": { "mr": "रमेश", "hi": "रमेश", "honorific": { "mr": "दादा", "hi": "जी" } },
+      "gender": "male",
+      "age": 42,
+      "dob": "1984-02-09",
+      "city": "Mumbai",
+      "locality": "Kurla, Mumbai 400070",
+      "occupation": "Auto-rickshaw driver",
+      "business_name": null,
+      "language": "hi-IN",
+      "mobile_masked": "+91 99•••••347",
+      "consent_callbacks": true,
+      "dnd": false,
+      "digilocker": [
+        {
+          "doc_type": "aadhaar",
+          "issuer": "UIDAI (sample)",
+          "data": {
+            "number_masked": "XXXX XXXX 7310",
+            "name": "Ramesh Yadav",
+            "dob": "1984-02-09",
+            "gender": "M",
+            "address": "Kurla, Mumbai 400070"
+          }
+        },
+        {
+          "doc_type": "pan",
+          "issuer": "Income Tax Department (sample)",
+          "data": { "number_masked": "ABCPY5678K", "name": "Ramesh Yadav" }
+        }
+      ],
+      "ckyc": {
+        "ckyc_number_masked": "XXXXXXXXXX5566",
+        "kyc_status": "verified",
+        "last_updated": "2026-05-02",
+        "data": { "registry": "CERSAI (sample)", "risk_category": "low" }
+      },
+      "aa": {
+        "fip_name": "Demo Bank",
+        "account_masked": "XXXXXX5566",
+        "existing_emi": 3000,
+        "months": [
+          { "month": "2026-04-01", "credits": 21800, "debits": 19200, "avg_balance": 4200, "bounces": 0 },
+          { "month": "2026-05-01", "credits": 22400, "debits": 20100, "avg_balance": 3900, "bounces": 1 },
+          { "month": "2026-06-01", "credits": 21200, "debits": 18800, "avg_balance": 4600, "bounces": 0 },
+          { "month": "2026-07-01", "credits": 22600, "debits": 20400, "avg_balance": 4100, "bounces": 0 },
+          { "month": "2026-08-01", "credits": 21900, "debits": 19600, "avg_balance": 4400, "bounces": 0 },
+          { "month": "2026-09-01", "credits": 22100, "debits": 19900, "avg_balance": 4300, "bounces": 0 }
+        ]
+      }
+    },
+    {
+      "id": "priya",
+      "full_name": "Priya Nair",
+      "display_name_masked": "Priya N.",
+      "name_local": { "mr": "प्रिया", "hi": "प्रिया", "honorific": { "mr": "ताई", "hi": "जी" } },
+      "gender": "female",
+      "age": 28,
+      "dob": "1998-11-23",
+      "city": "Thane",
+      "locality": "Ghodbunder Road, Thane 400607",
+      "occupation": "BPO executive",
+      "business_name": null,
+      "language": "en-IN",
+      "mobile_masked": "+91 97•••••882",
+      "consent_callbacks": true,
+      "dnd": false,
+      "digilocker": [
+        {
+          "doc_type": "aadhaar",
+          "issuer": "UIDAI (sample)",
+          "data": {
+            "number_masked": "XXXX XXXX 9045",
+            "name": "Priya Nair",
+            "dob": "1998-11-23",
+            "gender": "F",
+            "address": "Ghodbunder Road, Thane 400607"
+          }
+        },
+        {
+          "doc_type": "pan",
+          "issuer": "Income Tax Department (sample)",
+          "data": { "number_masked": "ABCPN9012M", "name": "Priya Nair" }
+        }
+      ],
+      "ckyc": {
+        "ckyc_number_masked": "XXXXXXXXXX7788",
+        "kyc_status": "verified",
+        "last_updated": "2026-09-19",
+        "data": { "registry": "CERSAI (sample)", "risk_category": "low" }
+      },
+      "aa": {
+        "fip_name": "Demo Bank",
+        "account_masked": "XXXXXX7788",
+        "existing_emi": 0,
+        "months": [
+          { "month": "2026-04-01", "credits": 37400, "debits": 28100, "avg_balance": 24600, "bounces": 0 },
+          { "month": "2026-05-01", "credits": 38600, "debits": 29400, "avg_balance": 26200, "bounces": 0 },
+          { "month": "2026-06-01", "credits": 37900, "debits": 27800, "avg_balance": 25400, "bounces": 0 },
+          { "month": "2026-07-01", "credits": 38200, "debits": 30100, "avg_balance": 23900, "bounces": 0 },
+          { "month": "2026-08-01", "credits": 38800, "debits": 28600, "avg_balance": 27100, "bounces": 0 },
+          { "month": "2026-09-01", "credits": 37100, "debits": 27300, "avg_balance": 25800, "bounces": 0 }
+        ]
+      }
+    }
+  ]
+}

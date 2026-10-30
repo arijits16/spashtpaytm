@@ -1,0 +1,97 @@
+{
+  "journeyId": "b05f123e-b8ff-41d4-aae0-1d1191c4f1ff",
+  "version": 4,
+  "step": "MANUAL_FORM",
+  "status": "active",
+  "progress": {
+    "index": 1,
+    "total": 6,
+    "label": "माहिती",
+    "etaSeconds": 110
+  },
+  "language": "mr-IN",
+  "messages": [
+    {
+      "id": "b05f123e-b8ff-41d4-aae0-1d1191c4f1ff:3:a0",
+      "role": "assistant",
+      "text": "ठीक आहे, काही हरकत नाही. मग थोडी माहिती तुम्हीच भरा.",
+      "audioUrl": null
+    }
+  ],
+  "card": {
+    "type": "manual_form",
+    "data": {
+      "fields": [
+        {
+          "id": "fullName",
+          "label": "पूर्ण नाव",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "id": "dob",
+          "label": "जन्मतारीख",
+          "kind": "date",
+          "required": true
+        },
+        {
+          "id": "monthlyIncome",
+          "label": "महिन्याची मिळकत (₹)",
+          "kind": "number",
+          "required": true
+        },
+        {
+          "id": "shopAddress",
+          "label": "दुकानाचा पत्ता",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "id": "mobile",
+          "label": "मोबाईल नंबर",
+          "kind": "phone",
+          "required": true
+        }
+      ]
+    }
+  },
+  "quickReplies": [
+    {
+      "label": "पुन्हा सांगा",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "repeat"
+        }
+      }
+    },
+    {
+      "label": "समजलं नाही",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "didnt_understand"
+        }
+      }
+    },
+    {
+      "label": "माणसाशी बोलायचं",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "request_human"
+        }
+      }
+    }
+  ],
+  "transcript": null,
+  "detectedLanguage": null,
+  "locks": {
+    "acceptEnabled": false,
+    "reason": "आधी तीन छोटे प्रश्न पूर्ण करू, मग सहमतीचं बटण सुरू होईल."
+  },
+  "demoMode": false
+}

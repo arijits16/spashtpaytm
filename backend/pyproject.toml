@@ -19,6 +19,12 @@ dependencies = [
   # path for machines with no service-account credentials (plan section 13).
   "firebase-admin==7.7.0",
   "google-auth==2.62.0",
+  # Trust layer (phase 6): Ed25519 receipt signatures and AES-256-GCM transcripts.
+  "pynacl==1.6.0",
+  "cryptography==46.0.3",
+  # Sample KFS PDFs (phase 2) and the offline text fallback (phase 11).
+  "reportlab==4.4.4",
+  "pdfplumber==0.11.7",
 ]
 
 [project.optional-dependencies]
@@ -57,6 +63,13 @@ select = [
 ]
 ignore = [
   "E501",  # line length is handled by the formatter
+  # RUF001-003 flag Devanagari characters as "ambiguous" lookalikes for Latin
+  # ones. This product is written in Marathi and Hindi: the whole point is that
+  # the customer-facing strings, the lexicons and the comments explaining them
+  # are in Devanagari, so the rule fires on correct code throughout.
+  "RUF001",
+  "RUF002",
+  "RUF003",
 ]
 
 [tool.ruff.lint.per-file-ignores]

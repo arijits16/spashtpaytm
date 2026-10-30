@@ -29,6 +29,8 @@ backend/secrets/
 # iOS: local config and the Firebase app config (build plan 13.3)
 ios/Config/Secrets.xcconfig
 ios/SpashtPaytm/Config/GoogleService-Info.plist
+# Defence in depth: a stray download anywhere in the tree is never committed.
+GoogleService-Info*.plist
 
 # --- ios build output ---
 # project.yml is the source of truth; the .xcodeproj IS committed (with

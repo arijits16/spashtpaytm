@@ -8,9 +8,9 @@
     "db-up": "docker compose -f infra/docker-compose.yml up -d",
     "db-down": "docker compose -f infra/docker-compose.yml down",
     "migrate": "node scripts/run.mjs backend alembic upgrade head",
-    "seed": "echo \"seed lands in phase 2\"",
+    "seed": "make seed",
     "keys": "node scripts/run.mjs backend python scripts/gen_keys.py",
-    "demo-reset": "echo \"demo-reset lands in phase 2\"",
+    "demo-reset": "make demo-reset",
     "dev": "npm run db-up && concurrently --kill-others --names \"api,web\" --prefix-colors \"blue,magenta\" \"npm:dev-api\" \"npm:dev-web\"",
     "dev-api": "node scripts/run.mjs backend uvicorn app.main:app --reload --host 127.0.0.1 --port 8000 --no-server-header --proxy-headers --forwarded-allow-ips 127.0.0.1",
     "dev-web": "npm --prefix frontend run dev",
@@ -29,7 +29,8 @@
     "ios-test": "make ios-test",
     "ios-run": "make ios-run",
     "ios-config": "make ios-config",
-    "ios-icon": "make ios-icon"
+    "ios-icon": "make ios-icon",
+    "kfs-pdfs": "make kfs-pdfs"
   },
   "devDependencies": {
     "concurrently": "9.2.5"

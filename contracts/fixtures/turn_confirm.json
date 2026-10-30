@@ -1,0 +1,94 @@
+{
+  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "version": 5,
+  "step": "CONFIRM_DETAILS",
+  "status": "active",
+  "progress": {
+    "index": 1,
+    "total": 6,
+    "label": "माहिती",
+    "etaSeconds": 70
+  },
+  "language": "mr-IN",
+  "messages": [
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:5:u",
+      "role": "user",
+      "text": "हो",
+      "audioUrl": null
+    },
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:5:a0",
+      "role": "assistant",
+      "text": "तुमची माहिती भरली आहे. फक्त दुकानाचा पत्ता आणि मोबाईल नंबर कन्फर्म करा.",
+      "audioUrl": null
+    }
+  ],
+  "card": {
+    "type": "confirm",
+    "data": {
+      "fields": [
+        {
+          "id": "shopAddress",
+          "label": "दुकानाचा पत्ता",
+          "value": "Shop 14, Nehru Road, Ghatkopar West, Mumbai 400086"
+        },
+        {
+          "id": "mobile",
+          "label": "मोबाईल नंबर",
+          "value": "+91 98•••••210"
+        }
+      ]
+    }
+  },
+  "quickReplies": [
+    {
+      "label": "हो",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "confirm_details",
+          "edits": null
+        }
+      }
+    },
+    {
+      "label": "पुन्हा सांगा",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "repeat"
+        }
+      }
+    },
+    {
+      "label": "समजलं नाही",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "didnt_understand"
+        }
+      }
+    },
+    {
+      "label": "माणसाशी बोलायचं",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "request_human"
+        }
+      }
+    }
+  ],
+  "transcript": null,
+  "detectedLanguage": null,
+  "locks": {
+    "acceptEnabled": false,
+    "reason": "आधी तीन छोटे प्रश्न पूर्ण करू, मग सहमतीचं बटण सुरू होईल."
+  },
+  "demoMode": false
+}

@@ -1,0 +1,92 @@
+{
+  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "version": 8,
+  "step": "TEACHBACK",
+  "status": "active",
+  "progress": {
+    "index": 3,
+    "total": 6,
+    "label": "समजून घ्या",
+    "etaSeconds": 35
+  },
+  "language": "mr-IN",
+  "messages": [
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:8:u",
+      "role": "user",
+      "text": "हो",
+      "audioUrl": null
+    },
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:8:a0",
+      "role": "assistant",
+      "text": "आता ३ छोटे प्रश्न, तुम्हाला सगळं नीट समजलं का हे बघण्यासाठी.",
+      "audioUrl": null
+    }
+  ],
+  "card": {
+    "type": "quiz",
+    "data": {
+      "questionId": "q_late_fee",
+      "index": 1,
+      "total": 3,
+      "prompt": "EMI उशिरा भरला तर काय होईल?",
+      "options": [
+        {
+          "id": "a",
+          "text": "₹500 लेट फी लागेल आणि CIBIL स्कोर कमी होऊ शकतो"
+        },
+        {
+          "id": "b",
+          "text": "काही होणार नाही"
+        },
+        {
+          "id": "c",
+          "text": "कर्ज रद्द होईल"
+        }
+      ],
+      "attempt": 1,
+      "maxAttempts": 3,
+      "result": null
+    }
+  },
+  "quickReplies": [
+    {
+      "label": "पुन्हा सांगा",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "repeat"
+        }
+      }
+    },
+    {
+      "label": "समजलं नाही",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "didnt_understand"
+        }
+      }
+    },
+    {
+      "label": "माणसाशी बोलायचं",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "request_human"
+        }
+      }
+    }
+  ],
+  "transcript": null,
+  "detectedLanguage": null,
+  "locks": {
+    "acceptEnabled": false,
+    "reason": "आधी तीन छोटे प्रश्न पूर्ण करू, मग सहमतीचं बटण सुरू होईल."
+  },
+  "demoMode": false
+}

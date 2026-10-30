@@ -23,7 +23,7 @@ from app.auth.users import upsert_user
 from app.config import Settings, get_settings
 from app.db.models.user import User
 from app.db.session import get_db
-from app.errors import forbidden, unauthorized
+from app.errors import ApiError, forbidden, unauthorized
 from app.security.demo_auth import DemoAuthError, demo_token, verify_demo_key
 from app.security.ratelimit import client_identity, limiter
 
@@ -116,3 +116,40 @@ def current_admin(user: CurrentUser) -> User:
 
 
 CurrentAdmin = Annotated[User, Depends(current_admin)]
+
+
+def maybe_current_user(
+    request: Request,
+    db: DbDep,
+    settings: SettingsDep,
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)] = None,
+    x_demo_user: Annotated[str | None, Header()] = None,
+    x_demo_key: Annotated[str | None, Header()] = None,
+) -> User | None:
+    """Resolve the user if credentials were sent, otherwise None.
+
+    For routes that serve everyone but show more to the person it concerns - the
+    public receipt page and `GET /receipts/{no}` (section 11.3). A *failed*
+    credential still returns None rather than raising, because the route's job
+    is to answer the anonymous question regardless; what it must never do is
+    show the payload to a caller whose token did not verify, and returning None
+    is exactly that.
+    """
+    if credentials is None and not x_demo_user:
+        return None
+    try:
+        return current_user(
+            request,
+            db,
+            settings,
+            credentials=credentials,
+            x_demo_user=x_demo_user,
+            x_demo_key=x_demo_key,
+        )
+    except ApiError:
+        log.info("optional auth failed; continuing anonymously")
+        return None
+
+
+optional_user = Depends(maybe_current_user)
+OptionalUser = Annotated[User | None, optional_user]

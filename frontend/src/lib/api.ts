@@ -142,6 +142,8 @@ export interface Persona {
   displayNameMasked: string | null;
   language: Lang | null;
   city: string | null;
+  occupation: string | null;
+  mobileMasked: string | null;
 }
 
 /**

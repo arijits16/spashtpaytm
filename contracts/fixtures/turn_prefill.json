@@ -1,0 +1,115 @@
+{
+  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "version": 4,
+  "step": "PREFILL",
+  "status": "active",
+  "progress": {
+    "index": 1,
+    "total": 6,
+    "label": "माहिती",
+    "etaSeconds": 80
+  },
+  "language": "mr-IN",
+  "messages": [
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:4:a0",
+      "role": "assistant",
+      "text": "तुमची माहिती भरली आहे. फक्त दुकानाचा पत्ता आणि मोबाईल नंबर कन्फर्म करा.",
+      "audioUrl": null
+    }
+  ],
+  "card": {
+    "type": "prefill",
+    "data": {
+      "rows": [
+        {
+          "label": "Aadhaar",
+          "value": "XXXX XXXX 4821",
+          "source": "DigiLocker"
+        },
+        {
+          "label": "Name",
+          "value": "Sunita Jadhav",
+          "source": "DigiLocker"
+        },
+        {
+          "label": "PAN",
+          "value": "ABCPJ1234F",
+          "source": "DigiLocker"
+        },
+        {
+          "label": "Address",
+          "value": "Shop 14, Nehru Road, Ghatkopar West, Mumbai 400086",
+          "source": "DigiLocker"
+        },
+        {
+          "label": "KYC status",
+          "value": "Verified",
+          "source": "CKYC"
+        },
+        {
+          "label": "Average monthly income",
+          "value": "₹28,400",
+          "source": "Account Aggregator"
+        },
+        {
+          "label": "Mobile",
+          "value": "+91 98•••••210",
+          "source": "UPI AutoPay"
+        },
+        {
+          "label": "Repayment account",
+          "value": "Demo Bank · XXXXXX1234",
+          "source": "UPI AutoPay"
+        }
+      ]
+    }
+  },
+  "quickReplies": [
+    {
+      "label": "बरोबर आहे",
+      "send": {
+        "type": "text",
+        "text": "हो",
+        "action": null
+      }
+    },
+    {
+      "label": "पुन्हा सांगा",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "repeat"
+        }
+      }
+    },
+    {
+      "label": "समजलं नाही",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "didnt_understand"
+        }
+      }
+    },
+    {
+      "label": "माणसाशी बोलायचं",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "request_human"
+        }
+      }
+    }
+  ],
+  "transcript": null,
+  "detectedLanguage": null,
+  "locks": {
+    "acceptEnabled": false,
+    "reason": "आधी तीन छोटे प्रश्न पूर्ण करू, मग सहमतीचं बटण सुरू होईल."
+  },
+  "demoMode": false
+}

@@ -8,8 +8,10 @@
   "session": "firebase",
   "persona": {
     "id": "sunita",
-    "displayNameMasked": null,
-    "language": null,
-    "city": null
+    "displayNameMasked": "Sunita J.",
+    "language": "mr-IN",
+    "city": "Mumbai",
+    "occupation": "Tailor",
+    "mobileMasked": "+91 98•••••210"
   }
 }

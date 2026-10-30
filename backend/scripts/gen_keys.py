@@ -10,8 +10,9 @@ Run with `make keys`. Three rules, all of them deliberate:
 3. **Never touch git.** `backend/.env` is gitignored; this script refuses to
    write anywhere else.
 
-The Ed25519 signing keypair belongs to the trust layer and is generated in
-phase 6, when PyNaCl is added; this script reports that rather than pretending.
+The Ed25519 receipt signing keypair (phase 6) is generated the same way: into
+`backend/secrets/` at mode 600, and never regenerated if a key already exists -
+replacing it would make every receipt signed with the old one unverifiable.
 """
 
 from __future__ import annotations
@@ -25,6 +26,7 @@ from pathlib import Path
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 ENV_PATH = BACKEND_DIR / ".env"
 ENV_EXAMPLE_PATH = BACKEND_DIR / ".env.example"
+SECRETS_DIR = BACKEND_DIR / "secrets"
 
 
 def _random_urlsafe(length: int = 48) -> str:
@@ -45,6 +47,38 @@ GENERATED: dict[str, tuple[object, str]] = {
     "TTS_CACHE_SECRET": (_random_urlsafe, "HMAC secret for TTS cache keys"),
     "DEMO_AUTH_KEY": (_random_urlsafe, "shared secret for the dev demo login"),
 }
+
+
+def ensure_signing_key(lines: list[str]) -> str:
+    """Generate the Ed25519 keypair if it is missing. Returns a status line.
+
+    The private key is a base64 32-byte seed at mode 600; the public half is
+    written beside it so it can be copied into another environment without
+    exposing the private one. An existing key is never touched: receipts signed
+    with it must keep verifying, which is the whole point of the trust layer.
+    """
+    from nacl import signing  # imported here so --print-names needs no PyNaCl
+
+    key_path = current_value(lines, "SIGNING_KEY_PATH") or "./secrets/ed25519_private.key"
+    private_path = Path(key_path)
+    if not private_path.is_absolute():
+        private_path = BACKEND_DIR / private_path
+    public_path = private_path.with_name(private_path.stem + "_public.key")
+
+    if private_path.is_file():
+        return f"unchanged: {private_path.name}  (already exists)"
+
+    SECRETS_DIR.mkdir(parents=True, exist_ok=True)
+    SECRETS_DIR.chmod(0o700)
+
+    key = signing.SigningKey.generate()
+    private_path.write_text(base64.b64encode(bytes(key)).decode("ascii") + "\n", encoding="utf-8")
+    private_path.chmod(0o600)
+    public_path.write_text(
+        base64.b64encode(bytes(key.verify_key)).decode("ascii") + "\n", encoding="utf-8"
+    )
+    public_path.chmod(0o644)
+    return f"generated: {private_path.name} + {public_path.name} (mode 600)"
 
 
 def read_env(path: Path) -> list[str]:
@@ -128,7 +162,9 @@ def main() -> int:
         print("    nothing to do - every secret already has a value")
 
     print("    values are never printed; read them from backend/.env if you must")
-    print("==> Ed25519 receipt signing keypair: generated in phase 6 (needs PyNaCl)")
+
+    print("==> Ed25519 receipt signing keypair")
+    print(f"    {ensure_signing_key(lines)}")
 
     if filled:
         print("\n    Restart the backend so it picks up the new values.")

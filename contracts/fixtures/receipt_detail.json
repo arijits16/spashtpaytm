@@ -1,0 +1,129 @@
+{
+  "receiptNo": "SP-6Q8JA82H",
+  "seq": 1,
+  "lender": "Partner NBFC A",
+  "product": "personal_loan",
+  "language": "mr-IN",
+  "teachbackPassed": 3,
+  "teachbackTotal": 3,
+  "createdAt": "2026-10-30T13:28:38.780714+00:00",
+  "shortHash": "abf24334dfe5dd33",
+  "valid": true,
+  "payload": {
+    "kfs": {
+      "id": "15b9b7e4-7c3a-4a84-ae83-8cc6de1d8cee",
+      "version": "v3.2",
+      "file_sha256": "ccb25662dee486ad1f4ad22fcf32c73aa86fa9aec65a8cd4d5011696e0a51a5f"
+    },
+    "seq": 1,
+    "terms": {
+      "apr": 18.67,
+      "emi": 4600,
+      "gst": 0,
+      "rate_pa": 18.67,
+      "late_fee": 500,
+      "principal": 50000,
+      "total_cost": 5200,
+      "total_repay": 55200,
+      "tenure_months": 12,
+      "processing_fee": 0,
+      "foreclosure_pct": 4.0,
+      "cooling_off_days": 3
+    },
+    "lender": "Partner NBFC A",
+    "channel": "paytm_ios_app_voice",
+    "product": "personal_loan",
+    "consents": [
+      {
+        "at": "2026-10-30T13:28:37.452104+00:00",
+        "method": "tap",
+        "granted": true,
+        "purpose": "fetch_account_aggregator"
+      },
+      {
+        "at": "2026-10-30T13:28:37.452104+00:00",
+        "method": "tap",
+        "granted": true,
+        "purpose": "fetch_digilocker"
+      },
+      {
+        "at": "2026-10-30T13:28:38.751049+00:00",
+        "method": "tap+otp",
+        "granted": true,
+        "purpose": "loan_terms"
+      }
+    ],
+    "language": "mr-IN",
+    "offer_id": "offer_a",
+    "teachback": [
+      {
+        "q": "q_insurance_optional",
+        "passed": true,
+        "attempts": 1,
+        "first_attempt_correct": true
+      },
+      {
+        "q": "q_late_fee",
+        "passed": true,
+        "attempts": 2,
+        "first_attempt_correct": false
+      },
+      {
+        "q": "q_total_repay",
+        "passed": true,
+        "attempts": 1,
+        "first_attempt_correct": true
+      }
+    ],
+    "journey_id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+    "receipt_no": "SP-6Q8JA82H",
+    "timestamps": {
+      "started": "2026-10-30T13:28:37.398562+00:00",
+      "completed": "2026-10-30T13:28:38.797688+00:00"
+    },
+    "app_version": "spasht-ios-0.1.0",
+    "suitability": {
+      "foir": 0.1639,
+      "reasons": [
+        "तुमचा EMI तुमच्या मिळकतीच्या 16% आहे",
+        "६ महिन्यांच्या बँक माहितीवरून तपासलेली मिळकत"
+      ],
+      "decision": "suitable",
+      "income_verified": true
+    },
+    "customer_ref": "093147c3f0bb333c77f4aa7136f2a2d2aa55ed8d4d1ec3f1ac12b7c4cf0dd8da",
+    "mobile_masked": "+91 98•••••210",
+    "facts_explained": [
+      "emi",
+      "total_repay",
+      "late_fee",
+      "foreclosure_pct",
+      "insurance_optional",
+      "cooling_off_days"
+    ],
+    "insurance_taken": false,
+    "customer_display": "Sunita J."
+  },
+  "checks": [
+    {
+      "name": "payload_hash",
+      "ok": true,
+      "detail": "The receipt's contents hash to exactly the stored hash."
+    },
+    {
+      "name": "chain_link",
+      "ok": true,
+      "detail": "First receipt in the chain, linked to the genesis block."
+    },
+    {
+      "name": "signature",
+      "ok": true,
+      "detail": "Signed by key 'spasht-07' and the signature is valid."
+    },
+    {
+      "name": "kfs_document",
+      "ok": true,
+      "detail": "Key Fact Statement v3.2 matches, PDF included."
+    }
+  ]
+}

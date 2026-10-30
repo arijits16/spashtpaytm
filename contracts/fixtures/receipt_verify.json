@@ -1,0 +1,29 @@
+{
+  "valid": true,
+  "checks": [
+    {
+      "name": "payload_hash",
+      "ok": true,
+      "detail": "The receipt's contents hash to exactly the stored hash."
+    },
+    {
+      "name": "chain_link",
+      "ok": true,
+      "detail": "First receipt in the chain, linked to the genesis block."
+    },
+    {
+      "name": "signature",
+      "ok": true,
+      "detail": "Signed by key 'spasht-07' and the signature is valid."
+    },
+    {
+      "name": "kfs_document",
+      "ok": true,
+      "detail": "Key Fact Statement v3.2 matches, PDF included."
+    }
+  ],
+  "hash": "abf24334dfe5dd3327adb77840d30bf7a969015eea5391bc016c49aa43efef2f",
+  "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "seq": 1,
+  "keyId": "spasht-07"
+}

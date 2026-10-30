@@ -14,11 +14,12 @@ from typing import Annotated, Literal
 
 from fastapi import APIRouter
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import select
 
+from app.db.models.persona import Persona
 from app.db.models.user import User
 from app.deps import CurrentAdmin, CurrentUser, DbDep
 from app.errors import ApiError
-from app.security.demo_auth import KNOWN_DEMO_IDENTITIES
 
 router = APIRouter(tags=["me"])
 
@@ -27,11 +28,11 @@ SessionKind = Literal["firebase", "demo"]
 
 
 class PersonaSummary(BaseModel):
-    """The linked synthetic customer.
+    """The linked synthetic customer (phase 2 fills every field from `personas`).
 
-    Only `id` is populated in phase 1 - `personas` is created in phase 2, which
-    fills in the masked name, language and city. Kept as an object from the
-    start so adding those fields does not change the shape clients decode.
+    Only masked values appear here. The persona's full name exists in the
+    database because the assistant needs it to build the spoken honorific
+    ("सुनीता ताई"), but nothing that reaches a client ever carries it.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -40,6 +41,19 @@ class PersonaSummary(BaseModel):
     displayNameMasked: str | None = None
     language: Lang | None = None
     city: str | None = None
+    occupation: str | None = None
+    mobileMasked: str | None = None
+
+    @classmethod
+    def of(cls, persona: Persona) -> PersonaSummary:
+        return cls(
+            id=persona.id,
+            displayNameMasked=persona.display_name_masked,
+            language=persona.language,  # type: ignore[arg-type]
+            city=persona.city,
+            occupation=persona.occupation,
+            mobileMasked=persona.mobile_masked,
+        )
 
 
 class MeResponse(BaseModel):
@@ -62,8 +76,15 @@ class MeResponse(BaseModel):
     persona: PersonaSummary | None
 
     @classmethod
-    def of(cls, user: User) -> MeResponse:
-        persona = PersonaSummary(id=user.persona_id) if user.persona_id else None
+    def of(cls, user: User, persona: Persona | None = None) -> MeResponse:
+        # A linked persona id with no row behind it would be a seeding bug; the
+        # id alone is still returned so the demo keeps working and the gap is
+        # visible rather than silent.
+        summary = (
+            PersonaSummary.of(persona)
+            if persona is not None
+            else (PersonaSummary(id=user.persona_id) if user.persona_id else None)
+        )
         return cls(
             uid=user.firebase_uid,
             email=user.email,
@@ -72,7 +93,7 @@ class MeResponse(BaseModel):
             preferredLanguage=user.preferred_language,  # type: ignore[arg-type]
             isAdmin=user.is_admin,
             session=user.session_kind,  # type: ignore[arg-type]
-            persona=persona,
+            persona=summary,
         )
 
 
@@ -96,10 +117,17 @@ class PersonaSwitch(BaseModel):
     personaId: str
 
 
+def _persona_of(db: DbDep, user: User) -> Persona | None:
+    """Load the linked persona row, if there is one."""
+    if not user.persona_id:
+        return None
+    return db.get(Persona, user.persona_id)
+
+
 @router.get("/me", response_model=MeResponse)
-def get_me(user: CurrentUser) -> MeResponse:
+def get_me(user: CurrentUser, db: DbDep) -> MeResponse:
     """Return the signed-in user. The dependency upserts them on first call."""
-    return MeResponse.of(user)
+    return MeResponse.of(user, _persona_of(db, user))
 
 
 @router.patch("/me", response_model=MeResponse)
@@ -109,22 +137,26 @@ def patch_me(payload: MePatch, user: CurrentUser, db: DbDep) -> MeResponse:
         user.preferred_language = payload.preferredLanguage
         db.commit()
         db.refresh(user)
-    return MeResponse.of(user)
+    return MeResponse.of(user, _persona_of(db, user))
 
 
 @router.post("/me/persona", response_model=MeResponse)
 def set_persona(payload: PersonaSwitch, admin: CurrentAdmin, db: DbDep) -> MeResponse:
     """Switch the linked persona (build plan section 8.2, admin only).
 
-    Phase 2 validates the id against the `personas` table; until that exists,
-    the check is against the known seed ids so a typo fails loudly now rather
-    than producing a journey with no persona later.
+    Validated against the `personas` table rather than a hard-coded list, so a
+    persona added to the seed file is immediately selectable and a typo fails
+    here instead of producing a journey with no persona several steps later.
+
+    422 rather than 404: the caller named something that is not a persona, which
+    is a bad request, not a missing resource of theirs.
     """
     persona_id = payload.personaId.strip().lower()
-    if persona_id not in KNOWN_DEMO_IDENTITIES:
+    persona = db.scalar(select(Persona).where(Persona.id == persona_id))
+    if persona is None:
         raise ApiError("validation_error", f"Unknown persona '{payload.personaId}'.")
 
-    admin.persona_id = persona_id
+    admin.persona_id = persona.id
     db.commit()
     db.refresh(admin)
-    return MeResponse.of(admin)
+    return MeResponse.of(admin, persona)

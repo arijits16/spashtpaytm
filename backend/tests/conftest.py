@@ -23,6 +23,23 @@ from app.main import create_app
 # Any test user gets a `test:` or `demo:` uid prefix so cleanup is unambiguous.
 TEST_UID_PREFIXES = ("test:", "demo:")
 
+# Cleanup has to get past the append-only triggers (migration 0004), which is
+# the whole point of them: not even a fixture may delete evidence row by row.
+# `session_replication_role = replica` suspends user triggers for this session
+# only, which is the standard Postgres escape hatch and is exactly how a
+# restore works. It is scoped to the test connection and to dev databases.
+APPEND_ONLY_TABLES = ("receipts", "consents", "audit_log", "teachback_attempts")
+
+
+def purge_test_rows(conn: object) -> None:
+    """Delete everything created by tests, triggers temporarily suspended."""
+    conn.execute(text("SET session_replication_role = replica"))
+    try:
+        for prefix in TEST_UID_PREFIXES:
+            conn.execute(text("DELETE FROM users WHERE firebase_uid LIKE :p"), {"p": f"{prefix}%"})
+    finally:
+        conn.execute(text("SET session_replication_role = DEFAULT"))
+
 
 def make_token(
     uid: str = "test:alice",
@@ -49,8 +66,7 @@ def clean_users() -> Iterator[None]:
     """Delete rows created by tests, so they cannot leak into one another."""
     yield
     with engine.begin() as conn:
-        for prefix in TEST_UID_PREFIXES:
-            conn.execute(text("DELETE FROM users WHERE firebase_uid LIKE :p"), {"p": f"{prefix}%"})
+        purge_test_rows(conn)
 
 
 @pytest.fixture(autouse=True)

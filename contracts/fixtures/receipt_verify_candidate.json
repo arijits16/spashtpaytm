@@ -1,0 +1,39 @@
+{
+  "valid": false,
+  "checks": [
+    {
+      "name": "payload_hash",
+      "ok": false,
+      "detail": "The edited copy hashes to 29529f45e0cf…, not the signed abf24334dfe5…"
+    },
+    {
+      "name": "chain_link",
+      "ok": true,
+      "detail": "First receipt in the chain, linked to the genesis block."
+    },
+    {
+      "name": "signature",
+      "ok": false,
+      "detail": "The signature was made over the original contents, not these."
+    },
+    {
+      "name": "kfs_document",
+      "ok": true,
+      "detail": "Key Fact Statement v3.2 matches, PDF included."
+    }
+  ],
+  "hash": "abf24334dfe5dd3327adb77840d30bf7a969015eea5391bc016c49aa43efef2f",
+  "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "seq": 1,
+  "keyId": "spasht-07",
+  "diff": [
+    {
+      "path": "terms.emi",
+      "from": 4600,
+      "to": 4000
+    }
+  ],
+  "reasons": [
+    "terms.emi: 4600 → 4000"
+  ]
+}

@@ -24,13 +24,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health, me
+from app.api import health, journeys, kfs, ledger, me, receipts
 from app.config import settings
 from app.errors import install_error_handlers
 from app.logging import configure_logging
 from app.security.bodylimit import BodySizeLimitMiddleware
 from app.security.headers import SecurityHeadersMiddleware
 from app.security.request_id import RequestIdMiddleware
+from app.web import public_receipt
 
 log = logging.getLogger(__name__)
 
@@ -103,6 +104,14 @@ def create_app() -> FastAPI:
 
     app.include_router(health.router, prefix=API_PREFIX)
     app.include_router(me.router, prefix=API_PREFIX)
+    app.include_router(journeys.router, prefix=API_PREFIX)
+    app.include_router(kfs.router, prefix=API_PREFIX)
+    app.include_router(receipts.router, prefix=API_PREFIX)
+    app.include_router(ledger.router, prefix=API_PREFIX)
+
+    # Deliberately *not* under /api: it is a page a person opens, and the QR
+    # code printed on a receipt is shorter for it (plan section 11.6).
+    app.include_router(public_receipt.router)
     return app
 
 

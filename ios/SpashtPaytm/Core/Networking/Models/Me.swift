@@ -36,12 +36,16 @@ struct Me: Decodable, Equatable, Sendable {
         case demo
     }
 
+    /// The linked synthetic customer. Masked values only: the persona's real
+    /// name stays on the backend, where the assistant uses it to build the
+    /// spoken honorific.
     struct Persona: Decodable, Equatable, Sendable {
         let id: String
-        /// Filled in from phase 2, when the `personas` table exists.
         let displayNameMasked: String?
         let language: Language?
         let city: String?
+        let occupation: String?
+        let mobileMasked: String?
     }
 
     /// True for a dev demo session rather than a real Google sign-in.

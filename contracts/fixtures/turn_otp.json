@@ -1,0 +1,69 @@
+{
+  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "version": 13,
+  "step": "OTP",
+  "status": "active",
+  "progress": {
+    "index": 4,
+    "total": 6,
+    "label": "तपासणी",
+    "etaSeconds": 12
+  },
+  "language": "mr-IN",
+  "messages": [
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:13:a0",
+      "role": "assistant",
+      "text": "पुष्टीसाठी तुमच्या मोबाईलवर आलेला OTP टाइप करा. तो कधीच बोलून सांगू नका.",
+      "audioUrl": null
+    }
+  ],
+  "card": {
+    "type": "otp",
+    "data": {
+      "length": 6,
+      "expiresInSec": 300,
+      "attemptsLeft": 3,
+      "demoCode": null
+    }
+  },
+  "quickReplies": [
+    {
+      "label": "पुन्हा सांगा",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "repeat"
+        }
+      }
+    },
+    {
+      "label": "समजलं नाही",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "didnt_understand"
+        }
+      }
+    },
+    {
+      "label": "माणसाशी बोलायचं",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "request_human"
+        }
+      }
+    }
+  ],
+  "transcript": null,
+  "detectedLanguage": null,
+  "locks": {
+    "acceptEnabled": true,
+    "reason": null
+  },
+  "demoMode": false
+}

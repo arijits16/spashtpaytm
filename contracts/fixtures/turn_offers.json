@@ -1,0 +1,127 @@
+{
+  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "version": 6,
+  "step": "OFFERS",
+  "status": "active",
+  "progress": {
+    "index": 2,
+    "total": 6,
+    "label": "ऑफर",
+    "etaSeconds": 55
+  },
+  "language": "mr-IN",
+  "messages": [
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:6:a0",
+      "role": "assistant",
+      "text": "कन्फर्म झालं. आता तुमच्यासाठीच्या ऑफर बघू.",
+      "audioUrl": null
+    }
+  ],
+  "card": {
+    "type": "offers",
+    "data": {
+      "suitability": {
+        "foirPct": 16.4,
+        "decision": "suitable",
+        "reasons": [
+          "तुमचा EMI तुमच्या मिळकतीच्या 16% आहे",
+          "६ महिन्यांच्या बँक माहितीवरून तपासलेली मिळकत"
+        ]
+      },
+      "offers": [
+        {
+          "offerId": "offer_a",
+          "lender": "Partner NBFC A",
+          "lenderType": "NBFC",
+          "principal": 50000,
+          "tenureMonths": 12,
+          "ratePa": 18.67,
+          "processingFee": 0,
+          "gst": 0,
+          "apr": 18.67,
+          "emi": 4600,
+          "totalRepay": 55200,
+          "totalCost": 5200,
+          "badges": [
+            "lowest_total_cost"
+          ],
+          "kfsUrl": "/api/kfs/15b9b7e4-7c3a-4a84-ae83-8cc6de1d8cee/file"
+        },
+        {
+          "offerId": "offer_c",
+          "lender": "Partner NBFC C",
+          "lenderType": "NBFC",
+          "principal": 50000,
+          "tenureMonths": 12,
+          "ratePa": 21.0,
+          "processingFee": 0,
+          "gst": 0,
+          "apr": 21.01,
+          "emi": 4656,
+          "totalRepay": 55872,
+          "totalCost": 5872,
+          "badges": [],
+          "kfsUrl": "/api/kfs/6a179f9c-9b76-4474-9455-d397f15b5472/file"
+        },
+        {
+          "offerId": "offer_b",
+          "lender": "Partner Bank B",
+          "lenderType": "Bank",
+          "principal": 50000,
+          "tenureMonths": 12,
+          "ratePa": 15.99,
+          "processingFee": 2500,
+          "gst": 450,
+          "apr": 27.8,
+          "emi": 4536,
+          "totalRepay": 54432,
+          "totalCost": 7382,
+          "badges": [
+            "low_rate_high_fee"
+          ],
+          "kfsUrl": "/api/kfs/176a6b3b-093d-4faf-a8fb-40bc73abdb87/file"
+        }
+      ]
+    }
+  },
+  "quickReplies": [
+    {
+      "label": "पुन्हा सांगा",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "repeat"
+        }
+      }
+    },
+    {
+      "label": "समजलं नाही",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "didnt_understand"
+        }
+      }
+    },
+    {
+      "label": "माणसाशी बोलायचं",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "request_human"
+        }
+      }
+    }
+  ],
+  "transcript": null,
+  "detectedLanguage": null,
+  "locks": {
+    "acceptEnabled": false,
+    "reason": "आधी तीन छोटे प्रश्न पूर्ण करू, मग सहमतीचं बटण सुरू होईल."
+  },
+  "demoMode": false
+}

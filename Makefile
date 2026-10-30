@@ -7,7 +7,7 @@ SHELL := /bin/bash
 .DEFAULT_GOAL := help
 .PHONY: help setup db-up db-down migrate seed keys dev dev-api dev-web test lint \
         format eval tts-cache demo-reset tunnel clean sarvam-smoke secret-scan \
-        contracts ios-gen ios-open ios-build ios-test ios-run ios-config ios-icon \
+        contracts kfs-pdfs golden-path ios-gen ios-open ios-build ios-test ios-run ios-config ios-icon \
         test-backend test-web lint-backend lint-web
 
 # Pinned to 3.12: the system default (3.15) has no reliable wheels for
@@ -70,11 +70,15 @@ db-down: ## Stop the containers (data is kept in the named volume)
 migrate: ## Apply Alembic migrations
 	@cd backend && .venv/bin/alembic upgrade head
 
-seed: ## Load the synthetic demo data (phase 2)
-	@echo "seed lands in phase 2"
+seed: ## Load the synthetic demo data (idempotent)
+	@echo "==> seeding personas, offers, KFS PDFs and the question bank"
+	@cd backend && .venv/bin/python -m app.seed.run
 
-demo-reset: ## Dev only: wipe journey data and re-seed (phase 2)
-	@echo "demo-reset lands in phase 2"
+kfs-pdfs: ## Regenerate only the sample KFS PDFs
+	@cd backend && .venv/bin/python scripts/generate_kfs_pdf.py
+
+demo-reset: ## Dev only: wipe journey data, reset the ledger, re-seed
+	@cd backend && .venv/bin/python scripts/demo_reset.py
 
 # ------------------------------------------------------------- secrets -------
 

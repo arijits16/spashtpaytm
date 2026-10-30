@@ -1,0 +1,85 @@
+{
+  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "version": 12,
+  "step": "TERMS_CONSENT",
+  "status": "active",
+  "progress": {
+    "index": 4,
+    "total": 6,
+    "label": "तपासणी",
+    "etaSeconds": 20
+  },
+  "language": "mr-IN",
+  "messages": [
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:12:a0",
+      "role": "assistant",
+      "text": "एकदम बरोबर!",
+      "audioUrl": null
+    },
+    {
+      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:12:a1",
+      "role": "assistant",
+      "text": "छान! आता \"मी सहमत आहे\" बटण सुरू झालं आहे. विम्याचा पर्याय वेगळा आहे आणि तो \"नाही\" वर आहे.",
+      "audioUrl": null
+    }
+  ],
+  "card": {
+    "type": "consent_lock",
+    "data": {
+      "acceptEnabled": true,
+      "reason": null,
+      "terms": [
+        "Partner NBFC A कडून ₹50,000 कर्ज घेत आहे",
+        "दर महिन्याला ₹4,600 EMI, 12 महिने",
+        "एकूण ₹55,200 परत करणार",
+        "उशीर झाला तर ₹500 दंड लागेल हे मला माहीत आहे",
+        "विमा ऐच्छिक आहे आणि तो वेगळा पर्याय आहे"
+      ],
+      "insurance": {
+        "premium": 750,
+        "granted": false,
+        "optional": true
+      }
+    }
+  },
+  "quickReplies": [
+    {
+      "label": "पुन्हा सांगा",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "repeat"
+        }
+      }
+    },
+    {
+      "label": "समजलं नाही",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "didnt_understand"
+        }
+      }
+    },
+    {
+      "label": "माणसाशी बोलायचं",
+      "send": {
+        "type": "tap",
+        "text": null,
+        "action": {
+          "name": "request_human"
+        }
+      }
+    }
+  ],
+  "transcript": null,
+  "detectedLanguage": null,
+  "locks": {
+    "acceptEnabled": true,
+    "reason": null
+  },
+  "demoMode": false
+}

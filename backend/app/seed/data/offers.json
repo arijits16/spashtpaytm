@@ -1,0 +1,118 @@
+{
+  "_comment": "Lenders, offers and KFS clauses (build plan 7.2). All lenders are fictional. The derived numbers (emi, total_repay, apr, ...) are NOT stored here: make seed computes them with journey/loan_math.py, so the database can never disagree with the arithmetic the receipt is verified against.",
+  "lenders": [
+    {
+      "id": "nbfc_a",
+      "name": "Partner NBFC A",
+      "type": "NBFC",
+      "reg_no_sample": "N-13.02XXX (sample)",
+      "grievance_contact_sample": "grievance@partner-nbfc-a.example · 1800-000-0001 (sample)"
+    },
+    {
+      "id": "bank_b",
+      "name": "Partner Bank B",
+      "type": "Bank",
+      "reg_no_sample": "MH/BNK/00XXX (sample)",
+      "grievance_contact_sample": "nodal.officer@partner-bank-b.example · 1800-000-0002 (sample)"
+    },
+    {
+      "id": "nbfc_c",
+      "name": "Partner NBFC C",
+      "type": "NBFC",
+      "reg_no_sample": "N-13.03XXX (sample)",
+      "grievance_contact_sample": "grievance@partner-nbfc-c.example · 1800-000-0003 (sample)"
+    }
+  ],
+  "offers": [
+    {
+      "id": "offer_a",
+      "lender_id": "nbfc_a",
+      "principal": 50000,
+      "tenure_months": 12,
+      "rate_pa": 18.67,
+      "processing_fee": 0,
+      "gst_on_fee": 0,
+      "late_fee": 500,
+      "foreclosure_pct": 4.0,
+      "cooling_off_days": 3,
+      "insurance_premium": 750,
+      "kfs_version": "v3.2"
+    },
+    {
+      "id": "offer_b",
+      "lender_id": "bank_b",
+      "principal": 50000,
+      "tenure_months": 12,
+      "rate_pa": 15.99,
+      "processing_fee": 2500,
+      "gst_on_fee": 450,
+      "late_fee": 600,
+      "foreclosure_pct": 3.0,
+      "cooling_off_days": 3,
+      "insurance_premium": 750,
+      "kfs_version": "v2.8"
+    },
+    {
+      "id": "offer_c",
+      "lender_id": "nbfc_c",
+      "principal": 50000,
+      "tenure_months": 12,
+      "rate_pa": 21.0,
+      "processing_fee": 0,
+      "gst_on_fee": 0,
+      "late_fee": 450,
+      "foreclosure_pct": 5.0,
+      "cooling_off_days": 3,
+      "insurance_premium": 750,
+      "kfs_version": "v1.4"
+    }
+  ],
+  "_clause_comment": "One set of clause templates, rendered per offer with that offer's facts. These are the text phase 8 searches to answer 'what if I close the loan early?'. English, because the KFS format is English; the assistant translates.",
+  "clauses": [
+    {
+      "clause_key": "emi_schedule",
+      "title": "Repayment schedule",
+      "text_en": "The loan of INR {PRINCIPAL} is repayable in {TENURE} equal monthly instalments of INR {EMI} each, by auto-debit on the 5th of every month. The total amount repayable over the tenure is INR {TOTAL_REPAY}, of which INR {TOTAL_INTEREST} is interest."
+    },
+    {
+      "clause_key": "interest_rate",
+      "title": "Rate of interest and APR",
+      "text_en": "Interest is charged at {RATE_PA}% per annum on a reducing balance basis. The annual percentage rate (APR), which includes the processing fee and applicable GST, is {APR}% per annum. The rate is fixed for the full tenure."
+    },
+    {
+      "clause_key": "processing_fee",
+      "title": "Fees and other charges",
+      "text_en": "A one-time processing fee of INR {PROCESSING_FEE} plus GST of INR {GST} is deducted from the loan amount before disbursal. The net amount credited to the borrower's account is therefore INR {NET_DISBURSED}. No other charge is levied at disbursal."
+    },
+    {
+      "clause_key": "late_fee",
+      "title": "Penal charges for delayed payment",
+      "text_en": "If an instalment is not paid on or before its due date, a late payment charge of INR {LATE_FEE} is payable for each such instalment. Delayed or missed payments are reported to credit information companies and will lower the borrower's credit (CIBIL) score, which can make future borrowing harder or more expensive."
+    },
+    {
+      "clause_key": "foreclosure",
+      "title": "Prepayment and foreclosure",
+      "text_en": "The borrower may prepay the loan in full at any time after the cooling-off period. A foreclosure charge of {FORECLOSURE_PCT}% of the principal outstanding on the date of prepayment is payable, plus applicable GST. Part-prepayment is not permitted under this product."
+    },
+    {
+      "clause_key": "cooling_off",
+      "title": "Cooling-off / look-up period",
+      "text_en": "The borrower may exit this loan within {COOLING_OFF_DAYS} days of disbursal by repaying the principal together with proportionate interest for the period of use. No foreclosure charge and no penalty of any kind applies during this cooling-off period."
+    },
+    {
+      "clause_key": "insurance_optional",
+      "title": "Insurance",
+      "text_en": "Credit-life insurance cover of a one-time premium of INR {INSURANCE_PREMIUM} is offered with this loan. This insurance is entirely OPTIONAL. The loan will be sanctioned and disbursed on identical terms whether or not the borrower takes it, and it must never be presented as a condition of the loan."
+    },
+    {
+      "clause_key": "grievance",
+      "title": "Grievance redressal",
+      "text_en": "Complaints may be raised with {LENDER} at {GRIEVANCE}. If the complaint is not resolved within 30 days, the borrower may escalate to the RBI Integrated Ombudsman Scheme. This is a SAMPLE document prepared for a concept demonstration and the contact details are not real."
+    },
+    {
+      "clause_key": "recovery",
+      "title": "Recovery practices",
+      "text_en": "Recovery agents engaged by {LENDER} may contact the borrower only between 8 a.m. and 7 p.m. The borrower will be informed of the agent's identity in advance. Abusive or coercive recovery practice may be reported to the grievance channel above."
+    }
+  ]
+}

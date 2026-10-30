@@ -27,7 +27,10 @@ const ALLOW_MARKER = "spasht-secret-scan:allow";
 
 /** The patterns from section 13.3, plus the obvious private-key headers. */
 const RULES = [
-  { name: "generic secret key (sk_…)", re: /sk_[A-Za-z0-9_]{10,}/ },
+  // (?<![A-Za-z0-9]) so the "sk_" of an ordinary identifier is not a hit:
+  // "ask_amount_again" and "risk_score" are not Stripe keys, and a scanner
+  // that cries wolf on template keys is a scanner people start ignoring.
+  { name: "generic secret key (sk_…)", re: /(?<![A-Za-z0-9])sk_[A-Za-z0-9_]{10,}/ },
   { name: "Google API key (AIza…)", re: /AIza[0-9A-Za-z_-]{35}/ },
   { name: "PEM block header", re: /-----BEGIN/ },
   { name: "private key material", re: /PRIVATE KEY/ },

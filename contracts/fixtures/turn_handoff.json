@@ -1,0 +1,42 @@
+{
+  "journeyId": "9f1b5a7d-70f9-47e5-95fb-6014edb6ebf6",
+  "version": 3,
+  "step": "HUMAN_HANDOFF",
+  "status": "needs_human",
+  "progress": {
+    "index": 4,
+    "total": 6,
+    "label": "तपासणी",
+    "etaSeconds": 0
+  },
+  "language": "mr-IN",
+  "messages": [
+    {
+      "id": "9f1b5a7d-70f9-47e5-95fb-6014edb6ebf6:2:u",
+      "role": "user",
+      "text": "माणसाशी बोलायचं",
+      "audioUrl": null
+    },
+    {
+      "id": "9f1b5a7d-70f9-47e5-95fb-6014edb6ebf6:2:a0",
+      "role": "assistant",
+      "text": "काही हरकत नाही. आमचे कर्ज तज्ज्ञ सकाळी ९ ते संध्याकाळी ६ दरम्यान तुम्हाला फोन करतील.",
+      "audioUrl": null
+    }
+  ],
+  "card": {
+    "type": "handoff",
+    "data": {
+      "message": "काही हरकत नाही. आमचे कर्ज तज्ज्ञ सकाळी ९ ते संध्याकाळी ६ दरम्यान तुम्हाला फोन करतील.",
+      "window": "9 am - 6 pm"
+    }
+  },
+  "quickReplies": [],
+  "transcript": null,
+  "detectedLanguage": null,
+  "locks": {
+    "acceptEnabled": false,
+    "reason": "आधी तीन छोटे प्रश्न पूर्ण करू, मग सहमतीचं बटण सुरू होईल."
+  },
+  "demoMode": false
+}
