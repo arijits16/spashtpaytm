@@ -20,11 +20,14 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
+
+from app.auth.firebase import VerifiedToken
 
 FIXTURE_DIR = Path(__file__).resolve().parents[2] / "contracts" / "fixtures"
 
@@ -113,9 +116,35 @@ def test_contract_health(client: TestClient) -> None:
     _check("health", response.json())
 
 
+def test_contract_me(client: TestClient, mock_verifier: Callable[[VerifiedToken], None]) -> None:
+    """`GET /api/me` - the signed-in profile both clients render."""
+    mock_verifier(
+        VerifiedToken(
+            uid="test:contract",
+            email="contract@example.invalid",
+            name="Contract Example",
+            picture="https://example.invalid/photo.jpg",
+            email_verified=True,
+        )
+    )
+
+    response = client.get("/api/me", headers={"Authorization": "Bearer good-token"})
+
+    assert response.status_code == 200
+    _check("me", response.json())
+
+
 def test_contract_error_not_found(client: TestClient) -> None:
     """The standard error envelope (section 8.1), as every client must parse it."""
     response = client.get("/api/does-not-exist")
 
     assert response.status_code == 404
     _check("error_not_found", response.json())
+
+
+def test_contract_error_unauthorized(client: TestClient) -> None:
+    """401 is the error both clients must handle specially: sign out and retry."""
+    response = client.get("/api/me")
+
+    assert response.status_code == 401
+    _check("error_unauthorized", response.json())

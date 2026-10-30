@@ -66,7 +66,7 @@ def test_rejection_reason_is_not_leaked_to_the_caller(
     expired_error = expired.json()["error"]
     forged_error = forged.json()["error"]
     assert expired_error["code"] == forged_error["code"] == "unauthorized"
-    assert expired_error["message"] == forged_error["message"] == "Invalid or expired credentials"
+    assert expired_error["message"] == forged_error["message"] == "Not authenticated"
 
 
 # --- 200: a valid token ------------------------------------------------------
@@ -84,7 +84,8 @@ def test_me_returns_the_profile_and_creates_the_user(
     assert body["photoUrl"] == "https://example.invalid/a.jpg"
     assert body["preferredLanguage"] == "mr-IN"
     assert body["isAdmin"] is False
-    assert body["personaId"] == "sunita"
+    assert body["persona"]["id"] == "sunita"
+    assert body["session"] == "firebase"
 
     stored = db.scalar(select(User).where(User.firebase_uid == "test:alice"))
     assert stored is not None
@@ -98,7 +99,7 @@ def test_repeat_logins_do_not_create_duplicate_users(
     first = client.get("/api/me", headers=AUTH).json()
     second = client.get("/api/me", headers=AUTH).json()
 
-    assert first["id"] == second["id"]
+    assert first["uid"] == second["uid"]
     rows = db.scalars(select(User).where(User.firebase_uid == "test:alice")).all()
     assert len(rows) == 1
 
@@ -170,8 +171,12 @@ def test_a_client_cannot_make_itself_admin(
 
     response = client.patch("/api/me", headers=AUTH, json={"isAdmin": True})
 
-    assert response.status_code == 200
-    assert response.json()["isAdmin"] is False
+    # `extra="forbid"` (build plan 13.5): an unknown field is a loud 422 rather
+    # than a silent no-op, which otherwise looks to the caller like it worked.
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "validation_error"
+
+    assert client.get("/api/me", headers=AUTH).json()["isAdmin"] is False
 
 
 # --- PATCH /me ---------------------------------------------------------------

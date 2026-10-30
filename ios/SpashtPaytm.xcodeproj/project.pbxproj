@@ -9,14 +9,16 @@
 /* Begin PBXBuildFile section */
 		094E1D50FB4A281355FE3547 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 82FA38A791CF8A94FA842DBF /* GoogleSignIn */; };
 		0C02B8645F400817AF39F8A0 /* ConceptRibbon.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31DECE0C63337F4A98BAAE2 /* ConceptRibbon.swift */; };
-		1CB259434AE607E09C280CC9 /* HealthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7DA3B26FC6F2CE558041DA /* HealthView.swift */; };
+		1DEEAFB4EE714590086FFF32 /* GoogleSignInService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE9C9C67D9CF2E6A45587C68 /* GoogleSignInService.swift */; };
+		30D82A8BE4AFE3C25ED91ECD /* DemoAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9956300371DD99FAD529C5B5 /* DemoAuth.swift */; };
 		366C0F12EA67C3900CF521C0 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4060A054C480CCD5CF7107 /* Colors.swift */; };
 		4855F921782E707FD73DB6AB /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128CC6557A65DF1310D85D2E /* APIClient.swift */; };
 		49432E9EB9567FC2D9B3BFCF /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9313EEEEFD0A8D02223BED0B /* Typography.swift */; };
 		49E7EF80E1CE6866206E10F7 /* PrivacyCover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF8AFEF684BA88CECA0FE35 /* PrivacyCover.swift */; };
 		501E796895738EE42C6B987A /* SpashtPaytmApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C65CB1DF8AEF1C2FBA69AE9 /* SpashtPaytmApp.swift */; };
-		54E40714D80B34A47C6D67A4 /* HealthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 609AFF6D348A9FAC4C09D59F /* HealthViewModel.swift */; };
+		673648D751EE0B7AF1118F39 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7C84F04DCEA7EFEBD7B516 /* LoginView.swift */; };
 		69CF633268941F85A73B64BF /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03F5C88723E8215466208E7F /* APIClientTests.swift */; };
+		7D250B072A5B0A411D9256FC /* Me.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6AB109962B8980A72E6CA4E /* Me.swift */; };
 		82B740AAC9FD0BD2F0830757 /* AppConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B8ECF62B6E794A3AD4F691 /* AppConfigTests.swift */; };
 		8DB810C55D8151643958BFB8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 551B9918AAA9661C08D101AB /* Assets.xcassets */; };
 		A6C584379F9C388B6604FE00 /* Health.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAD919990274ECA12A03880 /* Health.swift */; };
@@ -24,8 +26,11 @@
 		CD49AE7D832B0AC6995F606A /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525D868949FC5B8E0BCBC15A /* AppConfig.swift */; };
 		CD656E99E82ED7556154310D /* ContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1C25827978BC3E428F028E /* ContractTests.swift */; };
 		CE589A1EB0986BE0C316891A /* fixtures in Resources */ = {isa = PBXBuildFile; fileRef = 0140EDC8225F430D4A128BF9 /* fixtures */; };
+		CF8D724DBA5FF08960600702 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C760CC886A672B4C97FBAD2 /* AuthService.swift */; };
+		E017D4BA5AB5223A691FCC4C /* SignedInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9348CE0C2459A890EFF3C1C7 /* SignedInView.swift */; };
 		E9ED2B4D58F6BDA8119C0EAA /* Metrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB0C222A4DD4F172A944711 /* Metrics.swift */; };
 		F15680346FD10BB00C5AFEC3 /* Endpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 680BB647E4A4FFEF7C8B9597 /* Endpoints.swift */; };
+		F1D796B3581454B8FBCAC1BD /* AuthServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECBED56EF9381C0CC784F73D /* AuthServiceTests.swift */; };
 		F3BC63F318052F7FABF8CD81 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DF13FCD742E863C48D31D /* APIError.swift */; };
 		FC8B4F87DE1D1D2358B9A520 /* FixtureLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E98ACB6CF518E53B5456D8 /* FixtureLoader.swift */; };
 /* End PBXBuildFile section */
@@ -43,6 +48,7 @@
 /* Begin PBXFileReference section */
 		0140EDC8225F430D4A128BF9 /* fixtures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = fixtures; path = ../contracts/fixtures; sourceTree = SOURCE_ROOT; };
 		03F5C88723E8215466208E7F /* APIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClientTests.swift; sourceTree = "<group>"; };
+		0C7C84F04DCEA7EFEBD7B516 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		128CC6557A65DF1310D85D2E /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		17367A20F4BF6DBCCCB28739 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		2C1C25827978BC3E428F028E /* ContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContractTests.swift; sourceTree = "<group>"; };
@@ -52,19 +58,23 @@
 		525D868949FC5B8E0BCBC15A /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		551B9918AAA9661C08D101AB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5C65CB1DF8AEF1C2FBA69AE9 /* SpashtPaytmApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpashtPaytmApp.swift; sourceTree = "<group>"; };
+		5C760CC886A672B4C97FBAD2 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		5CB6720C5FEE91612D8669DF /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		5FF8AFEF684BA88CECA0FE35 /* PrivacyCover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyCover.swift; sourceTree = "<group>"; };
-		609AFF6D348A9FAC4C09D59F /* HealthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthViewModel.swift; sourceTree = "<group>"; };
 		680BB647E4A4FFEF7C8B9597 /* Endpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoints.swift; sourceTree = "<group>"; };
 		6DAD919990274ECA12A03880 /* Health.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Health.swift; sourceTree = "<group>"; };
 		9201C438E6E1849017289CF5 /* SpashtPaytmTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SpashtPaytmTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9313EEEEFD0A8D02223BED0B /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		9348CE0C2459A890EFF3C1C7 /* SignedInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignedInView.swift; sourceTree = "<group>"; };
 		96E98ACB6CF518E53B5456D8 /* FixtureLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixtureLoader.swift; sourceTree = "<group>"; };
-		AE7DA3B26FC6F2CE558041DA /* HealthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthView.swift; sourceTree = "<group>"; };
+		9956300371DD99FAD529C5B5 /* DemoAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoAuth.swift; sourceTree = "<group>"; };
+		C6AB109962B8980A72E6CA4E /* Me.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Me.swift; sourceTree = "<group>"; };
 		CC4060A054C480CCD5CF7107 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		D31DECE0C63337F4A98BAAE2 /* ConceptRibbon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConceptRibbon.swift; sourceTree = "<group>"; };
 		DD7A9C5CC694EA40849147BE /* SpashtPaytm.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SpashtPaytm.entitlements; sourceTree = "<group>"; };
 		E6B8ECF62B6E794A3AD4F691 /* AppConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigTests.swift; sourceTree = "<group>"; };
+		ECBED56EF9381C0CC784F73D /* AuthServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthServiceTests.swift; sourceTree = "<group>"; };
+		FE9C9C67D9CF2E6A45587C68 /* GoogleSignInService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +90,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		13771914315A7E91C77EE535 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				5C760CC886A672B4C97FBAD2 /* AuthService.swift */,
+				9956300371DD99FAD529C5B5 /* DemoAuth.swift */,
+				FE9C9C67D9CF2E6A45587C68 /* GoogleSignInService.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
 		1853E2B07A26BA41EFDC4EAC /* spashtpaytm */ = {
 			isa = PBXGroup;
 			children = (
@@ -96,15 +116,6 @@
 				5C65CB1DF8AEF1C2FBA69AE9 /* SpashtPaytmApp.swift */,
 			);
 			path = App;
-			sourceTree = "<group>";
-		};
-		49B81AE93F87204420716854 /* Health */ = {
-			isa = PBXGroup;
-			children = (
-				AE7DA3B26FC6F2CE558041DA /* HealthView.swift */,
-				609AFF6D348A9FAC4C09D59F /* HealthViewModel.swift */,
-			);
-			path = Health;
 			sourceTree = "<group>";
 		};
 		63F39687664562F97F5138B8 /* SpashtPaytm */ = {
@@ -172,6 +183,7 @@
 		926647C43FFDCDBC1E71CE5E /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				13771914315A7E91C77EE535 /* Auth */,
 				6DEEFF0BCA454AF443973F54 /* Networking */,
 				862C03D58DAC8D10157B6C79 /* Theme */,
 			);
@@ -183,6 +195,7 @@
 			children = (
 				03F5C88723E8215466208E7F /* APIClientTests.swift */,
 				E6B8ECF62B6E794A3AD4F691 /* AppConfigTests.swift */,
+				ECBED56EF9381C0CC784F73D /* AuthServiceTests.swift */,
 				2C1C25827978BC3E428F028E /* ContractTests.swift */,
 				96E98ACB6CF518E53B5456D8 /* FixtureLoader.swift */,
 			);
@@ -195,6 +208,15 @@
 				551B9918AAA9661C08D101AB /* Assets.xcassets */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		A8092B75EE13CEBF8915C166 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				0C7C84F04DCEA7EFEBD7B516 /* LoginView.swift */,
+				9348CE0C2459A890EFF3C1C7 /* SignedInView.swift */,
+			);
+			path = Login;
 			sourceTree = "<group>";
 		};
 		BCAB74C0A3DFA5F55FA133BE /* contracts */ = {
@@ -217,7 +239,7 @@
 		D02CC48232D606D30D249B7E /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				49B81AE93F87204420716854 /* Health */,
+				A8092B75EE13CEBF8915C166 /* Login */,
 				7F53C39D9EECC81769D7B088 /* Shared */,
 			);
 			path = Features;
@@ -227,6 +249,7 @@
 			isa = PBXGroup;
 			children = (
 				6DAD919990274ECA12A03880 /* Health.swift */,
+				C6AB109962B8980A72E6CA4E /* Me.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -367,14 +390,18 @@
 				4855F921782E707FD73DB6AB /* APIClient.swift in Sources */,
 				F3BC63F318052F7FABF8CD81 /* APIError.swift in Sources */,
 				CD49AE7D832B0AC6995F606A /* AppConfig.swift in Sources */,
+				CF8D724DBA5FF08960600702 /* AuthService.swift in Sources */,
 				366C0F12EA67C3900CF521C0 /* Colors.swift in Sources */,
 				0C02B8645F400817AF39F8A0 /* ConceptRibbon.swift in Sources */,
+				30D82A8BE4AFE3C25ED91ECD /* DemoAuth.swift in Sources */,
 				F15680346FD10BB00C5AFEC3 /* Endpoints.swift in Sources */,
+				1DEEAFB4EE714590086FFF32 /* GoogleSignInService.swift in Sources */,
 				A6C584379F9C388B6604FE00 /* Health.swift in Sources */,
-				1CB259434AE607E09C280CC9 /* HealthView.swift in Sources */,
-				54E40714D80B34A47C6D67A4 /* HealthViewModel.swift in Sources */,
+				673648D751EE0B7AF1118F39 /* LoginView.swift in Sources */,
+				7D250B072A5B0A411D9256FC /* Me.swift in Sources */,
 				E9ED2B4D58F6BDA8119C0EAA /* Metrics.swift in Sources */,
 				49E7EF80E1CE6866206E10F7 /* PrivacyCover.swift in Sources */,
+				E017D4BA5AB5223A691FCC4C /* SignedInView.swift in Sources */,
 				501E796895738EE42C6B987A /* SpashtPaytmApp.swift in Sources */,
 				49432E9EB9567FC2D9B3BFCF /* Typography.swift in Sources */,
 			);
@@ -386,6 +413,7 @@
 			files = (
 				69CF633268941F85A73B64BF /* APIClientTests.swift in Sources */,
 				82B740AAC9FD0BD2F0830757 /* AppConfigTests.swift in Sources */,
+				F1D796B3581454B8FBCAC1BD /* AuthServiceTests.swift in Sources */,
 				CD656E99E82ED7556154310D /* ContractTests.swift in Sources */,
 				FC8B4F87DE1D1D2358B9A520 /* FixtureLoader.swift in Sources */,
 			);

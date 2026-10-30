@@ -1,0 +1,15 @@
+{
+  "uid": "test:contract",
+  "email": "contract@example.invalid",
+  "displayName": "Contract Example",
+  "photoUrl": "https://example.invalid/photo.jpg",
+  "preferredLanguage": "mr-IN",
+  "isAdmin": false,
+  "session": "firebase",
+  "persona": {
+    "id": "sunita",
+    "displayNameMasked": null,
+    "language": null,
+    "city": null
+  }
+}

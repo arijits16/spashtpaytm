@@ -7,7 +7,7 @@ need. Kept current at the end of every phase (build plan §13).
 documented gaps everywhere else. All data is synthetic but is treated as if it
 were real — that is the only way the controls get exercised.
 
-**Status:** phase 0 complete. Sections marked ⬜ land with the phase that builds
+**Status:** phases 0 and 1 complete. Sections marked ⬜ land with the phase that builds
 the thing they protect.
 
 ---
@@ -19,8 +19,8 @@ the thing they protect.
 | Sarvam API key and credits | Leak through git, the app bundle or logs; abuse through the tunnel | Key only in `backend/.env`; secret scan + pre-commit hook; never logged; clients never call Sarvam | ✅ key handling · ⬜ rate limits on voice (phase 7) |
 | Receipt integrity | Someone edits a receipt or the database | Hash chain + Ed25519 signature + append-only triggers + daily Merkle anchor | ⬜ phase 6 |
 | Customer data | Another user reads someone's journey or receipt | Token auth, ownership checks returning 404, masked fields, encrypted transcripts | ⬜ phases 2–3 |
-| Admin dashboard | Non-admins get in | Server-side admin check on every route; verified-email allowlist | ✅ guard exists · ⬜ `email_verified` (phase 1) |
-| Backend exposed through ngrok | Strangers calling the API | Auth on everything except health/public receipt/audio; hardened demo auth; rate limits; body limits | ✅ baseline · ⬜ demo key (phase 1) |
+| Admin dashboard | Non-admins get in | Server-side admin check on every route; verified-email allowlist | ✅ |
+| Backend exposed through ngrok | Strangers calling the API | Auth on everything except health/public receipt/audio; hardened demo auth; rate limits; body limits | ✅ |
 | LLM behaviour | Prompt injection through speech; invented numbers | Structured outputs, code decides transitions, Number Guard, user text treated as data | ⬜ phase 8 |
 
 ---
@@ -37,14 +37,23 @@ the thing they protect.
   request.
 - 401 responses carry one generic message for every failure mode, so they are
   not a probing oracle. The real reason is logged.
-- `Settings.demo_auth_allowed` requires `DEMO_AUTH=true` **and** `APP_ENV=dev`
-  **and** a non-empty `DEMO_AUTH_KEY`. An empty key cannot match an empty
-  header.
+- **Demo auth needs four conditions** (D-035): `DEMO_AUTH=true`, `APP_ENV=dev`,
+  a non-empty `DEMO_AUTH_KEY`, and a caller `X-Demo-Key` matching it via
+  `hmac.compare_digest`. Rate-limited (60/min/IP) **before** the key is checked,
+  so guessing through the tunnel is slow. Every refusal returns one identical
+  message; tested by breaking each condition alone and asserting the four
+  responses are byte-identical.
+- **Admin requires a verified email** (D-037): `email_verified AND email in
+  DASHBOARD_ADMIN_EMAILS`. Anyone can put an address in a profile; only Google
+  can mark it verified.
+- **Two demo identities** (D-036): `sunita` (customer, iOS) and `demo-admin`
+  (dashboard, website, no persona). Both still need the allowlist to be admins.
+  All demo addresses use RFC 2606 `.invalid`, so none can reach a real mailbox.
+- `users.email_verified`, `session_kind` and `last_login_at` are stored, so the
+  dashboard and audit log can tell a real session from a demo one.
 
 **Open**
-- ⬜ `X-Demo-Key`, compared in constant time, with the `sunita` / `demo-admin`
-  identities and `actor=demo` audit entries (phase 1).
-- ⬜ Admin requires `email_verified == true` (phase 1).
+- ⬜ `actor=demo` audit entries (phase 3, when `audit_log` exists).
 - ⬜ Per-resource ownership checks returning **404**, never 403, so a wrong id
   and someone else's id are indistinguishable (phase 3).
 
@@ -106,7 +115,7 @@ the thing they protect.
   → 429 with `Retry-After`.
 
 **Open**
-- ⬜ Apply the limiter to routes as they are built (phases 1, 3, 6, 7).
+- ⬜ Apply the limiter to the remaining routes as they are built (phases 3, 6, 7).
 - ⬜ Pydantic models with `extra="forbid"`, enums and length caps (phase 3).
 - ⬜ Audio magic-byte validation → 415 (phase 7).
 
@@ -117,7 +126,7 @@ the thing they protect.
 | `/otp/verify` | 5 per 10 min per journey | ⬜ phase 3 |
 | `/receipts/*/verify-candidate` | 20 / min / user | ⬜ phase 6 |
 | `/r/*`, public `/receipts/*` | 60 / min / IP | ⬜ phase 6 |
-| Any demo-auth request | 60 / min / IP | ⬜ phase 1 |
+| Any demo-auth request | 60 / min / IP | ✅ phase 1 |
 
 ---
 
@@ -213,8 +222,16 @@ X-Request-ID: <16 hex chars>
 - `NSMicrophoneUsageDescription` present; the mic is requested only on first
   use, and typing always works if it is denied.
 
-**Open:** ⬜ assert no debug symbols in a Release binary (phase 1); ⬜ tokens in
-the Keychain, never `UserDefaults` (phase 1).
+- **Release verified in phase 1:** the built `Info.plist` has an empty
+  `DemoAuthKey` and no `NSAppTransportSecurity` block, and `strings` on the
+  binary finds no demo UI text. The whole of `DemoAuth.swift` is inside
+  `#if DEBUG`.
+- **Tokens are never stored by us.** Firebase keeps them in the Keychain; the
+  app asks for a fresh one per request and never writes one to `UserDefaults`.
+  `Auth.auth()` is reached only through one nil-guard (D-039).
+
+**Open:** ⬜ re-check the Release binary after every phase that touches auth
+(phase 12 security review).
 
 ---
 

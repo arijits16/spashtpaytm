@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { onAuthStateChanged, signInWithPopup, signOut, type User } from "firebase/auth";
 import { getMe, setAuthTokenProvider, setDemoUser, type Me } from "@/lib/api";
 import { AuthContext, type AuthContextValue, type AuthStatus } from "@/lib/authContext";
-import { DEMO_AUTH_ENABLED, DEMO_PERSONA, DEMO_SESSION_KEY } from "@/lib/env";
+import { DEMO_AUTH_ENABLED, DEMO_AUTH_KEY, DEMO_PERSONA, DEMO_SESSION_KEY } from "@/lib/env";
 import { getFirebaseAuth, googleProvider, isFirebaseConfigured } from "@/lib/firebase";
 
 /** Outcome of a `/api/me` call. Pure data - no React state is touched here. */
@@ -96,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hasStoredDemoSession()) return;
 
-    setDemoUser(DEMO_PERSONA);
+    setDemoUser(DEMO_PERSONA, DEMO_AUTH_KEY);
     void fetchMe().then(applyMe);
   }, [applyMe]);
 
@@ -146,7 +146,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInAsDemoUser = useCallback(async () => {
     setError(null);
     if (!DEMO_AUTH_ENABLED) {
-      setError("Demo sign-in is disabled. Set VITE_DEMO_AUTH=true in frontend/.env.");
+      setError(
+        "Demo sign-in is disabled. Set VITE_DEMO_AUTH=true and VITE_DEMO_AUTH_KEY " +
+          "(matching backend/.env) in frontend/.env.",
+      );
       return;
     }
 
@@ -162,14 +165,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     firebaseUser.current = null;
 
-    setDemoUser(DEMO_PERSONA);
+    setDemoUser(DEMO_PERSONA, DEMO_AUTH_KEY);
     sessionStorage.setItem(DEMO_SESSION_KEY, DEMO_PERSONA);
     setIsDemo(true);
 
     const result = await fetchMe();
     applyMe(result);
     if (!result.ok) {
-      setError("Demo sign-in failed. Is the backend running with DEMO_AUTH=true?");
+      setError(
+        "Demo sign-in failed. Check that the backend has DEMO_AUTH=true and that " +
+          "VITE_DEMO_AUTH_KEY matches DEMO_AUTH_KEY in backend/.env.",
+      );
     }
   }, [applyMe]);
 

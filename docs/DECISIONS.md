@@ -91,11 +91,15 @@ version in the 9.x line that resolves them. Root and frontend both audit clean.
 is the common hackathon-laptop case. Both check signature, issuer, audience and
 expiry against Google's published keys, so the fallback is not weaker.
 
-### D-014 — `is_admin` is recomputed on every request
+### D-014 — `is_admin` is recomputed on every request ~~(amended by D-037, D-038)~~
 It is derived from `DASHBOARD_ADMIN_EMAILS` inside `upsert_user`, never stored as
 a client-settable field. Removing an email from the allowlist revokes access on
 the next request rather than at the next login, and a `PATCH /api/me` carrying
 `isAdmin` is simply ignored. Both behaviours are tested.
+
+> **Amended in v2:** the allowlist check now also requires `email_verified`
+> (D-037), and an unknown field in `PATCH /api/me` is a 422 rather than ignored
+> (D-038).
 
 ### D-015 — Demo uids are namespaced `demo:<persona>`
 A demo user and a real Firebase account can therefore never collide on
@@ -280,3 +284,102 @@ phase 6; the script says so rather than pretending.
 It never overwrites a value that is already set — regenerating `CUSTOMER_REF_PEPPER`
 would silently invalidate every receipt already issued — and never prints a
 value, because the terminal is often on a projector.
+
+---
+
+## Phase 1 (v2)
+
+### D-035 — Demo auth needs four conditions, not two
+v1 honoured `X-Demo-User` whenever `DEMO_AUTH=true` and `APP_ENV=dev`. During a
+demo the API is reachable from the internet through the ngrok tunnel, which made
+that one header away from a session.
+
+It now also requires a non-empty `DEMO_AUTH_KEY` and a matching `X-Demo-Key`,
+compared with `hmac.compare_digest` so the key cannot be recovered by timing.
+The first three conditions are the environment's decision; the fourth is the
+caller's, and it is the only one an attacker cannot satisfy by finding the URL.
+
+The path is rate-limited **before** the key is checked (60/min/IP), so guessing
+is slow, and every refusal returns the same message — which condition failed is
+exactly what a prober wants to learn. Tested by breaking each condition on its
+own and by asserting all four refusals are byte-identical.
+
+### D-036 — `demo-admin` is a separate identity from `sunita`
+§13.2 names two demo identities. `sunita` is the customer the iPhone app signs
+in as; `demo-admin` is the dashboard operator the website signs in as, and it
+has **no persona** because an operator has no journey.
+
+The website previously signed in as `sunita`, which would now show a customer
+with no admin rights on a dashboard. `demo-admin` still has to be on
+`DASHBOARD_ADMIN_EMAILS` — the identity alone grants nothing — so
+`demo-admin@spasht.invalid` was added to the local `backend/.env`. All demo
+addresses use `.invalid`, which RFC 2606 reserves, so none can ever reach a
+real mailbox.
+
+### D-037 — Admin requires a **verified** email
+`is_admin` is now `email_verified AND email in DASHBOARD_ADMIN_EMAILS`. Anyone
+can put an address into a profile; only Google can mark it verified. Without the
+check, the allowlist admits whoever *claims* one of its addresses, which is no
+barrier at all.
+
+`users.email_verified` is stored (migration `0003_user_session`) and refreshed on
+every request alongside `is_admin` (D-014), so verifying an address grants access
+on the next request rather than at the next login. Existing rows default to
+`false`, which is the safe direction: a current admin signs in again.
+
+### D-038 — `/api/me` changed shape, and `extra="forbid"` makes that loud
+v2 §8.2 fixes the response as
+`{uid, email, displayName, photoUrl, preferredLanguage, isAdmin, session, persona}`.
+Renames from v1: `id` → `uid`, and `personaId` → a nested `persona` object.
+`persona` is an object from the start, with its other fields null, so phase 2
+filling in the masked name and city does not change the shape clients decode.
+
+`session` is returned so the demo badge is driven by the server's answer rather
+than the client's own state — in v1 the badge could disagree with reality
+(D-016). Now it cannot.
+
+`MePatch` uses `extra="forbid"` (§13.5), so `PATCH /api/me {"isAdmin": true}` is
+a 422 rather than a silent no-op. This **amends D-014**, which said such a field
+is "simply ignored": ignoring it looks to the caller like it worked. The field is
+still never honoured; it is now also never accepted.
+
+### D-039 — `Auth.auth()` is only ever reached through one guard
+**Found by running the app, not by a test.** `AuthService.start()` installed a
+token provider that called `Auth.auth().currentUser`. On a machine with no
+`GoogleService-Info.plist` Firebase is never configured, and `Auth.auth()`
+**traps** in that state — it is not a throwing API, so there is no recovering at
+the call site. The first demo request therefore crashed the app on launch: the
+one path that is supposed to work without Firebase was the one that could not.
+
+Every access now goes through `AuthService.currentFirebaseUser()`, which returns
+nil when `FirebaseApp.app()` is nil, and `GoogleSignInService.signOut()` guards
+the same way. `AuthServiceTests` runs in exactly that configuration — the test
+bundle has no plist — and asserts both the guard and that `start()` always
+reaches a terminal state, since a view stuck on `.starting` is the blank screen
+the crash produced.
+
+### D-040 — The Google button carries no Google logo
+§5.1 forbids third-party logo artwork anywhere in this concept, and that rule
+does not get an exception for the sign-in button: reproducing someone else's
+mark is the thing it exists to prevent. The button keeps the standard white
+surface, 48 pt height and "Continue with Google" wording, with an SF Symbol in
+place of the mark.
+
+### D-041 — The iOS app holds no business logic, including about itself
+`isAdmin`, the persona, the language and the session kind all come from
+`/api/me`. The app has no notion of what an admin is; it renders what the
+backend decided. The same applies to the website, whose route guard is cosmetic
+on top of the backend's own 403 (plan rule 10).
+
+### D-042 — `make ios-run` cannot show the app on this machine
+Xcode 27 does not install `Simulator.app` where previous versions did, and it is
+not present anywhere on this machine. `simctl` boots the device headlessly, so
+building, installing, launching, screenshotting and testing all work — but the
+scene never becomes `.active`, so anything behind a tap cannot be driven from
+the command line, and the privacy cover (§5.10) shows instead of the real
+screen.
+
+Consequence: the login screen was verified by screenshot, and everything behind
+it was verified through the API and the test suites. Checking the signed-in
+screen visually needs Xcode's ▶ button. Installing the Simulator component is in
+the human steps.

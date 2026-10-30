@@ -20,7 +20,7 @@ One line per phase. Tick a box only when its acceptance criteria in
 | Phase | What | Status |
 |---|---|---|
 | 0 | Monorepo, laptop-only website, iOS scaffold, security baseline | ✅ done — 2026-10-30 |
-| 1 | Login on iPhone and website, hardened demo auth, tunnel helper | ⬜ not started |
+| 1 | Login on iPhone and website, hardened demo auth, tunnel helper | ✅ done — 2026-10-30 |
 | 2 | Database and mock data | ⬜ not started |
 | 3 | Journey engine and API (backend only) | ⬜ not started |
 | 4 | iPhone: Paytm-style home and profile | ⬜ not started |
@@ -88,3 +88,57 @@ One line per phase. Tick a box only when its acceptance criteria in
 - `APP_VERSION` was raised to `0.2.0` in `backend/.env`, but uvicorn only
   watches `.py` files — the running backend keeps reporting `0.1.0` until it is
   restarted.
+
+---
+
+## Phase 1 (v2) — done (2026-10-30)
+
+- [⚠️] Simulator: **Continue with Google** → signed-in screen with your Google
+      name and email. **Blocked on a human step** — `GoogleService-Info.plist` is
+      not in the repo yet, so the button is correctly hidden behind an
+      explanatory hint (see "Human steps still open").
+- [⚠️] Simulator: **Continue as demo user** → Sunita J. The login screen and the
+      demo button render correctly (`docs/screens/phase1-login.png`), and the
+      demo path is verified end to end against the running backend by `curl` and
+      by 22 backend tests. The *screen behind the button* could not be captured:
+      `Simulator.app` is not installed on this machine, so the scene never
+      becomes `.active` and the privacy cover shows instead (D-042). Needs
+      Xcode's ▶ button.
+- [x] Wrong demo key → 401, shown as a clear error (tested 4 ways).
+- [x] Website: demo admin works in dev; non-admins are blocked; Logout works.
+      Google admin login needs a browser (see the manual steps).
+- [x] `make ios-build CONFIG=Release` succeeds; the built `Info.plist` has an
+      **empty** `DemoAuthKey`, no `NSAppTransportSecurity` block, and the binary
+      contains no demo strings.
+- [x] `curl` without a token → 401; with `X-Demo-User` but no key → 401.
+- [x] All lint, tests and builds pass — 95 backend · 15 website · 35 iOS; secret
+      scan clean.
+
+**Built:**
+- **Backend:** migration `0003_user_session` (`email_verified`, `session_kind`,
+  `last_login_at`); `security/demo_auth.py` (four-condition gate, constant-time
+  key compare, rate limited before the key check); admin now requires a
+  **verified** allowlisted email; `/api/me` reshaped to §8.2 and
+  `POST /api/me/persona`.
+- **iOS:** `AuthService` (`@Observable`), `GoogleSignInService`, `DemoAuth`
+  (entirely `#if DEBUG`), `LoginView`, `SignedInView` with a working language
+  switcher, splash and sign-out.
+- **Website:** signs in as `demo-admin` rather than `sunita`, sends
+  `X-Demo-Key`, and decodes the v2 error envelope.
+- **Contracts:** `me.json` and `error_unauthorized.json`, decoded by both the
+  iOS tests and a new website test.
+
+### Bug found and fixed during the phase
+- **The app crashed on launch whenever a demo session was restored** on a
+  machine with no `GoogleService-Info.plist`. `Auth.auth()` traps when Firebase
+  was never configured, and the token provider called it on the first demo
+  request — so the one path meant to work *without* Firebase was the one that
+  could not. Found by running the app, not by a test. Fixed behind a single
+  guard and covered by `AuthServiceTests` (DECISIONS D-039).
+
+### Known issues / carried forward
+- `Simulator.app` is not installed, so `make ios-run` boots headlessly and
+  cannot drive taps (D-042).
+- The running backend caches settings: `backend/.env` changes (`APP_VERSION`,
+  the new allowlist entry) need a backend restart to take effect.
+- No component tests for the website's `AuthProvider` yet (D-021 still stands).

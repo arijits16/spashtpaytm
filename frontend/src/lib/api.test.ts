@@ -65,12 +65,19 @@ describe("apiFetch", () => {
     expect(calledUrl(spy)).not.toContain("secret-token");
   });
 
-  it("raises ApiError carrying the status and FastAPI detail", async () => {
+  it("raises ApiError carrying the status, code and message", async () => {
+    // The standard envelope from build plan 8.1.
     mockFetch({
       ok: false,
       status: 409,
       statusText: "Conflict",
-      jsonBody: { detail: "teach-back not passed" },
+      jsonBody: {
+        error: {
+          code: "consent_locked",
+          message: "teach-back not passed",
+          requestId: "abc123",
+        },
+      },
     });
 
     await expect(apiFetch("/journeys/x/turn", { method: "POST", body: {} })).rejects.toThrow(
@@ -78,11 +85,13 @@ describe("apiFetch", () => {
     );
     await expect(apiFetch("/journeys/x/turn", { method: "POST" })).rejects.toMatchObject({
       status: 409,
+      code: "consent_locked",
       detail: "teach-back not passed",
     });
   });
 
-  it("falls back to statusText when the error body is not JSON", async () => {
+  it("falls back to statusText when the error body is not our envelope", async () => {
+    // What an ngrok interstitial or a proxy error page looks like.
     mockFetch({
       ok: false,
       status: 500,
@@ -92,6 +101,7 @@ describe("apiFetch", () => {
 
     await expect(apiFetch("/health")).rejects.toMatchObject({
       status: 500,
+      code: "internal_error",
       detail: "Internal Server Error",
     });
   });

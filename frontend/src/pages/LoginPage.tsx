@@ -69,7 +69,7 @@ export function LoginPage() {
             disabled={busy !== null}
             className="text-text-2 rounded-full border border-slate-300 bg-white/70 py-3 text-body font-semibold disabled:opacity-60"
           >
-            {busy === "demo" ? "Signing in…" : "Continue as demo user"}
+            {busy === "demo" ? "Signing in…" : "Continue as demo admin"}
           </button>
         )}
       </div>

@@ -76,3 +76,64 @@ final class ContractTests: XCTestCase {
         XCTAssertThrowsError(try JSONDecoder().decode(APIErrorBody.self, from: json))
     }
 }
+
+// MARK: - GET /api/me (phase 1)
+
+extension ContractTests {
+
+    func testMeFixtureDecodes() throws {
+        let me = try FixtureLoader.decode(Me.self, from: "me")
+
+        XCTAssertFalse(me.uid.isEmpty)
+        XCTAssertEqual(me.preferredLanguage, .marathi)
+        XCTAssertEqual(me.session, .firebase)
+        XCTAssertFalse(me.isAdmin)
+        XCTAssertEqual(me.persona?.id, "sunita")
+        XCTAssertFalse(me.isDemoSession)
+    }
+
+    func testDemoSessionDecodes() throws {
+        /// `demo-admin` has no persona, so `persona` must tolerate null.
+        let json = """
+            {
+              "uid": "demo:demo-admin",
+              "email": "demo-admin@spasht.invalid",
+              "displayName": "Demo Admin",
+              "photoUrl": null,
+              "preferredLanguage": "hi-IN",
+              "isAdmin": true,
+              "session": "demo",
+              "persona": null
+            }
+            """.data(using: .utf8)!
+
+        let me = try JSONDecoder().decode(Me.self, from: json)
+
+        XCTAssertTrue(me.isDemoSession)
+        XCTAssertTrue(me.isAdmin)
+        XCTAssertNil(me.persona)
+        XCTAssertEqual(me.preferredLanguage, .hindi)
+    }
+
+    func testUnauthorizedFixtureDecodes() throws {
+        let error = try FixtureLoader.decode(APIErrorBody.self, from: "error_unauthorized")
+
+        XCTAssertEqual(error.code, "unauthorized")
+    }
+
+    func testAnUnknownLanguageIsRejected() {
+        /// Better a visible error than silently showing the wrong language in a
+        /// product whose whole point is being understood.
+        let json = """
+            {"uid":"x","email":null,"displayName":null,"photoUrl":null,
+             "preferredLanguage":"ta-IN","isAdmin":false,"session":"firebase","persona":null}
+            """.data(using: .utf8)!
+
+        XCTAssertThrowsError(try JSONDecoder().decode(Me.self, from: json))
+    }
+
+    func testInitialsAreBuiltFromTheName() throws {
+        let me = try FixtureLoader.decode(Me.self, from: "me")
+        XCTAssertEqual(me.initials, "CE")
+    }
+}

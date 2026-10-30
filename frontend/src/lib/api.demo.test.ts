@@ -37,19 +37,35 @@ afterEach(() => {
   setDemoUser(null);
 });
 
-describe("demo user header", () => {
-  it("sends X-Demo-User when there is no token", async () => {
+const DEMO_KEY = "test-demo-key";
+
+describe("demo headers", () => {
+  it("sends both demo headers when there is no token", async () => {
     const spy = mockFetch();
-    setDemoUser("sunita");
+    setDemoUser("demo-admin", DEMO_KEY);
 
     await apiFetch("/me");
 
-    expect(headersOf(spy).get("X-Demo-User")).toBe("sunita");
+    const headers = headersOf(spy);
+    expect(headers.get("X-Demo-User")).toBe("demo-admin");
+    // Both are required: the backend 401s on the identity alone (plan 13.2).
+    expect(headers.get("X-Demo-Key")).toBe(DEMO_KEY);
+  });
+
+  it("sends nothing when the key is missing", async () => {
+    const spy = mockFetch();
+    setDemoUser("demo-admin", null);
+
+    await apiFetch("/me");
+
+    const headers = headersOf(spy);
+    expect(headers.has("X-Demo-User")).toBe(false);
+    expect(headers.has("X-Demo-Key")).toBe(false);
   });
 
   it("prefers a real bearer token over the demo header", async () => {
     const spy = mockFetch();
-    setDemoUser("sunita");
+    setDemoUser("demo-admin", DEMO_KEY);
     setAuthTokenProvider(() => Promise.resolve("id-token-123"));
 
     await apiFetch("/me");
@@ -57,10 +73,11 @@ describe("demo user header", () => {
     const headers = headersOf(spy);
     expect(headers.get("Authorization")).toBe("Bearer id-token-123");
     expect(headers.has("X-Demo-User")).toBe(false);
+    expect(headers.has("X-Demo-Key")).toBe(false);
   });
 
   it("stops sending the header once the demo user is cleared", async () => {
-    setDemoUser("sunita");
+    setDemoUser("demo-admin", DEMO_KEY);
     setDemoUser(null);
     const spy = mockFetch();
 
@@ -69,12 +86,13 @@ describe("demo user header", () => {
     expect(headersOf(spy).has("X-Demo-User")).toBe(false);
   });
 
-  it("never puts the demo persona in the URL", async () => {
+  it("never puts the demo identity or key in the URL", async () => {
     const spy = mockFetch();
-    setDemoUser("sunita");
+    setDemoUser("demo-admin", DEMO_KEY);
 
     await apiFetch("/me");
 
     expect(calledUrl(spy)).toBe("/api/me");
+    expect(calledUrl(spy)).not.toContain(DEMO_KEY);
   });
 });
