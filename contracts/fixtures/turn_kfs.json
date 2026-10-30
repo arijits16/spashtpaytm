@@ -1,5 +1,5 @@
 {
-  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "journeyId": "5498e9f4-0013-4f43-a71f-661e8e4073bd",
   "version": 7,
   "step": "EXPLAIN_KFS",
   "status": "active",
@@ -12,22 +12,22 @@
   "language": "mr-IN",
   "messages": [
     {
-      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:7:a0",
+      "id": "5498e9f4-0013-4f43-a71f-661e8e4073bd:7:a0",
       "role": "assistant",
       "text": "तुमचा EMI दर महिन्याला ₹4,600, 12 महिने. एकूण परतफेड ₹55,200.",
-      "audioUrl": null
+      "audioUrl": "/api/audio/f3f4bfb77d095c62e0f4d561021e204d9449a484d8401f60a6531d6a2a6d1872.mp3"
     },
     {
-      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:7:a1",
+      "id": "5498e9f4-0013-4f43-a71f-661e8e4073bd:7:a1",
       "role": "assistant",
       "text": "EMI उशिरा भरला तर ₹500 दंड लागेल आणि CIBIL स्कोर कमी होऊ शकतो. विमा ऐच्छिक आहे, तुम्ही नाही म्हणू शकता.",
-      "audioUrl": null
+      "audioUrl": "/api/audio/1f9e6c4b3bb900f8db505ca20e0d25512cd04d27dc41b0dbd6ee96f961e486fb.mp3"
     },
     {
-      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:7:a2",
+      "id": "5498e9f4-0013-4f43-a71f-661e8e4073bd:7:a2",
       "role": "assistant",
       "text": "मुदतीआधी कर्ज बंद केलं तर बाकी रकमेवर 4% शुल्क लागेल. विचार बदलला तर 3 दिवसांत दंडाशिवाय कर्ज बंद करता येईल.",
-      "audioUrl": null
+      "audioUrl": "/api/audio/e85a4a699ed29c71b76a30a387cf4d78acc44a1ec769b8964701994f9c666802.mp3"
     }
   ],
   "card": {

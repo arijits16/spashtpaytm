@@ -1,0 +1,12 @@
+{"text": "तुमचा EMI ₹4,600 आहे.", "allowed": true, "note": "the real EMI"}
+{"text": "तुमचा EMI ₹४,६०० आहे.", "allowed": true, "note": "Devanagari digits"}
+{"text": "तुमचा EMI ₹4,000 आहे.", "allowed": false, "note": "invented EMI"}
+{"text": "व्याजदर 18.5% आहे.", "allowed": false, "note": "wrong rate"}
+{"text": "व्याजदर 18.67% आहे.", "allowed": true, "note": "the real rate"}
+{"text": "EMI 4.6 हजार आहे.", "allowed": true, "note": "multiplier form"}
+{"text": "EMI 4 हजार आहे.", "allowed": false, "note": "multiplier hiding a wrong number"}
+{"text": "एकूण ₹55,200 परत करणार.", "allowed": true, "note": "the real total"}
+{"text": "एकूण ₹60,000 परत करणार.", "allowed": false, "note": "invented total"}
+{"text": "आता 3 प्रश्न.", "allowed": true, "note": "a safe small count"}
+{"text": "विमा ऐच्छिक आहे.", "allowed": true, "note": "no numbers at all"}
+{"text": "दर जवळपास 19% आहे.", "allowed": false, "note": "rounding is not permitted"}

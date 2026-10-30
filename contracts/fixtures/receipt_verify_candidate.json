@@ -4,7 +4,7 @@
     {
       "name": "payload_hash",
       "ok": false,
-      "detail": "The edited copy hashes to 29529f45e0cf…, not the signed abf24334dfe5…"
+      "detail": "The edited copy hashes to 31972b5dc2df…, not the signed ecdfff621372…"
     },
     {
       "name": "chain_link",
@@ -22,7 +22,7 @@
       "detail": "Key Fact Statement v3.2 matches, PDF included."
     }
   ],
-  "hash": "abf24334dfe5dd3327adb77840d30bf7a969015eea5391bc016c49aa43efef2f",
+  "hash": "ecdfff62137272b55a51c139727d173450e5b78bf64d3bf82d2a2fd65e34b758",
   "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
   "seq": 1,
   "keyId": "spasht-07",

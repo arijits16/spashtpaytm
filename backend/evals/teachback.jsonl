@@ -1,0 +1,17 @@
+{"text": "₹500 लेट फी लागेल आणि CIBIL स्कोर कमी होईल", "language": "mr-IN", "question_id": "q_late_fee", "expected_correct": true}
+{"text": "लेट फी आणि सिबिल स्कोर खाली जाईल", "language": "mr-IN", "question_id": "q_late_fee", "expected_correct": true}
+{"text": "काही होणार नाही", "language": "mr-IN", "question_id": "q_late_fee", "expected_correct": false}
+{"text": "माहीत नाही", "language": "mr-IN", "question_id": "q_late_fee", "expected_correct": false}
+{"text": "लेट फीस लगेगी और सिबिल स्कोर गिरेगा", "language": "hi-IN", "question_id": "q_late_fee", "expected_correct": true}
+{"text": "कुछ नहीं होगा", "language": "hi-IN", "question_id": "q_late_fee", "expected_correct": false}
+{"text": "a late fee and my credit score will drop", "language": "en-IN", "question_id": "q_late_fee", "expected_correct": true}
+{"text": "nothing happens", "language": "en-IN", "question_id": "q_late_fee", "expected_correct": false}
+{"text": "एकूण ५५,२०० परत करावे लागतील", "language": "mr-IN", "question_id": "q_total_repay", "expected_correct": true}
+{"text": "५०,०००", "language": "mr-IN", "question_id": "q_total_repay", "expected_correct": false}
+{"text": "कुल 55,200 चुकाना होगा", "language": "hi-IN", "question_id": "q_total_repay", "expected_correct": true}
+{"text": "I repay 55,200 in total", "language": "en-IN", "question_id": "q_total_repay", "expected_correct": true}
+{"text": "नाही, विमा ऐच्छिक आहे, नाही म्हणता येतं", "language": "mr-IN", "question_id": "q_insurance_optional", "expected_correct": true}
+{"text": "हो, बंधनकारक आहे", "language": "mr-IN", "question_id": "q_insurance_optional", "expected_correct": false}
+{"text": "नहीं, बीमा ज़रूरी नहीं है, मना कर सकते हैं", "language": "hi-IN", "question_id": "q_insurance_optional", "expected_correct": true}
+{"text": "no, it is optional, I can say no", "language": "en-IN", "question_id": "q_insurance_optional", "expected_correct": true}
+{"text": "yes it is compulsory", "language": "en-IN", "question_id": "q_insurance_optional", "expected_correct": false}

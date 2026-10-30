@@ -130,11 +130,18 @@ DIDNT_UNDERSTAND_WORDS = (
     "dobara",
     "didnt understand",
     "did not understand",
+    "didnt get",
+    "didnt follow",
+    "dont understand",
     "repeat",
     "again",
-    "what",
     "pardon",
     "come again",
+    # Not a bare "what": it appears in every English question, so it read
+    # "what is the processing fee?" as a request to repeat rather than as a
+    # question about the terms.
+    "what do you mean",
+    "say again",
 )
 
 HUMAN_WORDS = (
@@ -161,33 +168,29 @@ _LANGUAGE_WORDS: dict[Lang, tuple[str, ...]] = {
     "en-IN": ("इंग्रजी", "अंग्रेज़ी", "english", "angrezi", "ingrji"),
 }
 
+# Marks an utterance as a *question* rather than an answer.
+#
+# Checked before yes/no, and the reason is a consequence of substring-matching
+# Devanagari (see `_contains_any`): "होईल" ("will happen") contains "हो"
+# ("yes"), and "लागेल ना" ("will apply, no?") contains "ना" ("no"). So
+# "EMI उशिरा भरला तर काय होईल?" was read as *yes* and "late zala tar fine lagel
+# na?" as *no* - both of them questions about the terms, answered as though the
+# customer had agreed to something.
+_INTERROGATIVE_WORDS = (
+    "किती", "कसं", "कसे", "काय", "कधी", "कुठे", "का",
+    "कितना", "कैसे", "क्या", "कब", "कहाँ", "क्यों",
+    "kiti", "kay", "kitna", "kya", "kaise", "kab",
+    "what", "how", "when", "why", "where", "will i", "can i", "do i", "is it",
+)
+
 # A question about the terms rather than an answer to ours. Routed to the KFS
-# question-answering path in phase 8; until then it triggers a re-explanation.
+# question-answering path (section 10.3).
 _TERMS_QUESTION_WORDS = (
-    "किती",
-    "कसं",
-    "काय होईल",
-    "लागेल का",
-    "कितना",
-    "कैसे",
-    "क्या होगा",
-    "लगेगा",
-    "how much",
-    "what if",
-    "what happens",
-    "will i",
-    "charge",
-    "fee",
-    "fine",
-    "दंड",
-    "शुल्क",
-    "जुर्माना",
-    "चार्ज",
-    "फी",
-    "फीस",
-    "व्याज",
-    "ब्याज",
-    "interest",
+    "किती", "कसं", "काय होईल", "लागेल", "कितना", "कैसे", "क्या होगा", "लगेगा",
+    "how much", "what if", "what happens", "will i", "charge", "fee", "fine",
+    "दंड", "शुल्क", "जुर्माना", "चार्ज", "फी", "फीस", "व्याज", "ब्याज", "interest",
+    "विमा", "बीमा", "insurance", "जरुरी", "ज़रूरी", "जरूरी", "बंधनकारक",
+    "बंद", "band", "रद्द", "cancel", "मन बदल", "विचार बदल", "lagel", "penalty",
 )
 
 # "the cheapest one" - the offer choice that is a judgement, not a name (§7.5).
@@ -313,7 +316,10 @@ _NUMBER_WORDS: dict[str, int] = {
 # further - the product does not price by purpose, it just records it.
 _PURPOSE_WORDS: dict[str, tuple[str, ...]] = {
     "machine": ("मशीन", "शिलाई मशीन", "शिवणयंत्र", "machine", "sewing", "silai"),
-    "shop": ("दुकान", "दुकानासाठी", "shop", "dukan", "business", "व्यवसाय", "धंदा"),
+    "shop": (
+        "दुकान", "दुकानासाठी", "shop", "dukan", "dukaan", "dukaan ke liye",
+        "business", "व्यवसाय", "धंदा", "shop ke liye",
+    ),
     "education": ("शिक्षण", "फी", "पढाई", "education", "school", "college", "fees"),
     "medical": ("दवाखाना", "इलाज", "औषध", "medical", "hospital", "treatment"),
     "home": ("घर", "घरासाठी", "home", "house", "ghar", "repair", "दुरुस्ती"),
@@ -325,24 +331,64 @@ def normalise(text: str) -> str:
     """Fold a raw utterance into something matchable.
 
     NFKC first, so visually identical Devanagari written with different code
-    points compares equal; then Devanagari digits to ASCII; then commas inside
-    numbers away, so "५०,०००" and "50000" are the same token.
+    points compares equal; then Devanagari digits to ASCII; then apostrophes
+    away, so "didn't" matches the lexicon's "didnt"; then commas inside numbers
+    away, so "५०,०००" and "50000" are the same token.
     """
     folded = unicodedata.normalize("NFKC", text).strip().lower()
     folded = folded.translate(_DIGIT_MAP)
+    # Typed and curly apostrophes both, since an iOS keyboard produces the
+    # curly one and a lexicon cannot list every spelling of every contraction.
+    folded = folded.replace("\u2019", "").replace("'", "")
     folded = re.sub(r"(?<=\d)[,\s](?=\d)", "", folded)
     return re.sub(r"\s+", " ", folded)
 
 
-def _contains_any(haystack: str, needles: tuple[str, ...]) -> bool:
-    """Substring match, which is right for these languages.
+def tokenise(text: str) -> list[str]:
+    r"""Split a normalised utterance into words.
 
-    Marathi and Hindi agglutinate postpositions onto the word ("दुकानासाठी" =
-    "दुकान" + "साठी"), so a whole-word match would miss most real sentences. The
-    risk of a false positive on a short needle is handled by checking the
-    specific lexicons before the general ones.
+    **Not** `re.findall(r"\w+")`. Python's `\w` excludes Unicode combining
+    marks, and Devanagari vowel signs *are* combining marks - so `\w+` splits
+    "पहिला" into "पह" and "ल", and a word-level lookup can never match it. That
+    silently broke spoken offer choice in Marathi and Hindi.
+
+    Splitting on separators instead keeps each word whole in every script.
     """
-    return any(needle in haystack for needle in needles)
+    return [token for token in re.split(r"[\s,.!?;:()\[\]/\\\"-]+", text) if token]
+
+
+# A needle made only of ASCII letters and spaces. These are matched on word
+# boundaries; Devanagari needles are matched as substrings. See `_contains_any`.
+_ASCII_NEEDLE_RE = re.compile(r"^[a-z ]+$")
+
+
+def _contains_any(haystack: str, needles: tuple[str, ...]) -> bool:
+    """Match a lexicon against an utterance, per script.
+
+    **Devanagari needles are substring-matched.** Marathi and Hindi agglutinate
+    postpositions onto the word ("दुकानासाठी" = "दुकान" + "साठी"), so requiring
+    a whole-word match would miss most real sentences.
+
+    **Latin needles are word-boundary-matched.** Substring matching them is how
+    "no thanks" was read as *yes*: the Hindi transliteration "han" appears
+    inside "thanks". The transliterations are short and common enough that they
+    collide with ordinary English words, so they only count as whole words.
+    """
+    tokens = set(tokenise(haystack))
+
+    for needle in needles:
+        if _ASCII_NEEDLE_RE.match(needle):
+            if " " in needle:
+                # A multi-word Latin phrase: substring is right, and the words
+                # are long enough that a collision is not a real risk.
+                if needle in haystack:
+                    return True
+            elif needle in tokens:
+                return True
+        elif needle in haystack:
+            return True
+
+    return False
 
 
 def parse_amount(text: str) -> int | None:
@@ -422,11 +468,141 @@ def parse_offer_hint(text: str, lender_names: tuple[str, ...] = ()) -> str | Non
 
     # Whole-token match for ordinals: "a" and "one" are too short to substring
     # match safely ("a" appears in almost every Latin transliteration).
-    for token in re.findall(r"\w+", normalised):
+    for token in tokenise(normalised):
         if token in _ORDINALS:
             return f"index:{_ORDINALS[token]}"
 
     return None
+
+
+# Marathi/Hindi question words mapped to the English terms the KFS clauses are
+# written in (§10.3). The customer asks in their language; the clauses are in
+# English because that is the format the document comes in, so the question has
+# to be translated into *search terms* rather than the clauses into Marathi.
+_CLAUSE_TERMS: dict[str, tuple[str, ...]] = {
+    "late fee penalty cibil credit score delayed payment": (
+        # Both spellings of "late": the oblique form "उशिरा" is what appears in
+        # a real sentence ("EMI उशिरा भरला"), and it does not contain "उशीर" -
+        # the vowel sign differs, so one spelling cannot match the other.
+        "उशीर",
+        "उशिरा",
+        "लेट",
+        "दंड",
+        "फी",
+        "फीस",
+        "जुर्माना",
+        "देर",
+        "cibil",
+        "सिबिल",
+        "late",
+        "fine",
+        "penalty",
+        "miss",
+        "delay",
+    ),
+    "foreclosure prepayment close the loan early outstanding": (
+        "आधी",
+        "मुदतीआधी",
+        "बंद",
+        "फोरक्लोजर",
+        "पहले",
+        "जल्दी",
+        "foreclos",
+        "prepay",
+        "close",
+        "early",
+        "settle",
+        # Latin transliterations, which is how this gets typed on a phone:
+        # "loan lavkar band kela tar kiti charge?"
+        "lavkar",
+        "band kela",
+        "band kiya",
+        "jaldi band",
+        "pehle band",
+    ),
+    "cooling off look up period exit no penalty": (
+        "विचार बदल",
+        "मन बदल",
+        "कूलिंग",
+        "रद्द",
+        "cancel",
+        "cooling",
+        "change my mind",
+        "मन बदल जाए",
+    ),
+    "insurance optional premium credit life": (
+        "विमा",
+        "बीमा",
+        "insurance",
+        "premium",
+        "हप्ता",
+        "प्रीमियम",
+    ),
+    "processing fee gst deducted net amount disbursed": (
+        "शुल्क",
+        "फी",
+        "फीस",
+        "जीएसटी",
+        "gst",
+        "कापल",
+        "कटेगी",
+        "fee",
+        "charge",
+        "processing",
+        "deduct",
+    ),
+    "interest rate apr annual percentage reducing balance": (
+        "व्याज",
+        "दर",
+        "ब्याज",
+        "interest",
+        "rate",
+        "apr",
+        "ए पी आर",
+    ),
+    "repayment schedule emi instalment total amount repayable": (
+        "ईएमआय",
+        "ईएमआई",
+        "emi",
+        "हप्ता",
+        "किस्त",
+        "परतफेड",
+        "चुकाना",
+        "एकूण",
+        "कुल",
+        "total",
+        "repay",
+        "instal",
+    ),
+    "grievance redressal complaint ombudsman": (
+        "तक्रार",
+        "शिकायत",
+        "complaint",
+        "grievance",
+        "ombudsman",
+    ),
+    "recovery agent contact practices": (
+        "वसुली",
+        "एजंट",
+        "recovery",
+        "agent",
+        "वसूली",
+    ),
+}
+
+
+def clause_search_terms(text: str) -> str:
+    """English search terms for a question asked in any of the three languages.
+
+    Returns the concatenated terms for every topic the utterance touches, or the
+    text itself when nothing matched - a question in English needs no mapping,
+    and giving the search *something* beats giving it nothing.
+    """
+    normalised = normalise(text)
+    matched = [
+        terms for terms, triggers in _CLAUSE_TERMS.items() if _contains_any(normalised, triggers)
+    ]
+    return " ".join(matched) if matched else text
 
 
 def understand(
@@ -474,13 +650,23 @@ def understand(
     if offer_hint is not None and not step_expects_amount:
         return Understanding(Intent.CHOOSE_OFFER, offer_hint=offer_hint, raw=raw)
 
+    # A question about the terms is checked *before* yes/no. A question that
+    # happens to contain a yes-or-no substring is still a question, and
+    # answering it as agreement is the worst available outcome: it would move
+    # the journey on while the customer was still asking.
+    asks_about_terms = _contains_any(normalised, _TERMS_QUESTION_WORDS)
+    is_interrogative = "?" in raw or _contains_any(normalised, _INTERROGATIVE_WORDS)
+
+    if asks_about_terms and is_interrogative:
+        return Understanding(Intent.QUESTION_ABOUT_TERMS, raw=raw)
+
     if _contains_any(normalised, YES_WORDS):
         return Understanding(Intent.YES, raw=raw)
 
     if _contains_any(normalised, NO_WORDS):
         return Understanding(Intent.NO, raw=raw)
 
-    if _contains_any(normalised, _TERMS_QUESTION_WORDS):
+    if asks_about_terms:
         return Understanding(Intent.QUESTION_ABOUT_TERMS, raw=raw)
 
     # Nothing matched. `confident=False` is the signal for phase 8's LLM

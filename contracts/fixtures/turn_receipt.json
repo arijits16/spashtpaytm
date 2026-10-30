@@ -1,5 +1,5 @@
 {
-  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "journeyId": "5498e9f4-0013-4f43-a71f-661e8e4073bd",
   "version": 14,
   "step": "RECEIPT",
   "status": "completed",
@@ -12,16 +12,16 @@
   "language": "mr-IN",
   "messages": [
     {
-      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:14:a0",
+      "id": "5498e9f4-0013-4f43-a71f-661e8e4073bd:14:a0",
       "role": "assistant",
       "text": "झालं! तुमची स्पष्ट पावती तयार आहे आणि मराठीत सारांश पाठवला आहे.",
-      "audioUrl": null
+      "audioUrl": "/api/audio/f4dd9a50bb7224bbe34c89863329ed3395e70c1a71039737674e74ef358c415d.mp3"
     }
   ],
   "card": {
     "type": "receipt",
     "data": {
-      "receiptNo": "SP-6Q8JA82H",
+      "receiptNo": "SP-9RD45KQN",
       "lender": "Partner NBFC A",
       "emi": 4600,
       "tenureMonths": 12,
@@ -32,9 +32,9 @@
         "total": 3
       },
       "insuranceTaken": false,
-      "publicUrl": "http://localhost:8000/r/SP-6Q8JA82H",
-      "summaryText": "Partner NBFC A कडून कर्ज मंजूर. दर महिन्याला ₹4,600, 12 महिने. एकूण परतफेड ₹55,200. EMI उशिरा भरला तर ₹500 दंड आणि CIBIL स्कोर कमी होऊ शकतो. विमा घेतला नाही. विचार बदलला तर 3 दिवसांत दंडाशिवाय कर्ज बंद करता येईल. पावती क्रमांक SP-6Q8JA82H.",
-      "createdAt": "2026-10-30T13:28:38.780714+00:00"
+      "publicUrl": "http://localhost:8000/r/SP-9RD45KQN",
+      "summaryText": "Partner NBFC A कडून कर्ज मंजूर. दर महिन्याला ₹4,600, 12 महिने. एकूण परतफेड ₹55,200. EMI उशिरा भरला तर ₹500 दंड आणि CIBIL स्कोर कमी होऊ शकतो. विमा घेतला नाही. विचार बदलला तर 3 दिवसांत दंडाशिवाय कर्ज बंद करता येईल. पावती क्रमांक SP-9RD45KQN.",
+      "createdAt": "2026-10-30T14:22:59.261711+00:00"
     }
   },
   "quickReplies": [],

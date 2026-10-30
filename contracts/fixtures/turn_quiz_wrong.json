@@ -1,5 +1,5 @@
 {
-  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "journeyId": "5498e9f4-0013-4f43-a71f-661e8e4073bd",
   "version": 9,
   "step": "TEACHBACK",
   "status": "active",
@@ -12,16 +12,16 @@
   "language": "mr-IN",
   "messages": [
     {
-      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:9:a0",
+      "id": "5498e9f4-0013-4f43-a71f-661e8e4073bd:9:a0",
       "role": "assistant",
       "text": "जवळजवळ! मी सोप्या शब्दांत सांगते.",
-      "audioUrl": null
+      "audioUrl": "/api/audio/2efb42485b7dafba6caaaf25e1b9b9802125d68ab9e31e1af0f9155c13c8d94e.mp3"
     },
     {
-      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:9:a1",
+      "id": "5498e9f4-0013-4f43-a71f-661e8e4073bd:9:a1",
       "role": "assistant",
       "text": "समजा, तुम्ही EMI ठरलेल्या तारखेनंतर भरला, तर ₹500 दंड लागेल आणि तुमचा CIBIL स्कोर खाली जाईल. पुढे कर्ज मिळायला अडचण येऊ शकते.",
-      "audioUrl": null
+      "audioUrl": "/api/audio/2acfb88abb8b68a02e5d86fb7608e83eeacb66ca68021bc1f32bfa486ef6b427.mp3"
     }
   ],
   "card": {

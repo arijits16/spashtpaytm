@@ -24,7 +24,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health, journeys, kfs, ledger, me, receipts
+from app.api import audio, health, journeys, kfs, ledger, me, receipts, voice
 from app.config import settings
 from app.errors import install_error_handlers
 from app.logging import configure_logging
@@ -105,6 +105,8 @@ def create_app() -> FastAPI:
     app.include_router(health.router, prefix=API_PREFIX)
     app.include_router(me.router, prefix=API_PREFIX)
     app.include_router(journeys.router, prefix=API_PREFIX)
+    app.include_router(voice.router, prefix=API_PREFIX)
+    app.include_router(audio.router, prefix=API_PREFIX)
     app.include_router(kfs.router, prefix=API_PREFIX)
     app.include_router(receipts.router, prefix=API_PREFIX)
     app.include_router(ledger.router, prefix=API_PREFIX)

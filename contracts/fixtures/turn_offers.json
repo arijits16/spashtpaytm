@@ -1,5 +1,5 @@
 {
-  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "journeyId": "5498e9f4-0013-4f43-a71f-661e8e4073bd",
   "version": 6,
   "step": "OFFERS",
   "status": "active",
@@ -12,10 +12,10 @@
   "language": "mr-IN",
   "messages": [
     {
-      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:6:a0",
+      "id": "5498e9f4-0013-4f43-a71f-661e8e4073bd:6:a0",
       "role": "assistant",
       "text": "कन्फर्म झालं. आता तुमच्यासाठीच्या ऑफर बघू.",
-      "audioUrl": null
+      "audioUrl": "/api/audio/4c70bb9ba4f2b68468a727ffb799907664348becdb394db6392c6a38bdfe6117.mp3"
     }
   ],
   "card": {

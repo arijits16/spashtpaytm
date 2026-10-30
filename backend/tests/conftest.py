@@ -70,6 +70,26 @@ def clean_users() -> Iterator[None]:
 
 
 @pytest.fixture(autouse=True)
+def _no_live_ai(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
+    """Keep the test suite off the network.
+
+    A developer with `SARVAM_API_KEY` set would otherwise have the journey
+    tests making real LLM calls: slow, non-deterministic, and billed. Worse,
+    the suite would pass or fail depending on what a model happened to say, so
+    it would stop being evidence about *our* code.
+
+    Forcing demo mode means the rules-and-templates path is what gets tested,
+    which is also the path the golden path uses (§10.6). Tests that want the AI
+    layer exercise it directly with a fake client.
+    """
+    monkeypatch.setattr("app.ai.sarvam_client.demo_mode_active", lambda _settings: True)
+    monkeypatch.setattr("app.journey.understand.demo_mode_active", lambda _settings: True)
+    monkeypatch.setattr("app.journey.polish.demo_mode_active", lambda _settings: True)
+    monkeypatch.setattr("app.voice.turns.demo_mode_active", lambda _settings: True)
+    yield
+
+
+@pytest.fixture(autouse=True)
 def _clear_settings_cache() -> Iterator[None]:
     """Stop the cached settings singleton leaking between tests."""
     get_settings.cache_clear()

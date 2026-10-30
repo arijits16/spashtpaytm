@@ -1,0 +1,54 @@
+{"text": "मला ५० हजारांचं कर्ज शिलाई मशीनसाठी हवं आहे", "language": "mr-IN", "expected_intent": "provide_need", "expected_amount": 50000, "expected_purpose": "machine", "step_expects_amount": true}
+{"text": "पन्नास हजार रुपये हवे आहेत", "language": "mr-IN", "expected_intent": "provide_need", "expected_amount": 50000, "step_expects_amount": true}
+{"text": "५०,०००", "language": "mr-IN", "expected_intent": "provide_need", "expected_amount": 50000, "step_expects_amount": true}
+{"text": "मुझे 50 हजार का लोन चाहिए", "language": "hi-IN", "expected_intent": "provide_need", "expected_amount": 50000, "step_expects_amount": true}
+{"text": "mujhe 50 hazaar ka loan chahiye for machine", "language": "hi-IN", "expected_intent": "provide_need", "expected_amount": 50000, "expected_purpose": "machine", "step_expects_amount": true, "code_mixed": true}
+{"text": "एक लाख चाहिए दुकान के लिए", "language": "hi-IN", "expected_intent": "provide_need", "expected_amount": 100000, "expected_purpose": "shop", "step_expects_amount": true}
+{"text": "I need fifty thousand for a sewing machine", "language": "en-IN", "expected_intent": "provide_need", "expected_amount": 50000, "expected_purpose": "machine", "step_expects_amount": true}
+{"text": "25000 for my shop", "language": "en-IN", "expected_intent": "provide_need", "expected_amount": 25000, "expected_purpose": "shop", "step_expects_amount": true}
+{"text": "1.5 lakh", "language": "en-IN", "expected_intent": "provide_need", "expected_amount": 150000, "step_expects_amount": true}
+{"text": "dukaan ke liye paisa chahiye", "language": "hi-IN", "expected_intent": "provide_need", "expected_purpose": "shop", "step_expects_amount": true, "code_mixed": true}
+{"text": "मुलीच्या शिक्षणासाठी ७५ हजार", "language": "mr-IN", "expected_intent": "provide_need", "expected_amount": 75000, "expected_purpose": "education", "step_expects_amount": true}
+{"text": "घर दुरुस्तीसाठी ३० हजार हवे", "language": "mr-IN", "expected_intent": "provide_need", "expected_amount": 30000, "expected_purpose": "home", "step_expects_amount": true}
+{"text": "हो", "language": "mr-IN", "expected_intent": "yes"}
+{"text": "होय, चालेल", "language": "mr-IN", "expected_intent": "yes"}
+{"text": "ठीक आहे", "language": "mr-IN", "expected_intent": "yes"}
+{"text": "हाँ", "language": "hi-IN", "expected_intent": "yes"}
+{"text": "जी हाँ, ठीक है", "language": "hi-IN", "expected_intent": "yes"}
+{"text": "haan theek hai", "language": "hi-IN", "expected_intent": "yes"}
+{"text": "yes", "language": "en-IN", "expected_intent": "yes"}
+{"text": "okay, that's fine", "language": "en-IN", "expected_intent": "yes"}
+{"text": "ho chalel", "language": "mr-IN", "expected_intent": "yes"}
+{"text": "नाही", "language": "mr-IN", "expected_intent": "no"}
+{"text": "नको, आता नको", "language": "mr-IN", "expected_intent": "no"}
+{"text": "नहीं", "language": "hi-IN", "expected_intent": "no"}
+{"text": "nahi, mat lo", "language": "hi-IN", "expected_intent": "no"}
+{"text": "no thanks", "language": "en-IN", "expected_intent": "no"}
+{"text": "nako", "language": "mr-IN", "expected_intent": "no"}
+{"text": "समजलं नाही", "language": "mr-IN", "expected_intent": "didnt_understand"}
+{"text": "कळलं नाही, पुन्हा सांगा", "language": "mr-IN", "expected_intent": "didnt_understand"}
+{"text": "समझ नहीं आया", "language": "hi-IN", "expected_intent": "didnt_understand"}
+{"text": "फिर से बताओ", "language": "hi-IN", "expected_intent": "didnt_understand"}
+{"text": "I didn't understand", "language": "en-IN", "expected_intent": "didnt_understand"}
+{"text": "say that again", "language": "en-IN", "expected_intent": "didnt_understand"}
+{"text": "माणसाशी बोलायचं आहे", "language": "mr-IN", "expected_intent": "want_human"}
+{"text": "इंसान से बात करनी है", "language": "hi-IN", "expected_intent": "want_human"}
+{"text": "can I talk to a person", "language": "en-IN", "expected_intent": "want_human"}
+{"text": "agent se baat karao", "language": "hi-IN", "expected_intent": "want_human"}
+{"text": "सगळ्यात स्वस्त", "language": "mr-IN", "expected_intent": "choose_offer", "expected_offer_hint": "cheapest"}
+{"text": "सबसे सस्ता वाला", "language": "hi-IN", "expected_intent": "choose_offer", "expected_offer_hint": "cheapest"}
+{"text": "the cheapest one", "language": "en-IN", "expected_intent": "choose_offer", "expected_offer_hint": "cheapest"}
+{"text": "पहिला", "language": "mr-IN", "expected_intent": "choose_offer", "expected_offer_hint": "index:0"}
+{"text": "दूसरा चुनो", "language": "hi-IN", "expected_intent": "choose_offer", "expected_offer_hint": "index:1"}
+{"text": "Partner NBFC A", "language": "en-IN", "expected_intent": "choose_offer", "expected_offer_hint": "lender:Partner NBFC A", "lender_names": ["Partner NBFC A", "Partner Bank B", "Partner NBFC C"]}
+{"text": "हिंदी में बोलो", "language": "mr-IN", "expected_intent": "switch_language", "expected_language": "hi-IN"}
+{"text": "मराठीत सांगा", "language": "hi-IN", "expected_intent": "switch_language", "expected_language": "mr-IN"}
+{"text": "English please", "language": "mr-IN", "expected_intent": "switch_language", "expected_language": "en-IN"}
+{"text": "late zala tar fine lagel na?", "language": "mr-IN", "expected_intent": "question_about_terms", "expected_clause": "late_fee", "code_mixed": true}
+{"text": "loan lavkar band kela tar kiti charge?", "language": "mr-IN", "expected_intent": "question_about_terms", "expected_clause": "foreclosure", "code_mixed": true}
+{"text": "EMI उशिरा भरला तर काय होईल?", "language": "mr-IN", "expected_intent": "question_about_terms", "expected_clause": "late_fee"}
+{"text": "विमा घेणं जरुरी आहे का?", "language": "mr-IN", "expected_intent": "question_about_terms", "expected_clause": "insurance_optional"}
+{"text": "अगर मन बदल जाए तो?", "language": "hi-IN", "expected_intent": "question_about_terms", "expected_clause": "cooling_off"}
+{"text": "कितना ब्याज लगेगा?", "language": "hi-IN", "expected_intent": "question_about_terms", "expected_clause": "interest_rate"}
+{"text": "what is the processing fee?", "language": "en-IN", "expected_intent": "question_about_terms", "expected_clause": "processing_fee"}
+{"text": "how much do I repay in total?", "language": "en-IN", "expected_intent": "question_about_terms", "expected_clause": "emi_schedule"}

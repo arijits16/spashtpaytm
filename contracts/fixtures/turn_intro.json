@@ -1,5 +1,5 @@
 {
-  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "journeyId": "5498e9f4-0013-4f43-a71f-661e8e4073bd",
   "version": 2,
   "step": "ASK_NEED",
   "status": "active",
@@ -12,10 +12,10 @@
   "language": "mr-IN",
   "messages": [
     {
-      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:1:a0",
+      "id": "5498e9f4-0013-4f43-a71f-661e8e4073bd:1:a0",
       "role": "assistant",
       "text": "नमस्कार! मी स्पष्ट. तुम्हाला किती रकमेचं आणि कशासाठी कर्ज हवं आहे?",
-      "audioUrl": null
+      "audioUrl": "/api/audio/e5101acfed70cf85a159250bc8db8f2007260bc3f4c9ebc07091b34157caf254.mp3"
     }
   ],
   "card": {

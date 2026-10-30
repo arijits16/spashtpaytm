@@ -191,16 +191,29 @@ final class AuthService {
     }
 
     /// Change the language and persist it (`PATCH /api/me`).
+    ///
+    /// Non-throwing: callers that have nowhere to show an error get the message
+    /// in `errorMessage` instead.
     func setLanguage(_ language: Language) async {
         do {
-            let updated: Me = try await client.patch(
-                Endpoints.me, body: MePatch(preferredLanguage: language), as: Me.self
-            )
-            state = .signedIn(updated)
+            try await updateLanguage(language)
         } catch let error as APIError {
             errorMessage = error.userMessage
         } catch {
             errorMessage = "Could not save your language."
         }
+    }
+
+    /// Change the language, propagating the failure.
+    ///
+    /// The language sheet needs this: it has a visible error row and a Save
+    /// button to keep enabled, and silently dismissing after a failed save
+    /// would leave the customer believing a product about speaking their
+    /// language had agreed to speak it.
+    func updateLanguage(_ language: Language) async throws {
+        let updated: Me = try await client.patch(
+            Endpoints.me, body: MePatch(preferredLanguage: language), as: Me.self
+        )
+        state = .signedIn(updated)
     }
 }

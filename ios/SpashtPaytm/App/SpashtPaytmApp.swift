@@ -28,10 +28,7 @@ struct SpashtPaytmApp: App {
     }
 }
 
-/// Switches between login and the signed-in screen.
-///
-/// Phase 4 replaces `SignedInView` with the Paytm-style home; the shape of this
-/// view does not change.
+/// Switches between login and the home screen.
 struct RootView: View {
     let auth: AuthService
 
@@ -43,7 +40,14 @@ struct RootView: View {
             case .signedOut, .signingIn:
                 LoginView(auth: auth)
             case .signedIn(let me):
-                SignedInView(auth: auth, me: me)
+                // The concept ribbon sits above the home screen rather than
+                // inside it, so it is present on every screen the app can
+                // reach and no navigation can scroll it away (§5.1).
+                VStack(spacing: 0) {
+                    ConceptRibbon()
+                    HomeView(auth: auth, me: me)
+                }
+                .ignoresSafeArea(.keyboard, edges: .bottom)
             }
         }
         .animation(.easeInOut(duration: 0.2), value: auth.state)

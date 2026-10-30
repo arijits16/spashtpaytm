@@ -34,6 +34,14 @@ enum AppConfig {
         return plistURL(for: Key.apiBaseURL) ?? fallbackURL
     }
 
+    /// The Info.plist value, ignoring any Debug override.
+    ///
+    /// Shown in Dev settings so "clear the override" can say what it will fall
+    /// back to, rather than leaving the user to guess.
+    static var compiledAPIBaseURL: URL {
+        plistURL(for: Key.apiBaseURL) ?? fallbackURL
+    }
+
     /// The origin receipt QR codes point at. Only used for display in the app;
     /// the backend builds the real links so they cannot be spoofed by a client.
     static var publicBaseURL: URL {

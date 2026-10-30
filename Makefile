@@ -142,6 +142,9 @@ format: ## Auto-fix formatting and lint issues
 		&& swift-format format --in-place --recursive $(IOS_DIR)/SpashtPaytm $(IOS_DIR)/SpashtPaytmTests \
 		|| echo "    swift-format not installed, skipping Swift"
 
+golden-path: ## Walk the whole journey over HTTP and print each step
+	@cd backend && .venv/bin/python scripts/play_golden_path.py $(ARGS)
+
 contracts: ## Regenerate contracts/fixtures/*.json from the backend
 	@echo "==> regenerating contract fixtures"
 	@cd backend && SPASHT_WRITE_CONTRACTS=1 .venv/bin/python -m pytest tests/test_contracts.py -q
@@ -150,11 +153,11 @@ contracts: ## Regenerate contracts/fixtures/*.json from the backend
 sarvam-smoke: ## Check the Sarvam key and the TTS/STT/LLM endpoints
 	@cd backend && .venv/bin/python scripts/sarvam_smoke.py
 
-eval: ## Run the LLM eval suite (phase 8)
-	@echo "eval lands in phase 8"
+eval: ## Run the understanding + guard eval suite, writing docs/EVAL.md
+	@cd backend && .venv/bin/python -m evals.run $(ARGS)
 
-tts-cache: ## Pre-generate TTS audio for every template line (phase 7)
-	@echo "tts-cache lands in phase 7"
+tts-cache: ## Pre-generate TTS audio for every template line
+	@cd backend && .venv/bin/python scripts/tts_cache.py $(ARGS)
 
 # ------------------------------------------------------------------- ios -----
 

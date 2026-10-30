@@ -125,7 +125,12 @@ from app.journey.teachback import (
 )
 from app.journey.teachback import render as render_question
 from app.journey.templates import honorific, render, render_with_facts
-from app.journey.understand_rules import Intent, Understanding, understand
+from app.journey.understand_rules import (
+    Intent,
+    Understanding,
+    clause_search_terms,
+    understand,
+)
 
 log = logging.getLogger(__name__)
 
@@ -140,6 +145,28 @@ CONFUSION_LIMIT = 2
 
 # The window the handoff card promises. Matches `CONTACT_WINDOW` in config.
 HANDOFF_WINDOW = "9 am - 6 pm"
+
+
+@dataclass(frozen=True, slots=True)
+class GenerationRequest:
+    """A request for better-phrased text, which the route may fulfil.
+
+    @param kind            'reexplain' | 'kfs_answer'.
+    @param message_index   Which of `assistant_messages` to replace on success.
+    @param seeded          The already-correct text, and the guard's fallback.
+
+    Modelled as data rather than as a callback so the engine stays free of any
+    knowledge of the AI layer: it states what *could* be improved and the route
+    decides whether that is possible right now.
+    """
+
+    kind: str
+    message_index: int
+    seeded: str
+    facts: dict[str, Any]
+    question_prompt: str = ""
+    customer_question: str = ""
+    search_terms: str = ""
 
 
 @dataclass
@@ -159,6 +186,13 @@ class EngineResult:
     #: receipt (phase 6) before serialising the response.
     needs_receipt: bool = False
 
+    #: A prose improvement the route may await after the engine has finished
+    #: (phase 8). The engine has already produced a correct, seeded message;
+    #: this only asks for a better-phrased version of it. If the LLM is down or
+    #: the Number Guard rejects the result, the seeded text stands and nothing
+    #: about the journey changes.
+    generation: GenerationRequest | None = None
+
 
 class Engine:
     """One turn's worth of work on one journey.
@@ -175,6 +209,7 @@ class Engine:
         self.actor = actor
         self.context = JourneyContext.of(journey.context)
         self.messages: list[str] = []
+        self._generation: GenerationRequest | None = None
         self._card: Card | None = None
         self._quick_replies: list[QuickReply] = []
         self._needs_receipt = False
@@ -218,8 +253,50 @@ class Engine:
         self._enter(Step.RECEIPT)
         return self.finish()
 
-    def handle(self, turn_input: TurnInput) -> EngineResult:
-        """Advance the journey by one customer turn."""
+    def render_current_step_publicly(self) -> None:
+        """Rebuild the current card without advancing or speaking.
+
+        Used by the voice route when a recording was unclear: the
+        `didnt_catch` line has already been added, and the customer should see
+        the same step again rather than a blank screen.
+        """
+        self._render_current_step(speak=False)
+
+    def note_detected_language(self, detected: Lang | None) -> None:
+        """Track a language mismatch on a voice turn (§10.1).
+
+        Two consecutive turns detected in a different language than the journey
+        is being conducted in means the customer has switched and we have not.
+        Offering to follow them is better than continuing to answer in a
+        language they have stopped using.
+        """
+        if detected is None:
+            return
+        self.context.detected_language = detected
+        if detected == self._language:
+            self.context.language_mismatch_streak = 0
+            return
+
+        self.context.language_mismatch_streak += 1
+        if self.context.language_mismatch_streak >= 2:
+            # Follow the customer rather than asking: they have now said two
+            # things in this language, which is a clearer signal than a prompt
+            # they would have to answer in the language they are struggling in.
+            self._switch_language(detected)
+            self.context.language_mismatch_streak = 0
+
+    def handle(
+        self, turn_input: TurnInput, understanding: Understanding | None = None
+    ) -> EngineResult:
+        """Advance the journey by one customer turn.
+
+        @param understanding  A pre-resolved classification for a text turn
+                              (`journey/understand.resolve`). Passed in rather
+                              than computed here because resolving it may
+                              involve an LLM call, and keeping `await` out of
+                              the state machine is what lets every transition
+                              be read as a plain function.
+        """
         events.record(
             self.db,
             journey_id=self.journey.id,
@@ -232,7 +309,7 @@ class Engine:
         if isinstance(turn_input, TapInput):
             self._handle_action(turn_input.action)
         else:
-            self._handle_text(turn_input.text)
+            self._handle_text(turn_input.text, understanding)
 
         return self.finish(user_message=self._echo_of(turn_input))
 
@@ -246,19 +323,21 @@ class Engine:
         """
         return turn_input.text if isinstance(turn_input, TextInput) else None
 
-    def _handle_text(self, text: str) -> None:
-        """Understand free text, then route it like a tap.
+    def _handle_text(self, text: str, understanding: Understanding | None = None) -> None:
+        """Route free text through the same handlers a tap reaches.
 
-        The rules (§7.5) run first and the LLM (phase 8) only sees what they
-        cannot classify, so the golden path never waits on a model.
+        Falls back to the rules alone when no classification was supplied,
+        which keeps the engine usable on its own - in a test, or from the
+        golden-path script - without a model or a network.
         """
-        offers = self._current_offers()
-        result = understand(
-            text,
-            step_expects_amount=self._step is Step.ASK_NEED,
-            lender_names=lender_names(offers),
-        )
-        self._route_understanding(result)
+        if understanding is None:
+            offers = self._current_offers()
+            understanding = understand(
+                text,
+                step_expects_amount=self._step is Step.ASK_NEED,
+                lender_names=lender_names(offers),
+            )
+        self._route_understanding(understanding)
 
     def _route_understanding(self, result: Understanding) -> None:
         """Map an intent onto the same handlers a tap would reach.
@@ -281,11 +360,6 @@ class Engine:
         if result.intent in (Intent.DIDNT_UNDERSTAND, Intent.OTHER):
             self._on_not_understood(repeat=result.intent is Intent.DIDNT_UNDERSTAND)
             return
-
-        # Understood: the confusion streak resets, so two *consecutive*
-        # misunderstandings trigger the handoff rather than two spread over a
-        # conversation that was otherwise going fine.
-        self.context.confusion_streak = 0
 
         if step is Step.INTRO:
             # Any understood utterance at INTRO means she is talking already;
@@ -340,9 +414,7 @@ class Engine:
             return
 
         if result.intent is Intent.QUESTION_ABOUT_TERMS:
-            # Phase 8 answers from the KFS clauses. Until then, re-explaining is
-            # the honest fallback - it is the same information, less targeted.
-            self._on_question_about_terms()
+            self._on_question_about_terms(result.raw)
             return
 
         self._on_not_understood()
@@ -458,6 +530,27 @@ class Engine:
 
         self._enter(Step.PREFILL)
 
+    def offers_for_understanding(self) -> list[dict[str, Any]]:
+        """The offers on screen, as plain dicts for the understanding layer.
+
+        Empty before an amount is known, the full list at OFFERS, and just the
+        selected one afterwards - which is also exactly the Number Guard's
+        allow-list, because what is quotable and what is referrable are the
+        same set (§10.5).
+        """
+        selected = self._selected_offer()
+        offers = [selected] if selected is not None else self._current_offers()
+        return [{"offer_id": offer.offer_id, **offer.facts} for offer in offers]
+
+    def quiz_options_for_understanding(self) -> list[tuple[str, str]]:
+        """`(id, text)` for the question on screen, if there is one."""
+        if self._step is not Step.TEACHBACK:
+            return []
+        question = self._current_question()
+        if question is None:
+            return []
+        return [(option.id, option.text) for option in question.options]
+
     def needs_prefill(self) -> bool:
         """True when PREFILL has been entered but the adapters have not run.
 
@@ -467,13 +560,13 @@ class Engine:
         """
         return self._step is Step.PREFILL and not self._get_meta("prefill_rows", [])
 
-    def run_prefill_sync(self) -> None:
+    async def run_prefill(self) -> None:
         """PREFILL: fetch from the consented sources and show what came back.
 
-        Called by the route rather than from `_enter`, because the adapters are
-        async and the engine is deliberately synchronous - the state machine
-        reads better without `await` on every branch, and the only I/O that is
-        not the database is this one step.
+        The one `async` method on an otherwise synchronous state machine, and
+        the only non-database I/O in the whole journey. Awaited by the route
+        rather than reached from `_enter`, so every transition stays a plain
+        function call that a reviewer can follow without tracing a coroutine.
 
         The journey **stays** on PREFILL afterwards. The customer is shown each
         value with the source it came from, which is the screen that turns "we
@@ -481,22 +574,18 @@ class Engine:
         can see it is right" - the reassurance is the step's whole purpose, so
         it does not get skipped past in the same turn.
         """
-        import asyncio
-
-        from app.adapters import run_prefill
+        from app.adapters import run_prefill as fetch_all
 
         persona_id = self.journey.persona_id
         if not persona_id:
             self._enter(Step.MANUAL_FORM)
             return
 
-        results = asyncio.run(
-            run_prefill(
-                self.db,
-                persona_id,
-                include_identity=self.context.consent_digilocker,
-                include_financial=self.context.consent_account_aggregator,
-            )
+        results = await fetch_all(
+            self.db,
+            persona_id,
+            include_identity=self.context.consent_digilocker,
+            include_financial=self.context.consent_account_aggregator,
         )
 
         prefill = self.context.prefill
@@ -853,15 +942,29 @@ class Engine:
         self.messages.append(render("didnt_catch", self._language))
         self._render_current_step(speak=False)
 
-    def _on_question_about_terms(self) -> None:
+    def _on_question_about_terms(self, question: str = "") -> None:
         """A question about the loan rather than an answer to ours.
 
-        Phase 8 answers this from the KFS clauses. Re-stating the relevant
-        explanation is the honest interim: same facts, less precision.
+        A seeded explanation goes out immediately, and the route is told it may
+        replace it with an answer drawn from the actual KFS clauses (§10.3). So
+        the customer always gets something true, and gets something *targeted*
+        when the model and the clauses can supply it.
         """
         offer = self._selected_offer()
-        if offer is not None:
-            self.messages.append(render_with_facts("explain_2", self._language, offer.facts))
+        if offer is None:
+            self._on_not_understood()
+            return
+
+        seeded = render_with_facts("explain_2", self._language, offer.facts)
+        self.messages.append(seeded)
+        self._generation = GenerationRequest(
+            kind="kfs_answer",
+            message_index=len(self.messages) - 1,
+            seeded=seeded,
+            facts=offer.facts,
+            customer_question=question,
+            search_terms=clause_search_terms(question) if question else "",
+        )
         self._render_current_step(speak=False)
 
     def _to_handoff(self, reason: str, *, event_type: str = events.HANDOFF) -> None:
@@ -884,7 +987,18 @@ class Engine:
     # --- step entry and rendering -------------------------------------------
 
     def _enter(self, step: Step, *, speak: bool = True) -> None:
-        """Move to a step, audit it, and build its card."""
+        """Move to a step, audit it, and build its card.
+
+        Entering a *different* step clears the confusion streak. That is the
+        only thing that clears it, and it has to be: an earlier version reset
+        the streak whenever an intent was recognised, which meant a turn that
+        was classified and then still went nowhere - "I have a question" at
+        CONSENT_DATA, say - reset the counter it had just incremented. The
+        streak could never reach two and the §13.7 escalation never fired.
+        Measuring progress by the step actually changing cannot drift like that.
+        """
+        if str(step) != self.journey.step:
+            self.context.confusion_streak = 0
         self.journey.step = str(step)
         events.record(
             self.db,
@@ -1520,6 +1634,7 @@ class Engine:
             assistant_messages=list(self.messages),
             user_message=user_message,
             needs_receipt=self._needs_receipt,
+            generation=self._generation,
         )
 
     def _wire_status(self) -> str:

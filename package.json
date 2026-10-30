@@ -30,7 +30,8 @@
     "ios-run": "make ios-run",
     "ios-config": "make ios-config",
     "ios-icon": "make ios-icon",
-    "kfs-pdfs": "make kfs-pdfs"
+    "kfs-pdfs": "make kfs-pdfs",
+    "golden-path": "make golden-path"
   },
   "devDependencies": {
     "concurrently": "9.2.5"

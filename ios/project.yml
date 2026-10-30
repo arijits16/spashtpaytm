@@ -64,6 +64,16 @@ targets:
     postBuildScripts:
       - name: Copy GoogleService-Info.plist if present
         basedOnDependencyAnalysis: false
+        # Declared so user script sandboxing grants read access. A declared
+        # input that does not exist is fine for a *script* phase (it just means
+        # the phase always runs), unlike a missing source file - which is why
+        # this is a script and not a `sources:` entry.
+        inputFiles:
+          - $(SRCROOT)/SpashtPaytm/Config/GoogleService-Info.plist
+        # The destination has to be declared too, or the sandbox denies the
+        # write into the built .app.
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist
         script: |
           set -e
           SRC="$SRCROOT/SpashtPaytm/Config/GoogleService-Info.plist"

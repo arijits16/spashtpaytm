@@ -1,5 +1,5 @@
 {
-  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "journeyId": "5498e9f4-0013-4f43-a71f-661e8e4073bd",
   "version": 13,
   "step": "OTP",
   "status": "active",
@@ -12,10 +12,10 @@
   "language": "mr-IN",
   "messages": [
     {
-      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:13:a0",
+      "id": "5498e9f4-0013-4f43-a71f-661e8e4073bd:13:a0",
       "role": "assistant",
       "text": "पुष्टीसाठी तुमच्या मोबाईलवर आलेला OTP टाइप करा. तो कधीच बोलून सांगू नका.",
-      "audioUrl": null
+      "audioUrl": "/api/audio/3ef747568e662740126d37cc13e8bc2fed7b7e06e6703a61a27cb045525bbacf.mp3"
     }
   ],
   "card": {

@@ -1,5 +1,5 @@
 {
-  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "journeyId": "5498e9f4-0013-4f43-a71f-661e8e4073bd",
   "version": 8,
   "step": "TEACHBACK",
   "status": "active",
@@ -12,16 +12,16 @@
   "language": "mr-IN",
   "messages": [
     {
-      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:8:u",
+      "id": "5498e9f4-0013-4f43-a71f-661e8e4073bd:8:u",
       "role": "user",
       "text": "हो",
       "audioUrl": null
     },
     {
-      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:8:a0",
+      "id": "5498e9f4-0013-4f43-a71f-661e8e4073bd:8:a0",
       "role": "assistant",
       "text": "आता ३ छोटे प्रश्न, तुम्हाला सगळं नीट समजलं का हे बघण्यासाठी.",
-      "audioUrl": null
+      "audioUrl": "/api/audio/8b0a4e49cf280299e48817733111c8b1d7ac6b8024551f28e7876ad12ddc77a8.mp3"
     }
   ],
   "card": {

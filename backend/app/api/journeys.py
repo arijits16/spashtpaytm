@@ -35,9 +35,13 @@ from app.deps import CurrentUser, DbDep, SettingsDep
 from app.errors import ApiError, not_found
 from app.journey import events, otp
 from app.journey.engine import ConsentLocked, Engine, EngineResult
-from app.journey.responses import TurnRequest, TurnResponse
+from app.journey.polish import polish
+from app.journey.responses import TextInput, TurnRequest, TurnResponse
 from app.journey.states import DEFAULT_LANGUAGE, Lang, Status, Step
+from app.journey.understand import resolve
+from app.journey.understand_rules import Understanding
 from app.security.ratelimit import client_identity, limiter
+from app.voice.turns import attach_audio, record_turn
 
 log = logging.getLogger(__name__)
 
@@ -188,6 +192,28 @@ def _replay(db: Session, turn_id: uuid.UUID, user: User) -> TurnResponse | None:
     return TurnResponse.model_validate(row.response)
 
 
+async def resolve_understanding(
+    text: str, journey: Journey, engine: Engine, settings: Settings
+) -> Understanding:
+    """Classify a text turn, with the context the current step provides.
+
+    The offers and quiz options are handed over so the model can resolve "the
+    cheapest one" or "the second option" against what is actually on screen -
+    which is also why `understand_rules` does not need to know any of it.
+    """
+    offers = engine.offers_for_understanding()
+    return await resolve(
+        text,
+        language=journey.language,  # type: ignore[arg-type]
+        step=journey.step,
+        settings=settings,
+        step_expects_amount=journey.step == str(Step.ASK_NEED),
+        lender_names=tuple(offer["lender"] for offer in offers),
+        offers=offers,
+        quiz_options=engine.quiz_options_for_understanding(),
+    )
+
+
 def _check_version(journey: Journey, expected: int | None) -> None:
     """Optimistic lock (§8.3). Two racing taps become a 409, not a lost update."""
     if expected is not None and expected != journey.version:
@@ -201,7 +227,7 @@ def _check_version(journey: Journey, expected: int | None) -> None:
 
 
 @router.post("", response_model=TurnResponse)
-def start_journey(
+async def start_journey(
     payload: StartJourneyRequest,
     request: Request,
     user: CurrentUser,
@@ -219,6 +245,7 @@ def start_journey(
     if existing is not None:
         engine = Engine(db, existing, settings, actor=_actor(user))
         response = _finalise(db, existing, engine.resume(), settings, user)
+        await attach_audio(response, settings)
         db.commit()
         return response
 
@@ -236,13 +263,23 @@ def start_journey(
     db.flush()
 
     engine = Engine(db, journey, settings, actor=_actor(user))
-    response = _finalise(db, journey, engine.start(), settings, user)
+    result = engine.start()
+    response = _finalise(db, journey, result, settings, user)
+    await attach_audio(response, settings)
+    record_turn(
+        db,
+        journey,
+        settings,
+        user_text="",
+        assistant_messages=result.assistant_messages,
+        source="tap",
+    )
     db.commit()
     return response
 
 
 @router.get("/current", response_model=TurnResponse)
-def current_journey(user: CurrentUser, db: DbDep, settings: SettingsDep) -> TurnResponse:
+async def current_journey(user: CurrentUser, db: DbDep, settings: SettingsDep) -> TurnResponse:
     """The active journey's latest screen, or 404 (§8.2).
 
     This is what makes "kill the app mid-journey and relaunch" work: the client
@@ -254,24 +291,26 @@ def current_journey(user: CurrentUser, db: DbDep, settings: SettingsDep) -> Turn
 
     engine = Engine(db, journey, settings, actor=_actor(user))
     response = engine.resume().response
+    await attach_audio(response, settings)
     db.commit()
     return response
 
 
 @router.get("/{journey_id}", response_model=TurnResponse)
-def get_journey(
+async def get_journey(
     journey_id: uuid.UUID, user: CurrentUser, db: DbDep, settings: SettingsDep
 ) -> TurnResponse:
     """Re-render a journey the caller owns."""
     journey = _owned(db, journey_id, user)
     engine = Engine(db, journey, settings, actor=_actor(user))
     response = engine.resume().response
+    await attach_audio(response, settings)
     db.commit()
     return response
 
 
 @router.post("/{journey_id}/turn", response_model=TurnResponse)
-def take_turn(
+async def take_turn(
     journey_id: uuid.UUID,
     payload: TurnRequest,
     request: Request,
@@ -305,8 +344,16 @@ def take_turn(
         raise ApiError("validation_error", "This journey is already complete.")
 
     engine = Engine(db, journey, settings, actor=_actor(user))
+
+    # Free text is classified before the engine runs: the rules first, and the
+    # LLM only for what they cannot place (section 10.3). Resolving it out here
+    # keeps `await` out of the state machine entirely.
+    understanding = None
+    if isinstance(payload.input, TextInput):
+        understanding = await resolve_understanding(payload.input.text, journey, engine, settings)
+
     try:
-        result = engine.handle(payload.input)
+        result = engine.handle(payload.input, understanding)
     except ConsentLocked as exc:
         # 409, not 403: the request was legitimate and will succeed once the
         # teach-back passes, which is what the message says.
@@ -316,10 +363,25 @@ def take_turn(
     # PREFILL does the only non-database I/O in the journey, and the engine is
     # deliberately synchronous, so the adapters are driven from here.
     if engine.needs_prefill():
-        engine.run_prefill_sync()
+        await engine.run_prefill()
         result = engine.finish(user_message=result.user_message)
 
     response = _finalise(db, journey, result, settings, user)
+
+    # The engine has already put a correct, seeded message on the response.
+    # This may replace it with a better-phrased one - and cannot make it worse,
+    # because the Number Guard's fallback is the seeded text itself.
+    response = await polish(db, journey, result, response, settings, actor=_actor(user))
+
+    await attach_audio(response, settings)
+    record_turn(
+        db,
+        journey,
+        settings,
+        user_text=result.user_message or "",
+        assistant_messages=result.assistant_messages,
+        source="text" if isinstance(payload.input, TextInput) else "tap",
+    )
     _store_turn(db, journey, user, payload.clientTurnId, response)
     db.commit()
     return response
@@ -363,7 +425,7 @@ def send_otp(
 
 
 @router.post("/{journey_id}/otp/verify", response_model=TurnResponse)
-def verify_otp(
+async def verify_otp(
     journey_id: uuid.UUID,
     payload: OtpVerifyRequest,
     request: Request,
@@ -419,6 +481,15 @@ def verify_otp(
     result = engine.complete()
 
     response = _finalise(db, journey, result, settings, user)
+    await attach_audio(response, settings)
+    record_turn(
+        db,
+        journey,
+        settings,
+        user_text="",
+        assistant_messages=result.assistant_messages,
+        source="tap",
+    )
     journey.completed_at = journey.completed_at or journey.last_activity_at
     events.record(
         db,

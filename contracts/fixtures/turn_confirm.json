@@ -1,5 +1,5 @@
 {
-  "journeyId": "45307cd9-0a5a-4a94-9e67-6598a4abd82e",
+  "journeyId": "5498e9f4-0013-4f43-a71f-661e8e4073bd",
   "version": 5,
   "step": "CONFIRM_DETAILS",
   "status": "active",
@@ -12,16 +12,16 @@
   "language": "mr-IN",
   "messages": [
     {
-      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:5:u",
+      "id": "5498e9f4-0013-4f43-a71f-661e8e4073bd:5:u",
       "role": "user",
       "text": "हो",
       "audioUrl": null
     },
     {
-      "id": "45307cd9-0a5a-4a94-9e67-6598a4abd82e:5:a0",
+      "id": "5498e9f4-0013-4f43-a71f-661e8e4073bd:5:a0",
       "role": "assistant",
       "text": "तुमची माहिती भरली आहे. फक्त दुकानाचा पत्ता आणि मोबाईल नंबर कन्फर्म करा.",
-      "audioUrl": null
+      "audioUrl": "/api/audio/c22bf5c86d938cef5bec933caccca787f8273c79be7dfbf3df3fc835b48da292.mp3"
     }
   ],
   "card": {

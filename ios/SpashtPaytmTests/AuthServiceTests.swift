@@ -26,13 +26,41 @@ final class AuthServiceTests: XCTestCase {
         )
     }
 
-    func testGoogleIsUnavailableWithoutThePlist() {
+    /// Google sign-in is offered **exactly when** the config is present.
+    ///
+    /// Asserted as a relationship rather than as a fixed expectation, because
+    /// both sides are legitimate: a fresh clone has no
+    /// `GoogleService-Info.plist` and must hide the button, while a configured
+    /// machine has one and must show it. An earlier version of this test
+    /// hard-coded "unavailable" and started failing the moment the plist was
+    /// added — it was testing the checkout, not the behaviour.
+    func testGoogleAvailabilityTracksTheBundledConfig() {
         let auth = AuthService()
 
-        XCTAssertFalse(
+        XCTAssertEqual(
             auth.isGoogleAvailable,
-            "Without GoogleService-Info.plist the Google button must stay hidden."
+            AppConfig.isGoogleSignInConfigured,
+            "The Google button must appear if and only if the Firebase config is bundled."
         )
+    }
+
+    /// Whichever side of that we are on, the demo path must stand alone.
+    ///
+    /// This is the promise phase 1 makes: if the plist is missing, everything
+    /// else still works and the phase report says what is absent.
+    func testDemoLoginDoesNotDependOnGoogle() {
+        #if DEBUG
+            XCTAssertEqual(
+                AppConfig.isDemoLoginAvailable,
+                AppConfig.demoAuthKey != nil,
+                "Demo login depends only on the demo key, never on Firebase."
+            )
+        #else
+            XCTAssertFalse(
+                AppConfig.isDemoLoginAvailable,
+                "Release builds must never offer the demo login."
+            )
+        #endif
     }
 
     func testStartingUpWithoutCredentialsSettlesOnSignedOut() async {
