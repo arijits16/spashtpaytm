@@ -1,0 +1,8 @@
+{
+  "status": "ok",
+  "db": "ok",
+  "sarvam": "configured",
+  "version": "0.1.0",
+  "env": "dev",
+  "demoMode": false
+}

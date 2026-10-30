@@ -57,7 +57,9 @@ def test_admin_route_returns_403_for_a_signed_in_non_admin(
         response = c.get("/api/_test/admin-only", headers=AUTH)
 
     assert response.status_code == 403
-    assert response.json()["detail"] == "Admin access required"
+    body = response.json()["error"]
+    assert body["code"] == "forbidden"
+    assert body["message"] == "Admin access required"
 
 
 def test_admin_route_returns_401_with_no_credentials() -> None:

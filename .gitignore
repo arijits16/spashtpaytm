@@ -26,6 +26,19 @@ backend/secrets/
 *.pem
 *.key
 *service-account*.json
+# iOS: local config and the Firebase app config (build plan 13.3)
+ios/Config/Secrets.xcconfig
+ios/SpashtPaytm/Config/GoogleService-Info.plist
+
+# --- ios build output ---
+# project.yml is the source of truth; the .xcodeproj IS committed (with
+# Package.resolved) so every machine builds the same dependencies.
+xcuserdata/
+DerivedData/
+*.xcuserstate
+*.xcscmblueprint
+.swiftpm/
+ios/build/
 
 # --- generated caches / artefacts ---
 backend/.cache/
@@ -33,6 +46,8 @@ backend/app/assets/kfs/*.pdf
 
 # --- reference screenshots (personal data, look-matching only) ---
 docs/reference/
+# --- simulator screenshots taken while matching the design ---
+docs/screens/
 
 # --- os / editor ---
 .DS_Store

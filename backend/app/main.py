@@ -1,7 +1,18 @@
 """FastAPI application factory for the Spasht backend.
 
-Routers are mounted under `/api`; the Vite dev server proxies `/api` to port 8000,
-so the phone needs a single HTTPS tunnel and there is no CORS in development.
+One backend serves three clients (build plan section 3): the native iPhone app
+over the ngrok tunnel, the laptop website through the Vite `/api` proxy, and a
+judge's phone browser hitting the public receipt page. Routers are mounted under
+`/api`; the public receipt page (phase 6) will sit at `/r/{receiptNo}`.
+
+Middleware order matters and is asserted by tests. Starlette runs middleware in
+reverse registration order, so the list below is written outermost-last:
+
+    request id  ->  security headers  ->  CORS  ->  body limit  ->  routes
+
+The request id is set first so every log line and every error body can name it,
+and the security headers wrap CORS so that even a rejected pre-flight carries
+them.
 """
 
 from __future__ import annotations
@@ -15,16 +26,31 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import health, me
 from app.config import settings
+from app.errors import install_error_handlers
 from app.logging import configure_logging
+from app.security.bodylimit import BodySizeLimitMiddleware
+from app.security.headers import SecurityHeadersMiddleware
+from app.security.request_id import RequestIdMiddleware
 
 log = logging.getLogger(__name__)
 
 API_PREFIX = "/api"
 
+# Headers a client may send. `X-Demo-User` / `X-Demo-Key` are the dev-only demo
+# session (section 13.2); they are listed so the website can use demo admin in
+# dev. The native app is not subject to CORS at all.
+ALLOWED_REQUEST_HEADERS = [
+    "Authorization",
+    "Content-Type",
+    "X-Demo-User",
+    "X-Demo-Key",
+    "X-Request-ID",
+]
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Startup / shutdown. Background jobs (rescue agent) attach here in phase 9."""
+    """Startup / shutdown. Background jobs (rescue agent) attach here in phase 10."""
     configure_logging("DEBUG" if settings.is_dev else "INFO")
     log.info(
         "spasht backend starting",
@@ -33,6 +59,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             "version": settings.app_version,
             "sarvam": "configured" if settings.sarvam_configured else "demo",
             "demo_mode": settings.demo_mode,
+            "demo_auth": settings.demo_auth_allowed,
         },
     )
     yield
@@ -55,15 +82,24 @@ def create_app() -> FastAPI:
         openapi_url=f"{API_PREFIX}/openapi.json" if settings.is_dev else None,
     )
 
-    # In dev the Vite proxy makes requests same-origin; CORS is the escape hatch
-    # for a directly-opened backend and for the tunnel in phase 12.
+    # Innermost first (see the module docstring for the resulting order).
+    app.add_middleware(BodySizeLimitMiddleware)
+
+    # The native app does not use CORS; this exists only for the website, so the
+    # allowlist is exactly `CORS_ORIGINS` and never `*` (section 13.4).
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
         allow_credentials=True,
         allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-        allow_headers=["Authorization", "Content-Type", "X-Demo-User"],
+        allow_headers=ALLOWED_REQUEST_HEADERS,
+        expose_headers=["X-Request-ID", "Retry-After"],
     )
+
+    app.add_middleware(SecurityHeadersMiddleware)
+    app.add_middleware(RequestIdMiddleware)
+
+    install_error_handlers(app)
 
     app.include_router(health.router, prefix=API_PREFIX)
     app.include_router(me.router, prefix=API_PREFIX)

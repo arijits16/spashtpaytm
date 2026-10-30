@@ -5,11 +5,14 @@ import { DEMO_AUTH_ENABLED } from "@/lib/env";
 import { isFirebaseConfigured } from "@/lib/firebase";
 
 /**
- * Login and splash (build plan 5.5).
+ * Website login (build plan 5.8).
  *
- * Light-blue vertical gradient, centred text wordmark plus a `Concept` pill,
- * `Continue with Google`, and - only when VITE_DEMO_AUTH=true - a demo path
- * that needs no network.
+ * Laptop-only: this is the door to the lender and compliance dashboard, so it
+ * is centred in the viewport rather than laid out for a phone. Light-blue
+ * gradient, a text wordmark plus a `Concept` pill, `Continue with Google`, and
+ * - only when `VITE_DEMO_AUTH=true` - a demo path that needs no network.
+ *
+ * Customers do not log in here; they use the Spasht iPhone app.
  */
 export function LoginPage() {
   const { signInWithGoogle, signInAsDemoUser, error } = useAuth();
@@ -24,10 +27,10 @@ export function LoginPage() {
 
   return (
     <div
-      className="flex min-h-full flex-col items-center justify-between px-screen py-10 text-center"
+      className="flex min-h-dvh flex-col items-center justify-center gap-8 px-6 py-12 text-center"
       style={{ background: "var(--login-grad)" }}
     >
-      <div className="flex flex-1 flex-col items-center justify-center gap-2">
+      <div className="flex flex-col items-center gap-2">
         <div className="flex items-baseline gap-2">
           {/* Plain text wordmark - never the official two-tone logo artwork (5.1). */}
           <span className="text-navy text-[34px] leading-none font-bold tracking-tight">Paytm</span>
@@ -36,10 +39,10 @@ export function LoginPage() {
           </span>
         </div>
         <p className="text-text-2 mt-1 text-body font-medium">Spasht · loans you understand</p>
-        <p className="text-text-3 text-caption">स्पष्ट — तुमच्या भाषेत, तुम्हाला समजेल असं</p>
+        <p className="text-text-3 text-caption">Lender &amp; compliance dashboard</p>
       </div>
 
-      <div className="flex w-full max-w-[320px] flex-col gap-3">
+      <div className="flex w-full max-w-[340px] flex-col gap-3">
         {error && (
           <p
             role="alert"
@@ -71,8 +74,9 @@ export function LoginPage() {
         )}
       </div>
 
-      <p className="text-text-3 mt-8 max-w-[300px] text-[11px] leading-snug">
-        Concept prototype for Paytm Build for India AI Hackathon · not the live Paytm app
+      <p className="text-text-3 max-w-[360px] text-[11px] leading-snug">
+        Concept prototype for Paytm Build for India AI Hackathon · not the live Paytm app ·
+        synthetic data only
       </p>
     </div>
   );

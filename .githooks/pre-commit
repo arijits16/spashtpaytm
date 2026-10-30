@@ -1,0 +1,19 @@
+#!/bin/sh
+# Spasht pre-commit hook (build plan section 13.3).
+#
+# Blocks a commit that stages something looking like a secret. Enabled by
+# `make setup`, or by hand:
+#
+#     git config core.hooksPath .githooks
+#
+# To commit anyway (you had better be sure): git commit --no-verify
+
+set -e
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "pre-commit: node not found, skipping the secret scan." >&2
+  echo "            run 'npm run secret-scan' before pushing." >&2
+  exit 0
+fi
+
+node "$(git rev-parse --show-toplevel)/scripts/secret-scan.mjs" --staged

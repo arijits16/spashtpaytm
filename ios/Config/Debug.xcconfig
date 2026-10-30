@@ -1,0 +1,20 @@
+// Debug configuration (build plan section 14.3).
+//
+// Debug builds carry the developer conveniences that Release must not: the demo
+// login, Dev settings, canned transcripts, and HTTP to localhost. Everything
+// that depends on them is wrapped in `#if DEBUG` in Swift.
+
+#include "Base.xcconfig"
+
+// Optional: present on a developer machine, absent in a fresh clone and in CI.
+// `#include?` means a missing file is not an error.
+#include? "Secrets.xcconfig"
+
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) DEBUG
+SWIFT_OPTIMIZATION_LEVEL = -Onone
+GCC_OPTIMIZATION_LEVEL = 0
+ONLY_ACTIVE_ARCH = YES
+ENABLE_TESTABILITY = YES
+
+// Debug uses the plist with the localhost ATS exception.
+INFOPLIST_FILE = SpashtPaytm/Info-Debug.plist

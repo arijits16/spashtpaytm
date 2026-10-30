@@ -82,7 +82,9 @@ def test_demo_header_is_refused_when_disabled() -> None:
         response = c.get("/api/me", headers=DEMO)
 
     assert response.status_code == 401
-    assert response.json()["detail"] == "Demo auth is disabled"
+    body = response.json()["error"]
+    assert body["code"] == "unauthorized"
+    assert body["message"] == "Demo auth is disabled"
 
 
 def test_demo_header_is_refused_in_production() -> None:

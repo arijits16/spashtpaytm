@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Info.plist for DEBUG builds (build plan sections 13.4, 14.3).
+
+  This file and Info-Release.plist must stay identical EXCEPT for the
+  NSAppTransportSecurity block at the end. Every value that differs between
+  developers comes from the xcconfigs as $(VARIABLE), so there is nothing
+  machine-specific to drift. `SpashtPaytmTests/InfoPlistTests.swift` asserts the
+  keys the app actually reads.
+
+  Two files rather than one generated plist because App Transport Security needs
+  a real boolean, and a $(VARIABLE) substitution in a plist produces a string.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>Spasht (Concept)</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+
+	<!-- Spasht configuration, read by AppConfig.swift. -->
+	<key>APIBaseURL</key>
+	<string>$(API_BASE_URL)</string>
+	<key>PublicBaseURL</key>
+	<string>$(PUBLIC_BASE_URL)</string>
+	<!-- Debug only. Release.xcconfig forces this empty (section 13.11). -->
+	<key>DemoAuthKey</key>
+	<string>$(DEMO_AUTH_KEY)</string>
+
+	<!-- Google sign-in callback. Empty until `make ios-config` runs. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.google.SignIn</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>$(GOOGLE_REVERSED_CLIENT_ID)</string>
+			</array>
+		</dict>
+	</array>
+
+	<!-- Asked for only on the first mic tap, never at launch (section 13.11). -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Spasht uses the microphone so you can speak to it in your language.</string>
+
+	<!-- iPhone, portrait, light mode only (section 5.2). -->
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+	</dict>
+
+	<!-- Solid #E6F6FD, matching the login gradient's top stop (section 5.5). -->
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+	</dict>
+
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+
+	<!--
+	  DEBUG ONLY. Lets the Simulator reach http://localhost:8000 while the
+	  backend is bound to 127.0.0.1 with no TLS. Scoped to localhost rather than
+	  using NSAllowsArbitraryLoads, so nothing else is exempt.
+	  Info-Release.plist has no ATS block at all.
+	-->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>localhost</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+</dict>
+</plist>

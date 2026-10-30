@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Keychain Sharing.
+
+  Firebase stores ID tokens in the Keychain. On a free "Personal Team" the
+  default access group can produce keychain error -34018 at sign-in, which
+  the build plan calls out in phase 1. Declaring the access group explicitly
+  avoids it. Nothing else is requested: no push, no background modes, no
+  App Groups.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	</array>
+</dict>
+</plist>

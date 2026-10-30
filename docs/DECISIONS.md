@@ -46,11 +46,15 @@ TS 6 deprecates `compilerOptions.baseUrl`. The `@/*` path mapping now resolves
 relative to the tsconfig itself, and `vite.config.ts` carries a matching
 `resolve.alias` (tsconfig paths alone do not affect Vite's bundling).
 
-### D-007 — A custom `frame` breakpoint at 500px
+### D-007 — A custom `frame` breakpoint at 500px ~~(superseded by D-023)~~
 §5.8 puts the phone bezel at **≥ 500px**, which is not any Tailwind default
 (`sm` is 640px). `--breakpoint-frame: 500px` is declared in `@theme`, and
 `PhoneFrame` uses `frame:` variants. Between 500 and 640px the app is framed,
 exactly as the plan specifies.
+
+> **Superseded in v2:** `PhoneFrame` no longer exists — the website is
+> laptop-only and the customer UI is the native iOS app (D-022, D-023). The
+> `--breakpoint-frame` token is unused but harmless and is left in `@theme`.
 
 ### D-008 — Synchronous SQLAlchemy engine
 Journey transitions are short, request-scoped transactions. A sync engine with a
@@ -133,3 +137,146 @@ Backend auth is covered end-to-end with a mocked verifier (the phase-1
 criterion), and the API client's token-vs-demo precedence is unit-tested. The
 `AuthProvider`/guard components are verified manually for now; adding
 `@testing-library/react` is deferred to phase 11 rather than widening phase 1.
+
+---
+
+## Phase 0 (v2)
+
+### D-022 — The customer UI is a native SwiftUI app; the website is laptop-only
+Build plan v2 replaces the React phone shell with a native iPhone app and
+reduces the website to the lender and compliance dashboard plus the receipt
+check. The backend is unchanged and now serves both, which is what makes this
+affordable: the journey is server-driven, so the state machine, the loan maths
+and the consent lock are written once and both clients only render what the
+backend returns.
+
+Consequences recorded elsewhere in this file: the phone components were deleted
+from the website (D-023), the error format became a shared contract rather than
+a FastAPI default (D-025), and the fixtures in `contracts/` now bind three
+codebases together (D-030).
+
+This **supersedes** the v1 reading of §5 for anything phone-shaped. Everything
+in D-001 … D-021 still holds unless named below.
+
+### D-023 — The website's phone routes were deleted, not hidden
+`PhoneFrame`, `PhoneLayout`, `SafeArea`, the phone `ConceptRibbon` and
+`HomePlaceholder` are gone, and with them the `RequireAuth` guard that only
+phone routes used. Leaving a second, half-maintained customer UI alive would
+have meant every journey change needed doing twice, and the one that was not
+demoed would quietly rot.
+
+The website now has four routes: `/` (redirect), `/login`, `/dashboard/*` and a
+catch-all. A v1 phone URL lands on the 404, which explains that the customer
+journey is in the iPhone app.
+
+`Logout` moved into the dashboard sidebar, because `HomePlaceholder` had been
+the website's only sign-out button.
+
+### D-024 — The dashboard sidebar carries the signed-in identity
+Partly practical (see D-023) and partly a compliance point: a dashboard showing
+other people's journeys should always say who is looking at it.
+
+### D-025 — One error envelope, enforced by exception handlers
+Every failure is `{"error": {"code", "message", "requestId"}}` (§8.1), installed
+as handlers for `ApiError`, `HTTPException`, `RequestValidationError` and bare
+`Exception`. Handlers rather than per-route discipline, because the errors that
+matter most — a 404 on an unknown path, a 422 from validation — never reach a
+route.
+
+Three v1 tests asserted FastAPI's `{"detail": ...}` and were updated. `deps.py`
+now raises `ApiError` directly so the code is explicit rather than derived from
+the status.
+
+`validation_error` never echoes the rejected value: it may be a transcript.
+
+### D-026 — Request IDs live in a `ContextVar`
+A log line emitted inside the journey engine can name its request without
+threading a `Request` through every function. An inbound `X-Request-ID` is
+reused (so one id can span app and backend) but only after matching
+`^[A-Za-z0-9._:-]{1,64}$` — it is echoed into a response header and into logs,
+so a caller must not be able to inject control characters.
+
+### D-027 — Rate limiting is an in-process token bucket
+One uvicorn worker on a laptop, so a shared store would add failure modes with
+no benefit; Redis is the production answer and is recorded as a residual risk in
+`SECURITY.md`.
+
+A token bucket rather than a fixed window because the demo is bursty: three
+quick replies in a second is legitimate, a script hammering `/voice` is not.
+Keyed by user id when signed in and client IP otherwise, so one noisy visitor
+cannot exhaust a customer's budget mid-journey. The IP comes from
+`request.client.host`, never from `X-Forwarded-For` — uvicorn only honours
+forwarded headers from 127.0.0.1, and reading the header ourselves would let any
+caller choose its own identity.
+
+### D-028 — Body limits are raw ASGI middleware
+`BaseHTTPMiddleware` materialises the whole body before handing it on, so a
+limit enforced there would already have buffered what it was meant to refuse.
+`Content-Length` is checked first; a chunked body without one is counted as it
+streams. 64 KB for JSON, 2 MB for the audio upload paths.
+
+### D-029 — `make secret-scan` falls back to its own patterns
+`gitleaks` is not installed on this machine and installing a global tool is not
+ours to decide (same reasoning as D-002). The scanner uses `gitleaks` when it is
+on `PATH` and otherwise applies the §13.3 patterns to **tracked** files — a
+secret only matters once it is staged or committed, and scanning the working
+tree would drown in `node_modules`.
+
+It runs inside `make lint` and as a `.githooks/pre-commit` hook, enabled by
+`make setup`. Findings print the location only, never the matched text: printing
+it would copy the secret into the terminal and the scrollback.
+
+Two files are exempt: the scanner (it contains every pattern by definition) and
+`BUILD_PLAN.md` (it documents the patterns and the variable names). A single
+line can opt out with the marker `spasht-secret-scan:allow`.
+
+### D-030 — Contract fixtures compare shape, not values
+`make contracts` regenerates `contracts/fixtures/*.json` from the live app;
+every other test run verifies that each committed fixture still has the field
+structure the backend produces. Only the structure is compared — ids and
+timestamps change every run, and a fixture that re-diffed constantly would train
+everyone to ignore it.
+
+The iOS test target references `contracts/fixtures` as a **folder reference**
+rather than copying it in: `ENABLE_USER_SCRIPT_SANDBOXING` (correctly) forbids a
+build script from writing into the source tree, and a folder reference also
+means a newly generated fixture is picked up without regenerating the project.
+
+### D-031 — Two Info.plists rather than one generated file
+App Transport Security needs a real boolean, and an `$(VARIABLE)` substituted
+into a plist produces a string — so `NSAllowsLocalNetworking` cannot be switched
+per configuration from the xcconfigs. `Info-Debug.plist` and
+`Info-Release.plist` are therefore separate files selected by `INFOPLIST_FILE`.
+
+They are identical except that Release has **no ATS block at all**: a Release
+build reaches the backend over HTTPS through the tunnel or not at all. Every
+value that varies by machine comes from the xcconfigs, so there is nothing
+machine-specific to drift, and `AppConfigTests` asserts the keys the app reads.
+
+### D-032 — The demo key cannot ship, for two independent reasons
+`Release.xcconfig` blanks `DEMO_AUTH_KEY` *after* including `Secrets.xcconfig`,
+so whatever a developer has locally, a Release build has none. Separately, the
+demo UI is inside `#if DEBUG`. Either alone would do; both means a mistake in
+one is not enough to leak it. `Settings.demo_auth_allowed` on the backend also
+requires a non-empty key, so an empty one cannot match an empty header.
+
+### D-033 — The Simulator is chosen by UDID, not by name
+`make ios-build` originally passed `name=iPhone 17 Pro`, which fails: that model
+exists only on the iOS 26.5 runtime while `OS:latest` resolves to 27.0.
+`scripts/ios-sim.sh` resolves a concrete UDID — the requested name if present,
+otherwise the newest available iPhone — and all three iOS targets share it.
+
+Related: the Simulator **GUI** app is not where Xcode used to install it on this
+machine, so `make ios-run` boots the device headlessly and prints a note.
+Install, launch, screenshots and tests all work without the window.
+
+### D-034 — `make keys` exists now, but generates no signing keypair yet
+Phase 1's hardened demo auth needs `DEMO_AUTH_KEY`, and the plan only lists
+`make keys` from phase 2. It is implemented now for the env-file secrets
+(`TRANSCRIPT_KEY`, the three peppers, `TTS_CACHE_SECRET`, `DEMO_AUTH_KEY`). The
+Ed25519 receipt-signing keypair needs PyNaCl and arrives with the trust layer in
+phase 6; the script says so rather than pretending.
+
+It never overwrites a value that is already set — regenerating `CUSTOMER_REF_PEPPER`
+would silently invalidate every receipt already issued — and never prints a
+value, because the terminal is often on a projector.

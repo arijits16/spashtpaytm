@@ -1,0 +1,25 @@
+// Release configuration (build plan sections 13.11, 14.3).
+//
+// A Release build is what goes on a team iPhone at the event, so it must
+// contain no demo login, no Dev settings, no canned transcripts and no demo
+// key. The Swift side is handled by `#if DEBUG`; the key is handled here.
+
+#include "Base.xcconfig"
+#include? "Secrets.xcconfig"
+
+// Deliberately AFTER the Secrets include: whatever a developer has in their
+// local Secrets.xcconfig, a Release build ships an empty DemoAuthKey. This is
+// asserted by the phase-1 acceptance check on the built Info.plist.
+DEMO_AUTH_KEY =
+
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited)
+SWIFT_OPTIMIZATION_LEVEL = -O
+SWIFT_COMPILATION_MODE = wholemodule
+GCC_OPTIMIZATION_LEVEL = s
+ONLY_ACTIVE_ARCH = NO
+ENABLE_TESTABILITY = NO
+VALIDATE_PRODUCT = YES
+
+// Release uses the plist with no App Transport Security exceptions at all:
+// the phone talks to the backend over HTTPS through the tunnel, or not at all.
+INFOPLIST_FILE = SpashtPaytm/Info-Release.plist

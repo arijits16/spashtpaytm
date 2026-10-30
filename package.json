@@ -1,7 +1,7 @@
 {
   "name": "spasht",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Spasht - voice-first loan clarity co-pilot. Concept demo for the Paytm Build for India AI Hackathon. Synthetic data only.",
   "scripts": {
     "setup": "node scripts/setup.mjs",
@@ -9,18 +9,27 @@
     "db-down": "docker compose -f infra/docker-compose.yml down",
     "migrate": "node scripts/run.mjs backend alembic upgrade head",
     "seed": "echo \"seed lands in phase 2\"",
-    "keys": "echo \"keys lands in phase 5\"",
+    "keys": "node scripts/run.mjs backend python scripts/gen_keys.py",
     "demo-reset": "echo \"demo-reset lands in phase 2\"",
     "dev": "npm run db-up && concurrently --kill-others --names \"api,web\" --prefix-colors \"blue,magenta\" \"npm:dev-api\" \"npm:dev-web\"",
-    "dev-api": "node scripts/run.mjs backend uvicorn app.main:app --reload --port 8000",
+    "dev-api": "node scripts/run.mjs backend uvicorn app.main:app --reload --host 127.0.0.1 --port 8000 --no-server-header --proxy-headers --forwarded-allow-ips 127.0.0.1",
     "dev-web": "npm --prefix frontend run dev",
     "test": "node scripts/run.mjs backend python -m pytest && npm --prefix frontend run test",
-    "lint": "node scripts/run.mjs backend python -m ruff check . && node scripts/run.mjs backend python -m ruff format --check . && npm --prefix frontend run typecheck && npm --prefix frontend run lint",
+    "lint": "node scripts/run.mjs backend python -m ruff check . && node scripts/run.mjs backend python -m ruff format --check . && npm --prefix frontend run typecheck && npm --prefix frontend run lint && npm run secret-scan",
+    "secret-scan": "node scripts/secret-scan.mjs",
+    "contracts": "node scripts/run.mjs backend --env SPASHT_WRITE_CONTRACTS=1 python -m pytest tests/test_contracts.py -q",
     "sarvam-smoke": "node scripts/run.mjs backend python scripts/sarvam_smoke.py",
     "format": "node scripts/run.mjs backend python -m ruff check --fix . && node scripts/run.mjs backend python -m ruff format . && npm --prefix frontend run lint:fix",
-    "eval": "echo \"eval lands in phase 7\"",
-    "tts-cache": "echo \"tts-cache lands in phase 6\"",
-    "tunnel": "echo \"tunnel lands in phase 12\""
+    "eval": "echo \"eval lands in phase 8\"",
+    "tts-cache": "echo \"tts-cache lands in phase 7\"",
+    "tunnel": "scripts/tunnel.sh",
+    "ios-gen": "make ios-gen",
+    "ios-open": "make ios-open",
+    "ios-build": "make ios-build",
+    "ios-test": "make ios-test",
+    "ios-run": "make ios-run",
+    "ios-config": "make ios-config",
+    "ios-icon": "make ios-icon"
   },
   "devDependencies": {
     "concurrently": "9.2.5"

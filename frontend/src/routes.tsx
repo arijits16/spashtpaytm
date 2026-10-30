@@ -1,42 +1,38 @@
 import { createBrowserRouter } from "react-router";
-import { PhoneLayout } from "@/components/phone/PhoneLayout";
+import { SiteLayout } from "@/components/SiteLayout";
 import { DashboardLayout } from "@/features/dashboard/DashboardLayout";
 import { Overview } from "@/features/dashboard/Overview";
-import { RedirectIfSignedIn, RequireAdmin, RequireAuth } from "@/lib/guards";
-import { HomePlaceholder } from "@/pages/HomePlaceholder";
+import { IndexRedirect, RedirectIfSignedIn, RequireAdmin } from "@/lib/guards";
 import { LoginPage } from "@/pages/LoginPage";
 import { NotFound } from "@/pages/NotFound";
 
 /**
- * Route table (build plan 5.8 and phase 1).
+ * Route table for the laptop website (build plan 5.8).
  *
- * Phone routes render inside `PhoneFrame` and need a signed-in user;
- * `/dashboard/*` renders the desktop layout and needs an admin. `/login` is the
- * only phone route open to visitors, and it bounces a signed-in user home.
+ * Three routes and a catch-all: `/` redirects, `/login` is the only public
+ * page, and `/dashboard/*` needs an admin. There are deliberately **no phone
+ * routes** - the customer journey lives in the native iOS app (v2).
  */
 export const router = createBrowserRouter([
   {
-    element: <PhoneLayout />,
+    element: <SiteLayout />,
     children: [
+      { path: "/", element: <IndexRedirect /> },
       {
         element: <RedirectIfSignedIn />,
         children: [{ path: "/login", element: <LoginPage /> }],
       },
       {
-        element: <RequireAuth />,
-        children: [{ path: "/", element: <HomePlaceholder /> }],
+        element: <RequireAdmin />,
+        children: [
+          {
+            path: "/dashboard",
+            element: <DashboardLayout />,
+            children: [{ index: true, element: <Overview /> }],
+          },
+        ],
       },
       { path: "*", element: <NotFound /> },
-    ],
-  },
-  {
-    element: <RequireAdmin />,
-    children: [
-      {
-        path: "/dashboard",
-        element: <DashboardLayout />,
-        children: [{ index: true, element: <Overview /> }],
-      },
     ],
   },
 ]);

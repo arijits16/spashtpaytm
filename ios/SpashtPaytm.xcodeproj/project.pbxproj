@@ -1,0 +1,648 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		094E1D50FB4A281355FE3547 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 82FA38A791CF8A94FA842DBF /* GoogleSignIn */; };
+		0C02B8645F400817AF39F8A0 /* ConceptRibbon.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31DECE0C63337F4A98BAAE2 /* ConceptRibbon.swift */; };
+		1CB259434AE607E09C280CC9 /* HealthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7DA3B26FC6F2CE558041DA /* HealthView.swift */; };
+		366C0F12EA67C3900CF521C0 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4060A054C480CCD5CF7107 /* Colors.swift */; };
+		4855F921782E707FD73DB6AB /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128CC6557A65DF1310D85D2E /* APIClient.swift */; };
+		49432E9EB9567FC2D9B3BFCF /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9313EEEEFD0A8D02223BED0B /* Typography.swift */; };
+		49E7EF80E1CE6866206E10F7 /* PrivacyCover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF8AFEF684BA88CECA0FE35 /* PrivacyCover.swift */; };
+		501E796895738EE42C6B987A /* SpashtPaytmApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C65CB1DF8AEF1C2FBA69AE9 /* SpashtPaytmApp.swift */; };
+		54E40714D80B34A47C6D67A4 /* HealthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 609AFF6D348A9FAC4C09D59F /* HealthViewModel.swift */; };
+		69CF633268941F85A73B64BF /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03F5C88723E8215466208E7F /* APIClientTests.swift */; };
+		82B740AAC9FD0BD2F0830757 /* AppConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B8ECF62B6E794A3AD4F691 /* AppConfigTests.swift */; };
+		8DB810C55D8151643958BFB8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 551B9918AAA9661C08D101AB /* Assets.xcassets */; };
+		A6C584379F9C388B6604FE00 /* Health.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAD919990274ECA12A03880 /* Health.swift */; };
+		A95258B491885453551D6AAB /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 4C5C2235DF49E244F7C17300 /* FirebaseAuth */; };
+		CD49AE7D832B0AC6995F606A /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525D868949FC5B8E0BCBC15A /* AppConfig.swift */; };
+		CD656E99E82ED7556154310D /* ContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1C25827978BC3E428F028E /* ContractTests.swift */; };
+		CE589A1EB0986BE0C316891A /* fixtures in Resources */ = {isa = PBXBuildFile; fileRef = 0140EDC8225F430D4A128BF9 /* fixtures */; };
+		E9ED2B4D58F6BDA8119C0EAA /* Metrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB0C222A4DD4F172A944711 /* Metrics.swift */; };
+		F15680346FD10BB00C5AFEC3 /* Endpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 680BB647E4A4FFEF7C8B9597 /* Endpoints.swift */; };
+		F3BC63F318052F7FABF8CD81 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DF13FCD742E863C48D31D /* APIError.swift */; };
+		FC8B4F87DE1D1D2358B9A520 /* FixtureLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E98ACB6CF518E53B5456D8 /* FixtureLoader.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CFC7E089131611CC3B08CF58 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ACFF2B9D7705B6EF25037A77 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A642F60127FAE4D51FD5B22F;
+			remoteInfo = SpashtPaytm;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0140EDC8225F430D4A128BF9 /* fixtures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = fixtures; path = ../contracts/fixtures; sourceTree = SOURCE_ROOT; };
+		03F5C88723E8215466208E7F /* APIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClientTests.swift; sourceTree = "<group>"; };
+		128CC6557A65DF1310D85D2E /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		17367A20F4BF6DBCCCB28739 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		2C1C25827978BC3E428F028E /* ContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContractTests.swift; sourceTree = "<group>"; };
+		4E0DF13FCD742E863C48D31D /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
+		4FB0C222A4DD4F172A944711 /* Metrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Metrics.swift; sourceTree = "<group>"; };
+		507B050702B59C6C7A6DA416 /* SpashtPaytm.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SpashtPaytm.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		525D868949FC5B8E0BCBC15A /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
+		551B9918AAA9661C08D101AB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5C65CB1DF8AEF1C2FBA69AE9 /* SpashtPaytmApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpashtPaytmApp.swift; sourceTree = "<group>"; };
+		5CB6720C5FEE91612D8669DF /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		5FF8AFEF684BA88CECA0FE35 /* PrivacyCover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyCover.swift; sourceTree = "<group>"; };
+		609AFF6D348A9FAC4C09D59F /* HealthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthViewModel.swift; sourceTree = "<group>"; };
+		680BB647E4A4FFEF7C8B9597 /* Endpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoints.swift; sourceTree = "<group>"; };
+		6DAD919990274ECA12A03880 /* Health.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Health.swift; sourceTree = "<group>"; };
+		9201C438E6E1849017289CF5 /* SpashtPaytmTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SpashtPaytmTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9313EEEEFD0A8D02223BED0B /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		96E98ACB6CF518E53B5456D8 /* FixtureLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixtureLoader.swift; sourceTree = "<group>"; };
+		AE7DA3B26FC6F2CE558041DA /* HealthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthView.swift; sourceTree = "<group>"; };
+		CC4060A054C480CCD5CF7107 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		D31DECE0C63337F4A98BAAE2 /* ConceptRibbon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConceptRibbon.swift; sourceTree = "<group>"; };
+		DD7A9C5CC694EA40849147BE /* SpashtPaytm.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SpashtPaytm.entitlements; sourceTree = "<group>"; };
+		E6B8ECF62B6E794A3AD4F691 /* AppConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		325F6022FC5BF9AD1D527F1C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A95258B491885453551D6AAB /* FirebaseAuth in Frameworks */,
+				094E1D50FB4A281355FE3547 /* GoogleSignIn in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1853E2B07A26BA41EFDC4EAC /* spashtpaytm */ = {
+			isa = PBXGroup;
+			children = (
+				BCAB74C0A3DFA5F55FA133BE /* contracts */,
+			);
+			name = spashtpaytm;
+			path = ..;
+			sourceTree = "<group>";
+		};
+		3FFAFD5DE3ADFD6217892D59 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				525D868949FC5B8E0BCBC15A /* AppConfig.swift */,
+				5C65CB1DF8AEF1C2FBA69AE9 /* SpashtPaytmApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		49B81AE93F87204420716854 /* Health */ = {
+			isa = PBXGroup;
+			children = (
+				AE7DA3B26FC6F2CE558041DA /* HealthView.swift */,
+				609AFF6D348A9FAC4C09D59F /* HealthViewModel.swift */,
+			);
+			path = Health;
+			sourceTree = "<group>";
+		};
+		63F39687664562F97F5138B8 /* SpashtPaytm */ = {
+			isa = PBXGroup;
+			children = (
+				3FFAFD5DE3ADFD6217892D59 /* App */,
+				926647C43FFDCDBC1E71CE5E /* Core */,
+				D02CC48232D606D30D249B7E /* Features */,
+				A58433708ACBF2FB3C2DF32C /* Resources */,
+				DD7A9C5CC694EA40849147BE /* SpashtPaytm.entitlements */,
+			);
+			path = SpashtPaytm;
+			sourceTree = "<group>";
+		};
+		6C4C8965A66D09976FD16932 = {
+			isa = PBXGroup;
+			children = (
+				8B2749754BE7D135E304AC69 /* Config */,
+				63F39687664562F97F5138B8 /* SpashtPaytm */,
+				1853E2B07A26BA41EFDC4EAC /* spashtpaytm */,
+				9AA83DCC6E4922DC63806F40 /* SpashtPaytmTests */,
+				BF06D12BFB7A1004265E565C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6DEEFF0BCA454AF443973F54 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				DB2C2FAEC031B2E182D20716 /* Models */,
+				128CC6557A65DF1310D85D2E /* APIClient.swift */,
+				4E0DF13FCD742E863C48D31D /* APIError.swift */,
+				680BB647E4A4FFEF7C8B9597 /* Endpoints.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		7F53C39D9EECC81769D7B088 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				D31DECE0C63337F4A98BAAE2 /* ConceptRibbon.swift */,
+				5FF8AFEF684BA88CECA0FE35 /* PrivacyCover.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		862C03D58DAC8D10157B6C79 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				CC4060A054C480CCD5CF7107 /* Colors.swift */,
+				4FB0C222A4DD4F172A944711 /* Metrics.swift */,
+				9313EEEEFD0A8D02223BED0B /* Typography.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		8B2749754BE7D135E304AC69 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				17367A20F4BF6DBCCCB28739 /* Debug.xcconfig */,
+				5CB6720C5FEE91612D8669DF /* Release.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		926647C43FFDCDBC1E71CE5E /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				6DEEFF0BCA454AF443973F54 /* Networking */,
+				862C03D58DAC8D10157B6C79 /* Theme */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		9AA83DCC6E4922DC63806F40 /* SpashtPaytmTests */ = {
+			isa = PBXGroup;
+			children = (
+				03F5C88723E8215466208E7F /* APIClientTests.swift */,
+				E6B8ECF62B6E794A3AD4F691 /* AppConfigTests.swift */,
+				2C1C25827978BC3E428F028E /* ContractTests.swift */,
+				96E98ACB6CF518E53B5456D8 /* FixtureLoader.swift */,
+			);
+			path = SpashtPaytmTests;
+			sourceTree = "<group>";
+		};
+		A58433708ACBF2FB3C2DF32C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				551B9918AAA9661C08D101AB /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		BCAB74C0A3DFA5F55FA133BE /* contracts */ = {
+			isa = PBXGroup;
+			children = (
+				0140EDC8225F430D4A128BF9 /* fixtures */,
+			);
+			path = contracts;
+			sourceTree = "<group>";
+		};
+		BF06D12BFB7A1004265E565C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				507B050702B59C6C7A6DA416 /* SpashtPaytm.app */,
+				9201C438E6E1849017289CF5 /* SpashtPaytmTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D02CC48232D606D30D249B7E /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				49B81AE93F87204420716854 /* Health */,
+				7F53C39D9EECC81769D7B088 /* Shared */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		DB2C2FAEC031B2E182D20716 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				6DAD919990274ECA12A03880 /* Health.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		20F8298003DA63C1076E7179 /* SpashtPaytmTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FAA9566567000F59301528F1 /* Build configuration list for PBXNativeTarget "SpashtPaytmTests" */;
+			buildPhases = (
+				0B2248D95851602D3EEB80E1 /* Sources */,
+				3835542D7420534C918C9C62 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				500272D003DF6AEE119591E9 /* PBXTargetDependency */,
+			);
+			name = SpashtPaytmTests;
+			packageProductDependencies = (
+			);
+			productName = SpashtPaytmTests;
+			productReference = 9201C438E6E1849017289CF5 /* SpashtPaytmTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A642F60127FAE4D51FD5B22F /* SpashtPaytm */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D774043FADBD1D2BB595B733 /* Build configuration list for PBXNativeTarget "SpashtPaytm" */;
+			buildPhases = (
+				0095731F41F81C2411F663D1 /* Sources */,
+				7E89177AE58A3344E7D80D1E /* Resources */,
+				325F6022FC5BF9AD1D527F1C /* Frameworks */,
+				ABDB021FC2D6CE0A87622C73 /* Copy GoogleService-Info.plist if present */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SpashtPaytm;
+			packageProductDependencies = (
+				4C5C2235DF49E244F7C17300 /* FirebaseAuth */,
+				82FA38A791CF8A94FA842DBF /* GoogleSignIn */,
+			);
+			productName = SpashtPaytm;
+			productReference = 507B050702B59C6C7A6DA416 /* SpashtPaytm.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		ACFF2B9D7705B6EF25037A77 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					20F8298003DA63C1076E7179 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					A642F60127FAE4D51FD5B22F = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 58BE45F6E70277AECFAFDEA6 /* Build configuration list for PBXProject "SpashtPaytm" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 6C4C8965A66D09976FD16932;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F880264FC777964F6CC48630 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				F6F7ECEB65B280C2DD527B0F /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = BF06D12BFB7A1004265E565C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A642F60127FAE4D51FD5B22F /* SpashtPaytm */,
+				20F8298003DA63C1076E7179 /* SpashtPaytmTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3835542D7420534C918C9C62 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE589A1EB0986BE0C316891A /* fixtures in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7E89177AE58A3344E7D80D1E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8DB810C55D8151643958BFB8 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		ABDB021FC2D6CE0A87622C73 /* Copy GoogleService-Info.plist if present */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy GoogleService-Info.plist if present";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nSRC=\"$SRCROOT/SpashtPaytm/Config/GoogleService-Info.plist\"\nDEST=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\nif [ -f \"$SRC\" ]; then\n  cp \"$SRC\" \"$DEST/GoogleService-Info.plist\"\n  echo \"note: bundled GoogleService-Info.plist (Google sign-in enabled)\"\nelse\n  echo \"note: no GoogleService-Info.plist - Google sign-in stays hidden (see Appendix D.2)\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0095731F41F81C2411F663D1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4855F921782E707FD73DB6AB /* APIClient.swift in Sources */,
+				F3BC63F318052F7FABF8CD81 /* APIError.swift in Sources */,
+				CD49AE7D832B0AC6995F606A /* AppConfig.swift in Sources */,
+				366C0F12EA67C3900CF521C0 /* Colors.swift in Sources */,
+				0C02B8645F400817AF39F8A0 /* ConceptRibbon.swift in Sources */,
+				F15680346FD10BB00C5AFEC3 /* Endpoints.swift in Sources */,
+				A6C584379F9C388B6604FE00 /* Health.swift in Sources */,
+				1CB259434AE607E09C280CC9 /* HealthView.swift in Sources */,
+				54E40714D80B34A47C6D67A4 /* HealthViewModel.swift in Sources */,
+				E9ED2B4D58F6BDA8119C0EAA /* Metrics.swift in Sources */,
+				49E7EF80E1CE6866206E10F7 /* PrivacyCover.swift in Sources */,
+				501E796895738EE42C6B987A /* SpashtPaytmApp.swift in Sources */,
+				49432E9EB9567FC2D9B3BFCF /* Typography.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0B2248D95851602D3EEB80E1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				69CF633268941F85A73B64BF /* APIClientTests.swift in Sources */,
+				82B740AAC9FD0BD2F0830757 /* AppConfigTests.swift in Sources */,
+				CD656E99E82ED7556154310D /* ContractTests.swift in Sources */,
+				FC8B4F87DE1D1D2358B9A520 /* FixtureLoader.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		500272D003DF6AEE119591E9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A642F60127FAE4D51FD5B22F /* SpashtPaytm */;
+			targetProxy = CFC7E089131611CC3B08CF58 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		25254F1D25938A8FFCF77E30 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5CB6720C5FEE91612D8669DF /* Release.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+		3D2F2745914E131FB934AB3C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 17367A20F4BF6DBCCCB28739 /* Debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		3D407E1E827D84E26291DD10 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5CB6720C5FEE91612D8669DF /* Release.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_ENTITLEMENTS = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.finovators.spashtpaytm.tests;
+				PRODUCT_NAME = SpashtPaytmTests;
+				SDKROOT = iphoneos;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpashtPaytm.app/SpashtPaytm";
+			};
+			name = Release;
+		};
+		98DA4D9ED85E8E4D30FFD4C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 17367A20F4BF6DBCCCB28739 /* Debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SpashtPaytm/SpashtPaytm.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		9B2524849838D5800B482EC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5CB6720C5FEE91612D8669DF /* Release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SpashtPaytm/SpashtPaytm.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+		EC1C04F541436A4054E859A7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 17367A20F4BF6DBCCCB28739 /* Debug.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_ENTITLEMENTS = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.finovators.spashtpaytm.tests;
+				PRODUCT_NAME = SpashtPaytmTests;
+				SDKROOT = iphoneos;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpashtPaytm.app/SpashtPaytm";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		58BE45F6E70277AECFAFDEA6 /* Build configuration list for PBXProject "SpashtPaytm" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3D2F2745914E131FB934AB3C /* Debug */,
+				25254F1D25938A8FFCF77E30 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D774043FADBD1D2BB595B733 /* Build configuration list for PBXNativeTarget "SpashtPaytm" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				98DA4D9ED85E8E4D30FFD4C7 /* Debug */,
+				9B2524849838D5800B482EC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FAA9566567000F59301528F1 /* Build configuration list for PBXNativeTarget "SpashtPaytmTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC1C04F541436A4054E859A7 /* Debug */,
+				3D407E1E827D84E26291DD10 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F6F7ECEB65B280C2DD527B0F /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = exactVersion;
+				version = 10.1.0;
+			};
+		};
+		F880264FC777964F6CC48630 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = exactVersion;
+				version = 13.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4C5C2235DF49E244F7C17300 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F880264FC777964F6CC48630 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		82FA38A791CF8A94FA842DBF /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F6F7ECEB65B280C2DD527B0F /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = ACFF2B9D7705B6EF25037A77 /* Project object */;
+}

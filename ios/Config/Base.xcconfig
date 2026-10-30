@@ -1,0 +1,50 @@
+// Settings shared by every configuration (build plan section 14.3).
+//
+// IMPORTANT: xcconfig treats "//" as the start of a comment, so a URL cannot be
+// written literally. Break the "//" with an empty variable reference:
+//
+//     API_BASE_URL = https:/$()/my-domain.ngrok-free.app
+//
+// Secrets.xcconfig (gitignored) overrides the placeholders below; see
+// Secrets.example.xcconfig.
+
+// --- identity ---------------------------------------------------------------
+PRODUCT_BUNDLE_IDENTIFIER = com.finovators.spashtpaytm
+PRODUCT_NAME = SpashtPaytm
+MARKETING_VERSION = 0.2.0
+CURRENT_PROJECT_VERSION = 1
+
+// Signing. DEVELOPMENT_TEAM comes from Secrets.xcconfig so that regenerating
+// the project with `make ios-gen` never loses it.
+CODE_SIGN_STYLE = Automatic
+DEVELOPMENT_TEAM =
+
+// --- defaults overridden by Secrets.xcconfig --------------------------------
+// The Simulator reaches the backend on localhost; a real iPhone needs the ngrok
+// HTTPS domain (see `make tunnel`).
+API_BASE_URL = http:/$()/localhost:8000
+PUBLIC_BASE_URL = http:/$()/localhost:8000
+
+// Empty unless Secrets.xcconfig fills it. Release wipes it again regardless.
+DEMO_AUTH_KEY =
+
+// From GoogleService-Info.plist, written by `make ios-config`. Google sign-in
+// needs it as a custom URL scheme; without it the button stays hidden.
+GOOGLE_REVERSED_CLIENT_ID =
+
+// --- build ------------------------------------------------------------------
+SWIFT_VERSION = 5.0
+IPHONEOS_DEPLOYMENT_TARGET = 17.0
+TARGETED_DEVICE_FAMILY = 1
+SUPPORTED_PLATFORMS = iphoneos iphonesimulator
+SUPPORTS_MACCATALYST = NO
+SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO
+
+ENABLE_USER_SCRIPT_SANDBOXING = YES
+SWIFT_EMIT_LOC_STRINGS = YES
+GENERATE_INFOPLIST_FILE = NO
+
+// Warnings are reviewed, not ignored (plan rule 14).
+GCC_TREAT_WARNINGS_AS_ERRORS = NO
+SWIFT_TREAT_WARNINGS_AS_ERRORS = NO
+CLANG_WARN_DOCUMENTATION_COMMENTS = YES

@@ -10,7 +10,7 @@ from __future__ import annotations
 import logging
 from typing import Annotated
 
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, Header
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
@@ -20,6 +20,7 @@ from app.auth.users import upsert_user
 from app.config import Settings, get_settings
 from app.db.models.user import User
 from app.db.session import get_db
+from app.errors import forbidden, unauthorized
 
 log = logging.getLogger(__name__)
 
@@ -29,14 +30,6 @@ bearer_scheme = HTTPBearer(auto_error=False)
 
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 DbDep = Annotated[Session, Depends(get_db)]
-
-
-def _unauthorised(detail: str) -> HTTPException:
-    return HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail=detail,
-        headers={"WWW-Authenticate": "Bearer"},
-    )
 
 
 def current_user(
@@ -58,17 +51,17 @@ def current_user(
         except TokenError as exc:
             # The reason is logged, not returned: it is a probing oracle.
             log.info("token rejected", extra={"reason": str(exc)})
-            raise _unauthorised("Invalid or expired credentials") from exc
+            raise unauthorized("Invalid or expired credentials") from exc
 
     elif x_demo_user and settings.demo_auth_allowed:
         token = demo_token(x_demo_user)
 
     elif x_demo_user:
         # The header was sent but the environment forbids it - say so plainly.
-        raise _unauthorised("Demo auth is disabled")
+        raise unauthorized("Demo auth is disabled")
 
     else:
-        raise _unauthorised("Not authenticated")
+        raise unauthorized("Not authenticated")
 
     user = upsert_user(db, token, settings)
     db.commit()
@@ -85,10 +78,7 @@ def current_admin(user: CurrentUser) -> User:
     403, not 401: the caller is authenticated, just not permitted.
     """
     if not user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required",
-        )
+        raise forbidden("Admin access required")
     return user
 
 

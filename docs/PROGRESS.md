@@ -3,77 +3,88 @@
 One line per phase. Tick a box only when its acceptance criteria in
 `docs/BUILD_PLAN.md` §15 actually pass.
 
-**Hackathon minimum:** phases 0–8, 11, 12. Phases 9 and 10 are stretch.
+**Must-have:** phases 0–7, 9, 13. **Should-have:** 8, 12. **Stretch:** 10, 11.
+
+> **Plan v2 (30 Oct 2026).** The customer side moved from a React phone website
+> to a **native SwiftUI iPhone app**; the website became **laptop-only** (admin
+> dashboard, receipt check, tamper demo). The backend is unchanged and now serves
+> both. Phases were renumbered 0–13. See `DECISIONS.md` D-022.
+>
+> **v1 history:** v1 phases 0 and 1 (repo scaffold, Docker Postgres on 5433,
+> FastAPI health, React shell, Firebase web login, `users` table, demo header,
+> Sarvam smoke test) were completed on 29–30 Oct and are **reused**, not
+> rebuilt. v2 phases 0 and 1 reconcile that work and add the iOS side. A
+> partially-written v1 phase 2 (schema models) was discarded unmerged; v2
+> phase 2 supersedes it.
 
 | Phase | What | Status |
 |---|---|---|
-| 0 | Project folder, Docker Postgres, FastAPI health, Vite React shell | ✅ done — 2026-10-29 |
-| 1 | Firebase Google login, token verification, `users` table, demo auth | ✅ done — 2026-10-30 |
-| 2 | Schema, append-only triggers, seed data, loan math, sample KFS PDFs | ⬜ not started |
-| 3 | Paytm-style home, profile drawer, concept guardrails, PWA | ⬜ not started |
-| 4 | Deterministic Spasht journey, server-driven UI, consent lock | ⬜ not started |
-| 5 | Hash-chained signed receipts, verify page, tamper demo, Merkle anchors | ⬜ not started |
-| 6 | Sarvam Saaras STT + Bulbul TTS voice loop, cache, demo mode | ⬜ not started |
-| 7 | Sarvam-105B understanding, KFS Q&A, grading, re-explain, Number Guard, evals | ⬜ not started |
-| 8 | Live compliance dashboard with SSE, KPIs, ledger, receipts | ⬜ not started |
-| 9 | Rescue agent (stretch) | ⬜ not started |
-| 10 | KFS ingestion with Sarvam Document Intelligence (stretch) | ⬜ not started |
-| 11 | Polish, failure handling, demo reset, docs | ⬜ not started |
-| 12 | Tunnel, device fixes, demo-day checklist | ⬜ not started |
+| 0 | Monorepo, laptop-only website, iOS scaffold, security baseline | ✅ done — 2026-10-30 |
+| 1 | Login on iPhone and website, hardened demo auth, tunnel helper | ⬜ not started |
+| 2 | Database and mock data | ⬜ not started |
+| 3 | Journey engine and API (backend only) | ⬜ not started |
+| 4 | iPhone: Paytm-style home and profile | ⬜ not started |
+| 5 | iPhone: Spasht journey by tap and typing | ⬜ not started |
+| 6 | Trust layer: Spasht Receipt | ⬜ not started |
+| 7 | Voice with Sarvam: ears and mouth | ⬜ not started |
+| 8 | The brain: Sarvam-105B + Number Guard | ⬜ not started |
+| 9 | Website: live lender and compliance dashboard | ⬜ not started |
+| 10 | Rescue Agent (stretch) | ⬜ not started |
+| 11 | KFS ingestion with Document Intelligence (stretch) | ⬜ not started |
+| 12 | Polish, security review and QA | ⬜ not started |
+| 13 | iPhone device and demo-day setup | ⬜ not started |
 
 ---
 
-## Phase 0 — done (2026-10-29)
+## Phase 0 (v2) — done (2026-10-30)
 
-- [x] `make setup && make dev` (and `npm run setup && npm run dev`) start everything
-- [x] `http://localhost:5173` shows **Backend: OK · DB: OK** inside the phone frame
-- [x] `/dashboard` shows the empty desktop layout (navy sidebar, 1100px min width)
-- [x] `make lint` passes — ruff + ruff-format + tsc + eslint (0 warnings) + prettier
-- [x] `make test` passes — 17 backend, 6 frontend
-- [x] `git status` shows no secrets and no reference screenshots tracked
-- [x] No console errors in the browser
-- [x] `npm audit`: 0 vulnerabilities (root and frontend)
+- [x] `make dev` runs the backend + website; `/login` and `/dashboard` work as
+      before; there are no phone pages on the website
+- [x] `make ios-run` opens the Simulator with the concept ribbon and
+      **"Backend: OK · DB: OK"** (screenshot: `docs/screens/phase0-health.png`)
+- [x] `curl -i localhost:8000/api/health` shows the security headers and
+      `X-Request-ID`; an unknown route returns the standard error JSON
+- [x] `make lint`, `make test`, `make ios-build` and `make ios-test` pass
+      (90 backend · 10 website · 22 iOS)
+- [x] `make secret-scan` is clean, and the pre-commit hook blocks a throwaway
+      file containing a fake `sk_` key (tested, then deleted)
+- [x] `git status` shows no `.env`, `Secrets.xcconfig`, plist or screenshots
 
-**Not yet built, by design:** auth (phase 1), every real table (phase 2), the real
-home screen (phase 3). `make seed`, `keys`, `eval`, `tts-cache`, `demo-reset` and
-`tunnel` are declared and print the phase that fills them in.
+**Built:**
+- **Docs:** plan replaced with v2, `CLAUDE.md` from Appendix A, this file
+  re-based, `docs/SECURITY.md` created, decisions D-022 … D-033.
+- **Website:** phone frame, phone layout, safe-area helpers and the phone home
+  placeholder deleted; routes reduced to `/` → `/dashboard` | `/login`,
+  `/login`, `/dashboard/*`, catch-all. Identity and Logout moved into the
+  dashboard sidebar.
+- **Backend security baseline:** `security/request_id.py`,
+  `security/headers.py`, `security/ratelimit.py`, `security/bodylimit.py`,
+  `errors.py` (the §8.1 envelope on every error path). uvicorn now binds
+  127.0.0.1 with `--proxy-headers --forwarded-allow-ips 127.0.0.1` and
+  `--no-server-header`.
+- **Secrets:** `make keys` (`backend/scripts/gen_keys.py`), `make secret-scan`
+  (`scripts/secret-scan.mjs`, gitleaks when installed), `.githooks/pre-commit`
+  enabled by `make setup`.
+- **iOS:** `ios/project.yml` (XcodeGen), xcconfigs, two Info.plists, generated
+  app icon, `AppConfig`, `Theme`, `APIClient` + `APIError`, `HealthView`,
+  `ConceptRibbon`, `PrivacyCover`, and the `ios-*` make targets.
+- **Contracts:** `contracts/README.md`, `health.json`, `error_not_found.json`,
+  generated by `make contracts` and decoded by both backend and iOS tests.
 
-### Known issues / carried forward
-- `backend/requirements.lock` is a `pip freeze` snapshot for reproducibility; the
-  authoritative pins live in `backend/pyproject.toml`.
-- Postgres is on host port **5433**, not 5432 — see `DECISIONS.md` D-004.
-
----
-
-## Phase 1 — done (2026-10-30)
-
-- [x] Google login works on the laptop; `/api/me` returns name, email, photo,
-      `preferredLanguage` and `isAdmin`
-- [x] Refreshing the page keeps the user signed in; Logout works
-- [x] Protected routes return 401 without a token; `/dashboard` refuses non-admins
-      (403 from the backend guard, explanatory screen on the frontend)
-- [x] Demo auth works with no internet (`X-Demo-User`, dev-only)
-- [x] Auth tests use a mocked token verifier
-- [x] `make lint` clean; `make test` 45 backend + 10 frontend
-- [x] No console errors in the browser
-
-**Built:** `users` table + migration `0002_users` (with a language CHECK
-constraint), `auth/firebase.py` (two verification paths), `auth/demo.py`,
-`auth/users.py` (upsert + allowlist), `deps.py` (`current_user` / `current_admin`),
-`GET`/`PATCH /api/me`; frontend `lib/firebase.ts`, `lib/auth.tsx`,
-`lib/authContext.ts`, `lib/env.ts`, `lib/guards.tsx`, `LoginPage`, signed-in home.
-
-### Bugs found and fixed during the phase
-- Demo sign-in while a real Google session was live left the real identity active
-  behind a `Session: demo` badge (DECISIONS D-016).
-- The OTP log-redaction rule was mangling UUIDs, so `user_id` / `journey_id` were
-  untraceable in logs (DECISIONS D-020). Regression tests added.
+### Verified by test rather than end to end
+- **"Stopping Postgres turns the DB row red without a crash."** The backend's
+  degraded response is covered by
+  `test_health_reports_degraded_when_the_db_is_down`, and the app's handling of
+  it by `ContractTests.testDegradedHealthDecodes`. The full stop-the-container
+  check was not run because the human's dev stack was live; it is listed in the
+  manual test steps.
 
 ### Known issues / carried forward
-- No component tests for `AuthProvider` or the guards yet (DECISIONS D-021);
-  `@testing-library/react` is deferred to phase 11.
-- `DEMO_AUTH=true` / `VITE_DEMO_AUTH=true` are enabled in the local `.env` files
-  so the offline fallback is always one tap away. `.env.example` keeps them
-  `false`.
-- Google sign-in is verified as far as the OAuth handler and a real session; the
-  team should still run it on a phone in phase 12.
+- `ngrok` and `gitleaks` are not installed on this machine. `make secret-scan`
+  uses its own patterns (D-029); `make tunnel` prints install instructions.
+- The Simulator **GUI** app is not at the path Xcode used to install it, so
+  `make ios-run` boots the device headlessly and says so. Install, launch,
+  screenshots and tests are unaffected (D-033).
+- `APP_VERSION` was raised to `0.2.0` in `backend/.env`, but uvicorn only
+  watches `.py` files — the running backend keeps reporting `0.1.0` until it is
+  restarted.

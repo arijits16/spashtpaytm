@@ -1,0 +1,147 @@
+# XcodeGen spec - the source of truth for the Xcode project.
+#
+# `SpashtPaytm.xcodeproj` is GENERATED from this file by `make ios-gen`. Never
+# hand-edit the project file: the next regeneration throws the change away.
+# Edit this, run `make ios-gen`, commit both.
+#
+# Everything environment-specific (API URL, demo key, team ID, Google client ID)
+# comes from ios/Config/*.xcconfig, so this file carries no secrets.
+
+name: SpashtPaytm
+
+options:
+  bundleIdPrefix: com.finovators
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+  generateEmptyDirectories: false
+  # Keep the diff of the generated project small and stable across machines.
+  minimumXcodeGenVersion: "2.38.0"
+
+configs:
+  Debug: debug
+  Release: release
+
+# Project-level settings come from the xcconfigs so there is exactly one place
+# to look. `base:` is intentionally empty.
+configFiles:
+  Debug: Config/Debug.xcconfig
+  Release: Config/Release.xcconfig
+
+packages:
+  # Pinned exactly (plan rule 14). Package.resolved is committed inside the
+  # generated project, so every machine builds identical dependencies.
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    exactVersion: 13.1.1
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS
+    exactVersion: 10.1.0
+
+targets:
+  SpashtPaytm:
+    type: application
+    platform: iOS
+
+    configFiles:
+      Debug: Config/Debug.xcconfig
+      Release: Config/Release.xcconfig
+
+    sources:
+      - path: SpashtPaytm
+        excludes:
+          # Developer-local, copied in by the build phase below instead.
+          - "Config/GoogleService-Info.plist"
+          # Chosen per configuration via INFOPLIST_FILE in the xcconfigs.
+          - "Info-Debug.plist"
+          - "Info-Release.plist"
+
+    # GoogleService-Info.plist exists only on a machine the human has configured
+    # (Appendix D.2). Listing it as a source would make a fresh clone fail to
+    # build with "Build input file cannot be found", so it is copied by a script
+    # that tolerates its absence. `FirebaseApp.configure()` checks for it too.
+    postBuildScripts:
+      - name: Copy GoogleService-Info.plist if present
+        basedOnDependencyAnalysis: false
+        script: |
+          set -e
+          SRC="$SRCROOT/SpashtPaytm/Config/GoogleService-Info.plist"
+          DEST="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH"
+          if [ -f "$SRC" ]; then
+            cp "$SRC" "$DEST/GoogleService-Info.plist"
+            echo "note: bundled GoogleService-Info.plist (Google sign-in enabled)"
+          else
+            echo "note: no GoogleService-Info.plist - Google sign-in stays hidden (see Appendix D.2)"
+          fi
+
+    dependencies:
+      # Only FirebaseAuth and GoogleSignIn (plan rule 14: no other packages).
+      - package: Firebase
+        product: FirebaseAuth
+      - package: GoogleSignIn
+        product: GoogleSignIn
+
+    settings:
+      base:
+        # Firebase stores ID tokens in the Keychain. Without an access group a
+        # free Personal Team can hit keychain error -34018 (section phase 1.2).
+        CODE_SIGN_ENTITLEMENTS: SpashtPaytm/SpashtPaytm.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+
+  SpashtPaytmTests:
+    type: bundle.unit-test
+    platform: iOS
+
+    configFiles:
+      Debug: Config/Debug.xcconfig
+      Release: Config/Release.xcconfig
+
+    sources:
+      - SpashtPaytmTests
+      # The shared contract fixtures (§8.5), referenced in place as a folder so
+      # Xcode's own Copy Resources phase bundles them. No copy script: user
+      # script sandboxing (rightly) forbids writing into the source tree, and a
+      # folder reference also means a newly generated fixture is picked up
+      # without regenerating the project.
+      - path: ../contracts/fixtures
+        type: folder
+        buildPhase: resources
+
+    dependencies:
+      - target: SpashtPaytm
+
+    settings:
+      base:
+        # Base.xcconfig sets PRODUCT_NAME for the app, and the Swift module name
+        # follows it. Without this override both targets build a module called
+        # "SpashtPaytm" and the build fails with "Multiple commands produce
+        # SpashtPaytm.swiftmodule".
+        PRODUCT_NAME: SpashtPaytmTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.finovators.spashtpaytm.tests
+
+        # The app's plists and entitlements belong to the app, not the tests.
+        INFOPLIST_FILE: ""
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_ENTITLEMENTS: ""
+
+schemes:
+  SpashtPaytm:
+    build:
+      targets:
+        SpashtPaytm: all
+        SpashtPaytmTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - SpashtPaytmTests
+      gatherCoverageData: false
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

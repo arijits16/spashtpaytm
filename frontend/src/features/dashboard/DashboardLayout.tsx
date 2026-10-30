@@ -5,15 +5,18 @@ import {
   LayoutDashboard,
   Library,
   Link2,
+  LogOut,
   PhoneCall,
   SlidersHorizontal,
 } from "lucide-react";
+import { useAuth } from "@/lib/authContext";
 
 /**
- * Laptop shell for the lender / compliance dashboard (build plan 5.7, 12).
+ * Laptop shell for the lender / compliance dashboard (build plan 5.8, 12).
  *
  * Dark navy sidebar, white content area, minimum width 1100px. The pages
- * themselves land in phase 8; this is the frame they mount into.
+ * themselves land in phase 9; this is the frame they mount into, and it carries
+ * the signed-in identity and Logout for the whole website.
  */
 const NAV = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
@@ -26,6 +29,8 @@ const NAV = [
 ] as const;
 
 export function DashboardLayout() {
+  const { me, isDemo, logout } = useAuth();
+
   return (
     <div className="flex min-h-dvh min-w-[1100px] bg-white">
       <aside className="flex w-60 shrink-0 flex-col bg-[#0B1F44] text-white">
@@ -58,9 +63,27 @@ export function DashboardLayout() {
           ))}
         </nav>
 
-        <p className="mt-auto px-5 py-4 text-[10px] leading-snug text-white/40">
-          Concept demo · synthetic data only · not the live Paytm app
-        </p>
+        {/* Signed-in identity and the website's only Logout button. */}
+        <div className="mt-auto border-t border-white/10 px-5 py-4">
+          <p className="truncate text-[12px] font-semibold text-white/90">
+            {me?.displayName ?? me?.email ?? "Signed in"}
+          </p>
+          <p className="mt-0.5 truncate text-[11px] text-white/50">
+            {isDemo ? "demo admin session" : (me?.email ?? "")}
+          </p>
+          <button
+            type="button"
+            onClick={() => void logout()}
+            className="mt-3 flex items-center gap-1.5 rounded-full border border-white/25 px-3 py-1.5 text-[12px] font-semibold text-white/85 hover:bg-white/10"
+          >
+            <LogOut size={13} strokeWidth={2} aria-hidden />
+            Logout
+          </button>
+
+          <p className="mt-4 text-[10px] leading-snug text-white/40">
+            Concept demo · synthetic data only · not the live Paytm app
+          </p>
+        </div>
       </aside>
 
       <main className="bg-bg flex-1 overflow-y-auto">

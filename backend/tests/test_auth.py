@@ -63,7 +63,10 @@ def test_rejection_reason_is_not_leaked_to_the_caller(
     expired = client.get("/api/me", headers={"Authorization": "Bearer expired-one"})
     forged = client.get("/api/me", headers={"Authorization": "Bearer forged-one"})
 
-    assert expired.json()["detail"] == forged.json()["detail"] == "Invalid or expired credentials"
+    expired_error = expired.json()["error"]
+    forged_error = forged.json()["error"]
+    assert expired_error["code"] == forged_error["code"] == "unauthorized"
+    assert expired_error["message"] == forged_error["message"] == "Invalid or expired credentials"
 
 
 # --- 200: a valid token ------------------------------------------------------

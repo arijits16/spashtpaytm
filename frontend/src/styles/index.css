@@ -108,7 +108,7 @@
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
     -webkit-font-smoothing: antialiased;
-    /* No pull-to-refresh bounce inside the phone frame during the demo. */
+    /* No pull-to-refresh bounce while a judge scrolls the dashboard. */
     overscroll-behavior-y: none;
   }
 
@@ -130,13 +130,7 @@
 }
 
 @layer utilities {
-  /* iOS standalone safe areas - used by PhoneFrame / SafeArea. */
-  .pt-safe {
-    padding-top: env(safe-area-inset-top, 0px);
-  }
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
+  /* Horizontal card rails in the dashboard scroll without a visible bar. */
   .no-scrollbar {
     scrollbar-width: none;
   }

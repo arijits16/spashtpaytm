@@ -31,13 +31,18 @@ class Settings(BaseSettings):
 
     # --- app ---
     app_env: AppEnv = "dev"
-    app_version: str = "0.1.0"
+    app_version: str = "0.2.0"
 
     # --- database ---
     database_url: str = "postgresql+psycopg://spasht:spasht@localhost:5433/spasht"
 
     # --- web ---
     cors_origins: str = "http://localhost:5173"
+
+    # The origin the *outside world* reaches us on: the ngrok domain during a
+    # phone demo. Receipt QR codes are built from this and never from the
+    # request's Host header, which a caller controls (section 11.6).
+    public_base_url: str = "http://localhost:8000"
 
     # --- Sarvam AI (phases 6, 7, 10) ---
     sarvam_api_key: str = ""
@@ -58,14 +63,23 @@ class Settings(BaseSettings):
     signing_key_id: str = "spasht-07"
     transcript_key: str = ""
     customer_ref_pepper: str = ""
+    otp_pepper: str = ""
     tts_cache_secret: str = ""
 
     # --- demo switches ---
     demo_mode: bool = False
     demo_auth: bool = False
+
+    # Shared secret the demo header must also carry (section 13.2). Without it
+    # the tunnel would hand anyone a signed-in session.
+    demo_auth_key: str = ""
+
     otp_demo: bool = True
 
-    # --- rescue agent (phase 9) ---
+    # --- phone tunnel (phase 1 helper, phase 13 demo day) ---
+    ngrok_domain: str = ""
+
+    # --- rescue agent (phase 10) ---
     rescue_idle_seconds: int = 60
     contact_window: str = "09:00-18:00"
 
@@ -103,7 +117,12 @@ class Settings(BaseSettings):
 
     @property
     def demo_auth_allowed(self) -> bool:
-        """`X-Demo-User` is only honoured in dev, and only when explicitly enabled."""
+        """`X-Demo-User` is only honoured in dev, and only when explicitly enabled.
+
+        Phase 1 adds the third condition from section 13.2 - a non-empty
+        `DEMO_AUTH_KEY` that the caller must also send as `X-Demo-Key` - together
+        with the constant-time comparison that checks it.
+        """
         return self.demo_auth and self.is_dev
 
 
