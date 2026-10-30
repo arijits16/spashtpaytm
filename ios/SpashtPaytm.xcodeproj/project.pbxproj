@@ -28,6 +28,7 @@
 		501E796895738EE42C6B987A /* SpashtPaytmApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C65CB1DF8AEF1C2FBA69AE9 /* SpashtPaytmApp.swift */; };
 		5166DE2763D4914DF0E37878 /* ProfileCompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2939F23BBA00AB0BDF4E4E9A /* ProfileCompletionView.swift */; };
 		524404BD24B46828A4081E7D /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 397F94834D0B56CDF9BFA9A2 /* HomeView.swift */; };
+		556F7FCFDE7D2F763D376497 /* Prewarm.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF1217E62267BD505FAD2AF9 /* Prewarm.swift */; };
 		5BF38AB9AA23C196F19917AE /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7656DCF98519D8D96F19C7B /* Toast.swift */; };
 		5ED2FBCF6E210BABB9B78AA2 /* OtpSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AB3B9E7B8F26536E18F8B5D /* OtpSheet.swift */; };
 		5FCC0F0C16C336304E236D67 /* OfferCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A817097B17944377AC2D18A /* OfferCards.swift */; };
@@ -40,7 +41,6 @@
 		82B740AAC9FD0BD2F0830757 /* AppConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B8ECF62B6E794A3AD4F691 /* AppConfigTests.swift */; };
 		8DB810C55D8151643958BFB8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 551B9918AAA9661C08D101AB /* Assets.xcassets */; };
 		99067210F940C61B7E1811B4 /* DevSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB011BF894D9EAA5AF42FB7 /* DevSettings.swift */; };
-		99B4BBFA8A110AC1FFC6D2D0 /* CallAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DF953CE81D3034A36C8B68 /* CallAudioPlayer.swift */; };
 		9E6A1532DDD957BF1EED71A6 /* MicButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834F07CD5F4B5667E5407FF1 /* MicButton.swift */; };
 		A38F3DA79097B33D64CFD5B7 /* JourneyViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0143EA94ADA39C4061ADDD13 /* JourneyViewModel.swift */; };
 		A5115F56448E5C04919477D1 /* ConsentAndFormCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE6E63E31DC3CA3871501E4 /* ConsentAndFormCards.swift */; };
@@ -60,6 +60,8 @@
 		F15680346FD10BB00C5AFEC3 /* Endpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 680BB647E4A4FFEF7C8B9597 /* Endpoints.swift */; };
 		F1D796B3581454B8FBCAC1BD /* AuthServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECBED56EF9381C0CC784F73D /* AuthServiceTests.swift */; };
 		F3BC63F318052F7FABF8CD81 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DF13FCD742E863C48D31D /* APIError.swift */; };
+		F5EAAF23C07E4E4EC87526CC /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EB6EC9315C21851115D24C /* AudioRecorder.swift */; };
+		F7609DB961B5BF57DD7DDCAF /* SpeechPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03DD955916A1D33C73A72D1 /* SpeechPlayer.swift */; };
 		FC140DC096314D9636DD9AC6 /* HomeComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2995BB3B143BFC0B459F142 /* HomeComponents.swift */; };
 		FC8B4F87DE1D1D2358B9A520 /* FixtureLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E98ACB6CF518E53B5456D8 /* FixtureLoader.swift */; };
 /* End PBXBuildFile section */
@@ -107,7 +109,6 @@
 		6DAD919990274ECA12A03880 /* Health.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Health.swift; sourceTree = "<group>"; };
 		7AE6E63E31DC3CA3871501E4 /* ConsentAndFormCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentAndFormCards.swift; sourceTree = "<group>"; };
 		7DD0F89BF0109DEF709CEF8C /* IncomingCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingCallView.swift; sourceTree = "<group>"; };
-		80DF953CE81D3034A36C8B68 /* CallAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallAudioPlayer.swift; sourceTree = "<group>"; };
 		834F07CD5F4B5667E5407FF1 /* MicButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicButton.swift; sourceTree = "<group>"; };
 		83C56BFFCAB3D868C24B2C6D /* QrCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrCode.swift; sourceTree = "<group>"; };
 		9201C438E6E1849017289CF5 /* SpashtPaytmTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SpashtPaytmTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -117,6 +118,7 @@
 		9956300371DD99FAD529C5B5 /* DemoAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoAuth.swift; sourceTree = "<group>"; };
 		ACD214E70BE16FF54BD2F333 /* LanguageSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSheet.swift; sourceTree = "<group>"; };
 		B2995BB3B143BFC0B459F142 /* HomeComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeComponents.swift; sourceTree = "<group>"; };
+		B6EB6EC9315C21851115D24C /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		B7656DCF98519D8D96F19C7B /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		BF6E06A54FC8E5BCB60541B4 /* Wordmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wordmark.swift; sourceTree = "<group>"; };
 		C003C4AEBD395CACF2A178BE /* SpashtIntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpashtIntroView.swift; sourceTree = "<group>"; };
@@ -128,8 +130,10 @@
 		DA0FF31EA272FD697FCBBB50 /* ReceiptCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptCardView.swift; sourceTree = "<group>"; };
 		DAB011BF894D9EAA5AF42FB7 /* DevSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevSettings.swift; sourceTree = "<group>"; };
 		DD7A9C5CC694EA40849147BE /* SpashtPaytm.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SpashtPaytm.entitlements; sourceTree = "<group>"; };
+		E03DD955916A1D33C73A72D1 /* SpeechPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechPlayer.swift; sourceTree = "<group>"; };
 		E6B8ECF62B6E794A3AD4F691 /* AppConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigTests.swift; sourceTree = "<group>"; };
 		ECBED56EF9381C0CC784F73D /* AuthServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthServiceTests.swift; sourceTree = "<group>"; };
+		EF1217E62267BD505FAD2AF9 /* Prewarm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prewarm.swift; sourceTree = "<group>"; };
 		EF3039D1230581368D593695 /* HomeConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeConfig.swift; sourceTree = "<group>"; };
 		F0446A02AEA361C950F22292 /* JourneyContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JourneyContractTests.swift; sourceTree = "<group>"; };
 		FE9C9C67D9CF2E6A45587C68 /* GoogleSignInService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInService.swift; sourceTree = "<group>"; };
@@ -224,6 +228,7 @@
 				128CC6557A65DF1310D85D2E /* APIClient.swift */,
 				4E0DF13FCD742E863C48D31D /* APIError.swift */,
 				680BB647E4A4FFEF7C8B9597 /* Endpoints.swift */,
+				EF1217E62267BD505FAD2AF9 /* Prewarm.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -244,7 +249,8 @@
 		80321BED433B661ADAA85F82 /* Audio */ = {
 			isa = PBXGroup;
 			children = (
-				80DF953CE81D3034A36C8B68 /* CallAudioPlayer.swift */,
+				B6EB6EC9315C21851115D24C /* AudioRecorder.swift */,
+				E03DD955916A1D33C73A72D1 /* SpeechPlayer.swift */,
 			);
 			path = Audio;
 			sourceTree = "<group>";
@@ -543,8 +549,8 @@
 				4855F921782E707FD73DB6AB /* APIClient.swift in Sources */,
 				F3BC63F318052F7FABF8CD81 /* APIError.swift in Sources */,
 				CD49AE7D832B0AC6995F606A /* AppConfig.swift in Sources */,
+				F5EAAF23C07E4E4EC87526CC /* AudioRecorder.swift in Sources */,
 				CF8D724DBA5FF08960600702 /* AuthService.swift in Sources */,
-				99B4BBFA8A110AC1FFC6D2D0 /* CallAudioPlayer.swift in Sources */,
 				6BF2233A899519C90B32DADF /* Cards.swift in Sources */,
 				366C0F12EA67C3900CF521C0 /* Colors.swift in Sources */,
 				0C02B8645F400817AF39F8A0 /* ConceptRibbon.swift in Sources */,
@@ -571,6 +577,7 @@
 				9E6A1532DDD957BF1EED71A6 /* MicButton.swift in Sources */,
 				5FCC0F0C16C336304E236D67 /* OfferCards.swift in Sources */,
 				5ED2FBCF6E210BABB9B78AA2 /* OtpSheet.swift in Sources */,
+				556F7FCFDE7D2F763D376497 /* Prewarm.swift in Sources */,
 				49E7EF80E1CE6866206E10F7 /* PrivacyCover.swift in Sources */,
 				5166DE2763D4914DF0E37878 /* ProfileCompletionView.swift in Sources */,
 				4D17808033E2B7C7080574B7 /* ProfileDrawer.swift in Sources */,
@@ -581,6 +588,7 @@
 				E017D4BA5AB5223A691FCC4C /* SignedInView.swift in Sources */,
 				15171B22D4EE89BE93163D85 /* SpashtIntroView.swift in Sources */,
 				501E796895738EE42C6B987A /* SpashtPaytmApp.swift in Sources */,
+				F7609DB961B5BF57DD7DDCAF /* SpeechPlayer.swift in Sources */,
 				5BF38AB9AA23C196F19917AE /* Toast.swift in Sources */,
 				DC05BA0796B2B71652DA4072 /* Turn.swift in Sources */,
 				49432E9EB9567FC2D9B3BFCF /* Typography.swift in Sources */,

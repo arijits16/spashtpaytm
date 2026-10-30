@@ -242,7 +242,36 @@ X-Request-ID: <16 hex chars>
 `Package.resolved` inside the committed Xcode project. Only FirebaseAuth and
 GoogleSignIn are allowed as iOS packages.
 
-**Open:** ⬜ `npm audit` and `pip-audit` in phase 12.
+**Done (phase 12):** `make audit` runs both. The review on 2026-10-31 found
+**23 advisories across 7 Python packages** and **4 high-severity advisories** in
+the website's tree. What was done with each:
+
+| Package | Was | Now | Note |
+|---|---|---|---|
+| `cryptography` | 46.0.3 | **50.0.0** | 7 advisories cleared, including GHSA-537c-gmf6-5ccf |
+| `pynacl` | 1.6.0 | **1.6.2** | PYSEC-2026-3002; this signs every receipt |
+| `python-multipart` | 0.0.20 | **0.0.31** | 6 advisories; it parses the voice clip and the KFS upload |
+| `pdfplumber` / `pdfminer.six` | 0.11.7 / 20250506 | **0.11.10 / 20260107** | 2 advisories in the PDF reader an admin feeds untrusted files to |
+| `pydantic-settings` | 2.13.0 | **2.14.2** | GHSA-4xgf-cpjx-pc3j |
+| `pytest` | 9.0.1 | **9.0.3** | dev only |
+
+**23 → 5.** All 221 backend tests pass on the upgraded set, and the pins in
+`pyproject.toml` were moved to match, so the lockfile and the audit agree.
+
+**Accepted, with reasons:**
+
+- **`starlette` 0.49.3 — 5 advisories.** Every fix is in the 1.x line, and
+  `fastapi` does not permit it: tried, and FastAPI 0.162.0 (the latest) still
+  resolves 0.49.3. Upgrading is upstream's decision, not ours. What stands
+  between those advisories and us: the body-size middleware rejects an oversized
+  body *before* Starlette buffers it (D-028), multipart parsing is
+  `python-multipart` 0.0.31 rather than Starlette's own, every route is rate
+  limited, and the tunnel is only open during a rehearsal or the demo itself.
+- **4 high-severity advisories in `@grpc/grpc-js`,** reached only through
+  `@firebase/firestore`. The website imports `firebase/app` and `firebase/auth`
+  and **never constructs a Firestore client**, so the vulnerable code path is
+  not reachable. `npm audit fix --force` would downgrade `firebase` to 9.14.0 —
+  a breaking change that would take Google sign-in with it. Not taken.
 
 ---
 
@@ -258,7 +287,8 @@ GoogleSignIn are allowed as iOS packages.
 4. **The tunnel exposes the backend to the internet** while it is running. Auth
    covers everything except health, audio (unguessable HMAC keys) and the public
    receipt page. Stop the tunnel after the event.
-5. **Transcripts are plaintext until phase 6.**
+5. **Five `starlette` advisories stay open** because FastAPI pins it below the
+   fixed line (see §12).
 6. **`gitleaks` is not installed here,** so the scan uses our own smaller
    pattern set (D-029). It catches the shapes we actually handle; it is not a
    general-purpose scanner.
@@ -298,3 +328,76 @@ the one with a hard "when not to" rule rather than only an authorisation rule.
   no holiday calendar. For a demo with synthetic personas in Maharashtra that is
   honest; a real deployment would need both, plus the national DND registry
   rather than a column.
+
+---
+
+## 15. The phase-12 security review (2026-10-31)
+
+§13 checked end to end rather than as a list of intentions. What was verified,
+and how.
+
+### 15.1 Supply chain
+See §12. 23 Python advisories reduced to 5, all upstream-blocked; the website's
+4 are unreachable code paths with a breaking "fix". `make audit` is now a
+command, so the next check is one line rather than a research exercise.
+
+### 15.2 The iOS Release build carries no demo path
+`make ios-build CONFIG=Release` succeeds, and the resulting binary was searched
+for the demo session's fingerprints:
+
+```
+strings SpashtPaytm.app/SpashtPaytm | grep -icE 'X-Demo-User|demo-admin|Continue as demo'
+0
+```
+
+Zero. `DemoAuth`, the demo header plumbing and the "Continue as demo user"
+button are inside `#if DEBUG`, so a Release build cannot authenticate without
+Firebase even if the backend would allow it. `ENABLE_TESTABILITY = NO`,
+`SWIFT_OPTIMIZATION_LEVEL = -O`, and `DEMO_AUTH_KEY` is empty in
+`Config/Release.xcconfig`.
+
+### 15.3 Rate limits are applied, not merely configured
+Every route that costs money or advances state enforces a bucket:
+`/journeys/{id}/voice` (20/min/user), `/journeys/{id}/turn` (60/min/user),
+`/otp/verify` (5 per 10 min per journey, 3 attempts per code),
+`/receipts/*/verify-candidate` (20/min/user), the public receipt pages and audio
+(60/min/IP), every demo-auth request (60/min/IP), and the phase 10 and 11 routes
+on the `turn` bucket. `tests/test_ratelimit.py` asserts the policy table and the
+`Retry-After` header.
+
+### 15.4 Ownership returns 404, never 403
+Asserted for every resource a customer can own, in each case with the predicate
+**inside the query** so another user's row is never loaded into memory:
+
+| Resource | Test |
+|---|---|
+| A journey | `test_journey.py` |
+| A voice turn on someone else's journey | `test_failure_paths.py` |
+| A receipt detail | `test_trust.py` |
+| A rescue task (pending, accept, decline) | `test_rescue.py` |
+| A KFS document (admin-only, so 403 for a customer) | `test_kfs_ingestion.py` |
+
+### 15.5 Failure handling
+`tests/test_failure_paths.py` makes each link in the chain fail on purpose and
+asserts the degradation: speech-to-text failing still returns a turn with the
+"didn't catch that" line; text-to-speech failing leaves every caption on screen
+with a null `audioUrl`; the LLM timing out falls back to the rules and the
+seeded templates; a non-audio upload is 415 and an oversized one is 413, both
+before anything is forwarded to a paid API; an expired token is a 401 with one
+generic message, so the app ends the session and the message is no oracle; and
+`/health` answers 200 `degraded` even when the database check itself raises.
+
+On the phone: a denied microphone is not an error state but a sentence pointing
+at the keyboard, which is always beside the mic (§5.9).
+
+### 15.6 What this review did not cover
+- **No penetration test, and no fuzzing** of the multipart or PDF paths beyond
+  the magic-byte checks and the size caps.
+- **No review of the Sarvam account's own posture** — key scope, rotation
+  policy, what their logs retain.
+- **The dashboard's SSE stream is not rate limited.** An admin holding many
+  connections open could exhaust the queue set; the bus drops the oldest event
+  per subscriber rather than blocking, so the blast radius is a stale dashboard
+  rather than a stalled turn.
+- **`gitleaks` is still not installed here** (D-029), so the secret scan is our
+  own smaller pattern set.

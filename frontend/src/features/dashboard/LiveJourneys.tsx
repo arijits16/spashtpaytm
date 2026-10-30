@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { getJourneys } from "@/lib/api";
 import { useLiveDashboard } from "@/lib/useLiveDashboard";
 import type { JourneyRow } from "@/lib/types";
-import { Card, ConnectionBadge, ErrorNote, LiveDot, Pill, Spinner, Table } from "@/components/ui";
+import { Card, ConnectionBadge, ErrorNote, LiveDot, Pill, Skeleton, Table } from "@/components/ui";
 import { fmt } from "@/lib/format";
 import { JourneyDetailDrawer } from "@/features/dashboard/JourneyDetail";
 
@@ -24,7 +24,7 @@ export function LiveJourneys() {
 
   const [selected, setSelected] = useState<string | null>(null);
 
-  if (loading && !data) return <Spinner label="Loading journeys…" />;
+  if (loading && !data) return <Skeleton rows={6} label="Loading journeys" />;
 
   return (
     <div className="space-y-4 p-8">

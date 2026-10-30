@@ -18,7 +18,13 @@ struct SpashtPaytmApp: App {
                 .preferredColorScheme(.light)
                 .privacyCover(scenePhase: scenePhase)
                 .animation(.easeInOut(duration: 0.15), value: scenePhase)
-                .task { await auth.start() }
+                .task {
+                    // Warms the tunnel, the TLS connection and the backend's
+                    // first database connection while the customer is still
+                    // looking at the login screen (§10.4).
+                    Prewarm.ping()
+                    await auth.start()
+                }
                 .onOpenURL { url in
                     // The redirect back from Google. Without this the sheet
                     // closes and nothing happens.

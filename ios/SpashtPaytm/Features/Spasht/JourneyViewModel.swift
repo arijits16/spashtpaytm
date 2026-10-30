@@ -124,6 +124,40 @@ final class JourneyViewModel {
         await takeTurn(.tap(action))
     }
 
+    /// Send a recorded clip as this turn (§8.2, phase 7).
+    ///
+    /// `clientTurnId` is kept on failure exactly as a tapped turn's is, so
+    /// retrying a voice turn whose response was lost replays the stored answer
+    /// instead of transcribing and advancing twice. The clip itself is not kept
+    /// for the retry - re-uploading audio over a dropped tunnel is slower than
+    /// the keyboard, and `retry()` falls back to re-rendering the step.
+    func send(voice data: Data, languageHint: Language?) async {
+        guard let journeyId = response?.journeyId, acceptsInput else { return }
+
+        let turnId = pendingTurnId ?? UUID()
+        pendingTurnId = turnId
+
+        var fields = ["clientTurnId": turnId.uuidString.lowercased()]
+        if let languageHint {
+            fields["languageHint"] = languageHint.rawValue
+        }
+
+        await perform {
+            try await self.client.upload(
+                Endpoints.voice(journeyId),
+                fileField: "audio",
+                fileName: "turn.m4a",
+                mimeType: "audio/mp4",
+                fileData: data,
+                fields: fields,
+                as: TurnResponse.self
+            )
+        } onSuccess: {
+            self.pendingTurnId = nil
+            self.pendingInput = nil
+        }
+    }
+
     /// Send a backend-composed quick reply.
     ///
     /// The action half is relayed opaquely: the backend built it for this step,

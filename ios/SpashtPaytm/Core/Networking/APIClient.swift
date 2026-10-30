@@ -96,6 +96,61 @@ actor APIClient {
         try await send(path: path, method: "PATCH", body: body, as: type)
     }
 
+    /// POST a `multipart/form-data` body: a recorded voice turn (§8.2, phase 7).
+    ///
+    /// Built by hand rather than with a library: it is one file part and a
+    /// couple of text fields, and the alternative is a dependency on the
+    /// critical path of the product's main interaction.
+    ///
+    /// The timeout is the session's 15 s, which is the §10.4 budget for a voice
+    /// turn end to end - upload, transcribe, engine, synthesise.
+    func upload<T: Decodable>(
+        _ path: String,
+        fileField: String,
+        fileName: String,
+        mimeType: String,
+        fileData: Data,
+        fields: [String: String] = [:],
+        as type: T.Type = T.self
+    ) async throws -> T {
+        var request = try await makeRequest(path: path, method: "POST", body: Optional<Never>.none)
+
+        let boundary = "spasht.\(UUID().uuidString)"
+        request.setValue(
+            "multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type"
+        )
+
+        var body = Data()
+        func append(_ text: String) {
+            body.append(Data(text.utf8))
+        }
+
+        for (name, value) in fields {
+            append("--\(boundary)\r\n")
+            append("Content-Disposition: form-data; name=\"\(name)\"\r\n\r\n")
+            append("\(value)\r\n")
+        }
+
+        append("--\(boundary)\r\n")
+        append(
+            "Content-Disposition: form-data; name=\"\(fileField)\"; filename=\"\(fileName)\"\r\n"
+        )
+        append("Content-Type: \(mimeType)\r\n\r\n")
+        body.append(fileData)
+        append("\r\n--\(boundary)--\r\n")
+
+        request.httpBody = body
+
+        let (data, response) = try await perform(request)
+        try check(response: response, data: data)
+
+        do {
+            return try decoder.decode(type, from: data)
+        } catch let error as DecodingError {
+            throw APIError.decoding(error, requestId: requestId(from: response))
+        }
+    }
+
     /// Fetch raw bytes (cached TTS audio, a KFS PDF) with the same headers.
     ///
     /// Going through the client rather than handing a URL to `AVPlayer` means

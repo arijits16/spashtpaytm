@@ -59,6 +59,10 @@ struct SpashtIntroView: View {
                     .padding(.bottom, 8)
             }
         }
+        // Pinged again here: the language screen is the last moment before the
+        // first real turn, and a tunnel that dropped while the phone sat on the
+        // home screen is re-established now rather than on stage.
+        .task { Prewarm.ping() }
         .navigationTitle("Spasht")
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $startsJourney) {

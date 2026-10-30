@@ -5,7 +5,7 @@
 
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
-.PHONY: help setup db-up db-down migrate seed keys dev dev-api dev-web test lint \
+.PHONY: help setup db-up db-down migrate seed keys dev dev-api dev-web test lint audit \
         format eval tts-cache demo-reset tunnel clean sarvam-smoke secret-scan \
         contracts kfs-pdfs golden-path ios-gen ios-open ios-build ios-test ios-run ios-config ios-icon \
         test-backend test-web lint-backend lint-web
@@ -87,6 +87,13 @@ keys: ## Fill the empty secrets in backend/.env (never overwrites, never prints)
 
 secret-scan: ## Scan tracked files for anything that looks like a secret
 	@node scripts/secret-scan.mjs
+
+audit: ## Supply-chain check (§13.12): pip-audit + npm audit
+	@echo "==> pip-audit"
+	@cd backend && .venv/bin/python -m pip_audit --progress-spinner off || true
+	@echo "==> npm audit (website)"
+	@cd frontend && npm audit || true
+	@echo "    advisories we accept, and why, are in docs/SECURITY.md section 12"
 
 # ------------------------------------------------------------------- run -----
 

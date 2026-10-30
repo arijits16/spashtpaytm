@@ -173,6 +173,57 @@ export function Spinner({ label }: { label?: string }) {
   );
 }
 
+/**
+ * A page skeleton: the shape of the content, pulsing, while it loads.
+ *
+ * Used instead of a spinner on the pages that always render the same layout
+ * (build plan 12, phase 12). A spinner says "wait"; a skeleton says "here is
+ * what is coming", and on a dashboard the difference is that the eye has
+ * already found the KPI row by the time the numbers arrive.
+ *
+ * `aria-busy` with a live region, so a screen reader is told once rather than
+ * reading a wall of empty boxes.
+ */
+export function Skeleton({
+  rows = 3,
+  kpis = 0,
+  label = "Loading…",
+}: {
+  rows?: number;
+  kpis?: number;
+  label?: string;
+}) {
+  return (
+    <div className="space-y-4 p-8" role="status" aria-busy="true" aria-label={label}>
+      <div className="bg-hairline/60 h-7 w-56 animate-pulse rounded" />
+
+      {kpis > 0 && (
+        <div className="grid grid-cols-4 gap-4">
+          {Array.from({ length: kpis }, (_, index) => (
+            <div
+              key={index}
+              className="rounded-card bg-hairline/40 h-24 animate-pulse"
+              style={{ animationDelay: `${index * 60}ms` }}
+            />
+          ))}
+        </div>
+      )}
+
+      <div className="rounded-card space-y-3 border border-slate-200 bg-white p-5">
+        {Array.from({ length: rows }, (_, index) => (
+          <div
+            key={index}
+            className="bg-hairline/50 h-4 animate-pulse rounded"
+            // Staggered, so it reads as one surface filling in rather than as
+            // several things flashing at once.
+            style={{ width: `${92 - index * 11}%`, animationDelay: `${index * 80}ms` }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function ErrorNote({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
     <div className="bg-alert-pink rounded-card flex items-start gap-3 px-4 py-3">

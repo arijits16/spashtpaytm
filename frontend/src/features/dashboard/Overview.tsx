@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { getOverview } from "@/lib/api";
 import { useLiveDashboard } from "@/lib/useLiveDashboard";
 import type { FunnelStep, Overview as OverviewData, QuestionStat } from "@/lib/types";
-import { Card, ConnectionBadge, ErrorNote, Kpi, Spinner } from "@/components/ui";
+import { Card, ConnectionBadge, ErrorNote, Kpi, Skeleton } from "@/components/ui";
 import { fmt } from "@/lib/format";
 
 /**
@@ -21,7 +21,7 @@ export function Overview() {
     events: ["journey.updated", "receipt.created", "guard.blocked", "demo.reset"],
   });
 
-  if (loading && !data) return <Spinner label="Loading the overview…" />;
+  if (loading && !data) return <Skeleton kpis={4} rows={5} label="Loading the overview" />;
 
   return (
     <div className="space-y-4 p-8">

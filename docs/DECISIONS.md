@@ -496,3 +496,69 @@ verified against, and the two must never be able to differ.
 
 The seeded questions are deactivated, not deleted, so `make seed` puts the demo
 back. A publish is reversible.
+
+### D-051 — The iOS voice loop was missing, and phase 12 could not be done without it
+Phase 7 shipped the backend's ears and mouth, and the app's mic button was still
+the phase-6 placeholder reading "Voice comes in Phase 7". There was no
+`AVFoundation` in the app at all: no recorder, no playback, and
+`onReplay: { /* phase 7 plays the audio */ }` in `JourneyView`.
+
+That made three phase-12 requirements unreachable (mic denied, speech-to-text
+error, text-to-speech error) and phase 13's "the golden path runs on a real
+iPhone **by voice**" impossible, so it was built here:
+
+- `AudioRecorder` — AAC in m4a, 16 kHz mono (what `stt.detect_format` accepts by
+  magic bytes, and what the phone encodes in hardware), 25 s ceiling matching
+  §10.1, level metering so the button grows while the phone is hearing, and a
+  typed `Failure` per case. Nothing is kept: the clip goes to the caller as
+  `Data` and the temporary file is deleted immediately (§13.11).
+- `SpeechPlayer` — one player for the whole app, replacing the rescue call's
+  private one. Lines **queue** rather than interrupt, because EXPLAIN_KFS speaks
+  three of them and playing only the last would drop two thirds of the
+  explanation. Bytes come through `APIClient` so the tunnel header is present;
+  without it ngrok serves its HTML interstitial and `AVAudioPlayer` fails
+  silently. The audio session is `.playback`/`.spokenAudio`, so a phone on
+  silent still speaks.
+- `APIClient.upload` — multipart by hand. It is one file part and two text
+  fields; a dependency on the critical path of the product's main interaction is
+  the worse trade.
+
+A denied microphone is not an error state. It is a sentence pointing at the
+keyboard, which is always beside the mic (§5.9).
+
+### D-052 — Five starlette advisories are accepted because FastAPI will not allow the fix
+The phase-12 `pip-audit` found 23 advisories across 7 packages. Nineteen were
+cleared by moving pins forward (cryptography 46.0.3 → 50.0.0, pynacl → 1.6.2,
+python-multipart → 0.0.31, pdfplumber/pdfminer.six, pydantic-settings, pytest),
+with all 221 tests green on the upgraded set.
+
+The remaining five are in `starlette` 0.49.3 and every fix is in the 1.x line.
+FastAPI does not permit it: tried, and FastAPI 0.162.0 — the latest — still
+resolves 0.49.3. So the pin was returned to the tested 0.121.2 rather than left
+on an untested major for no security gain.
+
+What stands between those advisories and this demo is written down in
+`docs/SECURITY.md` §12 rather than left implicit: the body-size middleware
+rejects an oversized body before Starlette buffers it, multipart parsing is
+`python-multipart` rather than Starlette's own, every route is rate limited, and
+the tunnel is open only during a rehearsal or the demo.
+
+The website's four high-severity advisories are in `@grpc/grpc-js`, reachable
+only through `@firebase/firestore` — which the site never constructs. The
+"fix" downgrades `firebase` to 9.14.0 and takes Google sign-in with it.
+
+### D-053 — Pre-warming is a health ping, not a speculative journey
+§10.4 asks for pre-warming. The honest version is a `GET /api/health` at launch
+and again on the language screen: it establishes the tunnel connection, the TLS
+handshake and the backend's first database connection, costs nothing, and cannot
+fail visibly.
+
+The *audio* is pre-warmed where pre-warming actually belongs — `make tts-cache`
+on the server, and `SpeechPlayer`'s own cache on the client, which downloads
+every line of a turn before it starts speaking and keeps the bytes. The cache
+keys are a hash of the text, so a replayed line never costs a second fetch.
+
+What was considered and rejected: starting the journey eagerly from the language
+screen to pull the greeting's audio down early. It would warm one more thing and
+make the first screen a side effect of a screen the customer had not finished
+looking at.

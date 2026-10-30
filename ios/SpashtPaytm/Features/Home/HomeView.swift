@@ -26,7 +26,7 @@ struct HomeView: View {
     // only while this screen exists also means it only runs when somebody is
     // signed in.
     @State private var rescue = RescueService()
-    @State private var callAudio = CallAudioPlayer()
+    @State private var callAudio = SpeechPlayer()
     @State private var rescueScreen: RescueScreen?
 
     /// What the rescue agent is currently showing full-screen. One piece of
@@ -232,7 +232,7 @@ struct HomeView: View {
     /// has finished, so the journey screen is not held back by it.
     private func accept(_ call: RescueCall) {
         Task {
-            await callAudio.play(path: call.audioUrl)
+            callAudio.play(path: call.audioUrl)
 
             if let response = await rescue.accept(call) {
                 rescueScreen = .resumed(response)

@@ -229,3 +229,48 @@ nothing blocked by the guard.
   penalty without the foreclosure charge). The review step exists for exactly
   this; the seeded lines remain the default for the seeded documents.
 - `ruff format --check` still fails on three files untouched since `615f080`.
+
+## Phase 12 — Polish, failure handling, security review, docs — done (2026-10-31)
+
+**Acceptance criteria**
+
+- [x] The golden path completes **twice in a row** from `make demo-reset`, in all
+      three languages, with the receipt verifying and the tamper check failing
+      correctly (`make golden-path ARGS=--all`, run twice).
+- [x] Demo mode completes the path; all 231 backend tests pass; ruff, tsc,
+      eslint and prettier are clean; `SECURITY.md` has the review in it.
+- [ ] The on-device half of the §16 checklist still needs one manual run through
+      Xcode's ▶ — taps cannot be driven from the command line here (D-042).
+
+**Built**
+
+- **The iOS voice loop, which was missing** (D-051): `AudioRecorder`,
+  `SpeechPlayer` (replacing the rescue call's private player),
+  `APIClient.upload` for multipart, and the `JourneyView` wiring — mic button,
+  level, auto-play per turn, replay, and the mic-denied path pointing at the
+  keyboard.
+- **Failure handling, asserted**: `tests/test_failure_paths.py` makes
+  speech-to-text, text-to-speech, the LLM and the database fail on purpose and
+  asserts what each degrades to; plus 415/413 on bad uploads, 404 on another
+  customer's journey, and 401 on an expired token.
+- **`/health` hardened** so it answers `degraded` even if the database check
+  itself raises — it is the route the demo checks first and the one the phone
+  pre-warms with.
+- **Pre-warming** (D-053): `Prewarm.ping()` at launch and on the language screen.
+- **Security review** (§13, written into `docs/SECURITY.md` §12 and §15):
+  `make audit` added; 23 Python advisories reduced to 5 by moving six pins
+  forward; the Release binary searched for the demo path and found to contain
+  **zero** occurrences of `X-Demo-User`, `demo-admin` or "Continue as demo";
+  rate limits and 404-ownership verified route by route.
+- **Website polish**: a staggered `Skeleton` replaces the spinner on the five
+  dashboard pages that always render the same layout.
+- **Docs**: README rewritten for the three clients, with running, demo-day and
+  troubleshooting sections; `docs/ARCHITECTURE.md` rewritten with five mermaid
+  diagrams (system, a voice turn end to end, the state machine, the trust layer,
+  KFS ingestion); `docs/DEMO_SCRIPT.md` written.
+
+**Not done, deliberately**
+
+- The XCUITest of the golden path. The build plan marks it optional, and the
+  Simulator cannot be driven from the command line on this machine (D-042), so
+  it would be a test nobody could run.

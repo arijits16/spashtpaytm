@@ -25,6 +25,14 @@ struct JourneyView: View {
     @State private var muted = false
     @FocusState private var draftFocused: Bool
 
+    // --- voice (phase 7) ---
+    @State private var recorder = AudioRecorder()
+    @State private var speech = SpeechPlayer()
+
+    /// The last turn whose lines were spoken, so re-rendering the view does not
+    /// play the same explanation twice.
+    @State private var spokenTurn: String?
+
     init(auth: AuthService, language: Language, resumed: TurnResponse? = nil) {
         self.auth = auth
         self.language = language
@@ -46,12 +54,24 @@ struct JourneyView: View {
                     onLanguage: { newLanguage in
                         Task { await model.send(action: .setLanguage(newLanguage)) }
                     },
-                    onMute: { muted.toggle() }
+                    onMute: {
+                        muted.toggle()
+                        speech.muted = muted
+                    }
                 )
 
                 transcript
 
-                if case .failed(let message) = model.phase {
+                // The microphone's own failures are shown here rather than as
+                // an alert: §5.9 requires a typing alternative for every voice
+                // action, and a modal would cover the keyboard button.
+                if let failure = recorder.failure {
+                    ErrorBar(message: failure.message) {
+                        recorder.clearFailure()
+                        typing = true
+                        draftFocused = true
+                    }
+                } else if case .failed(let message) = model.phase {
                     ErrorBar(message: message) {
                         Task { await model.retry() }
                     }
@@ -72,6 +92,21 @@ struct JourneyView: View {
             // active journey rather than starting a second one (§8.2), which is
             // what makes relaunch-and-resume work with no extra code.
             await model.start(language: language)
+        }
+        // Speak whatever the backend just said, once per turn (§5.9).
+        .onChange(of: model.response?.version) { _, _ in speakLatestTurn() }
+        .onChange(of: model.transcript.count) { _, _ in speakLatestTurn() }
+        // The 25 s ceiling stopped the recording; upload what was captured
+        // rather than wait for a finger that never lifts (§10.1).
+        .onChange(of: recorder.reachedLimit) { _, limited in
+            guard limited else { return }
+            recorder.clearLimit()
+            sendRecording()
+        }
+        .onDisappear {
+            recorder.cancel()
+            speech.stop()
+            speech.releaseSession()
         }
         .onChange(of: model.step) { _, step in
             // The OTP needs the keyboard and a focused field, so it is a sheet
@@ -119,7 +154,7 @@ struct JourneyView: View {
                         MessageBubble(
                             message: message,
                             muted: muted,
-                            onReplay: { /* phase 7 plays the audio */ }
+                            onReplay: { speech.replay(path: message.audioUrl) }
                         )
                         .id(message.id)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -223,7 +258,14 @@ struct JourneyView: View {
                     .disabled(draft.trimmingCharacters(in: .whitespaces).isEmpty)
                 } else {
                     Spacer()
-                    MicButton(enabled: model.acceptsInput)
+                    MicButton(
+                        enabled: model.acceptsInput && !recorder.isDenied,
+                        isRecording: recorder.isRecording,
+                        level: recorder.level,
+                        deniedHint: recorder.isDenied,
+                        onStart: { Task { await recorder.start() } },
+                        onStop: sendRecording
+                    )
                     Spacer()
                 }
 
@@ -246,6 +288,31 @@ struct JourneyView: View {
         }
         .background(Theme.bg)
         .animation(.easeInOut(duration: 0.2), value: typing)
+    }
+
+    /// Stop recording and send the clip, or show why there is nothing to send.
+    private func sendRecording() {
+        Task {
+            guard let data = await recorder.stop() else { return }
+            // The phone's own detection, so a customer who switched language
+            // mid-journey is still transcribed in the language they spoke.
+            await model.send(voice: data, languageHint: model.language)
+        }
+    }
+
+    /// Play the assistant's lines for the current turn, in order, once.
+    ///
+    /// Keyed on the turn rather than on the message list, because the list is
+    /// the running total: re-speaking on every append would replay the whole
+    /// conversation after each turn.
+    private func speakLatestTurn() {
+        guard !muted, let response = model.response else { return }
+
+        let key = "\(response.journeyId):\(response.version)"
+        guard key != spokenTurn else { return }
+        spokenTurn = key
+
+        speech.play(paths: response.messages.filter { $0.role == .assistant }.map(\.audioUrl))
     }
 
     private func sendDraft() {

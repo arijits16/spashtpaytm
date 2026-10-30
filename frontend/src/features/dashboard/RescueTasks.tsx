@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { getRescueTasks } from "@/lib/api";
 import { useLiveDashboard } from "@/lib/useLiveDashboard";
 import type { RescueRow } from "@/lib/types";
-import { Card, ConnectionBadge, ErrorNote, Pill, Spinner, Table } from "@/components/ui";
+import { Card, ConnectionBadge, ErrorNote, Pill, Skeleton, Table } from "@/components/ui";
 import { fmt } from "@/lib/format";
 
 /**
@@ -20,7 +20,7 @@ export function RescueTasks() {
     events: ["rescue.created", "journey.updated", "demo.reset"],
   });
 
-  if (loading && !data) return <Spinner label="Loading rescue tasks…" />;
+  if (loading && !data) return <Skeleton rows={5} label="Loading rescue tasks" />;
 
   return (
     <div className="space-y-4 p-8">

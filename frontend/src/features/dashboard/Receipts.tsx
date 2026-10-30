@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { getDashboardReceipts } from "@/lib/api";
 import { useLiveDashboard } from "@/lib/useLiveDashboard";
 import type { ReceiptRow } from "@/lib/types";
-import { Card, ConnectionBadge, ErrorNote, Spinner, Table } from "@/components/ui";
+import { Card, ConnectionBadge, ErrorNote, Skeleton, Table } from "@/components/ui";
 import { fmt } from "@/lib/format";
 
 /** The receipts table (build plan 12). Each row links to its check page. */
@@ -14,7 +14,7 @@ export function Receipts() {
     events: ["receipt.created", "demo.reset"],
   });
 
-  if (loading && !data) return <Spinner label="Loading receipts…" />;
+  if (loading && !data) return <Skeleton rows={6} label="Loading receipts" />;
 
   return (
     <div className="space-y-4 p-8">

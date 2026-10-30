@@ -2,9 +2,9 @@ import SwiftUI
 
 /// The mic button (build plan §5.6, §5.9).
 ///
-/// Phase 7 wires it to the recorder. Until then it is visible but disabled with
-/// an explanatory caption, because hiding it would make the journey look
-/// typing-only and the voice loop is the point of the product.
+/// Wired to `AudioRecorder`. It stays visible even when the microphone is
+/// unavailable, with a caption pointing at the keyboard: hiding it would make
+/// the journey look typing-only, and the voice loop is the point of the product.
 ///
 /// It supports both press-and-hold and tap-to-toggle. Hold is what people do
 /// instinctively; tap-to-toggle is what someone with a tremor or an unsteady
@@ -14,6 +14,9 @@ struct MicButton: View {
     let enabled: Bool
     var isRecording = false
     var level: CGFloat = 0
+    /// True once the customer has denied the microphone. The caption then points
+    /// at the keyboard instead of promising a later phase.
+    var deniedHint = false
     var onStart: (() -> Void)?
     var onStop: (() -> Void)?
 
@@ -70,10 +73,14 @@ struct MicButton: View {
                 pulsing = recording
             }
             .accessibilityLabel(isRecording ? "Stop recording" : "Hold to speak")
-            .accessibilityHint(enabled ? "" : "Voice arrives in a later phase. Use the keyboard instead.")
+            .accessibilityHint(enabled ? "" : "Microphone unavailable. Use the keyboard instead.")
 
-            if !enabled {
-                Text("Voice comes in Phase 7")
+            if deniedHint {
+                Text("Microphone off — type instead")
+                    .font(.system(size: 10))
+                    .foregroundStyle(Theme.text3)
+            } else if isRecording {
+                Text("Listening… release to send")
                     .font(.system(size: 10))
                     .foregroundStyle(Theme.text3)
             }

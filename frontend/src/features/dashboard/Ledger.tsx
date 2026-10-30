@@ -3,7 +3,7 @@ import { ArrowDown } from "lucide-react";
 import { getLedger } from "@/lib/api";
 import { useLiveDashboard } from "@/lib/useLiveDashboard";
 import type { LedgerResponse } from "@/lib/types";
-import { Card, ConnectionBadge, ErrorNote, Pill, Spinner } from "@/components/ui";
+import { Card, ConnectionBadge, ErrorNote, Pill, Skeleton } from "@/components/ui";
 import { fmt } from "@/lib/format";
 
 /**
@@ -21,7 +21,7 @@ export function Ledger() {
     events: ["receipt.created", "demo.reset"],
   });
 
-  if (loading && !data) return <Spinner label="Walking the chain…" />;
+  if (loading && !data) return <Skeleton rows={4} label="Walking the chain" />;
 
   return (
     <div className="space-y-4 p-8">

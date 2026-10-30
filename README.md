@@ -20,12 +20,28 @@ answered, which anyone can verify and nobody can quietly edit.
 
 ## Status
 
-**Phase 1 of 12 complete** — scaffold, Docker Postgres, FastAPI, React shell, and
-Firebase Google sign-in with backend token verification. See
-[`docs/PROGRESS.md`](docs/PROGRESS.md).
+**Phases 0–12 complete.** Three clients on one backend:
 
-The full specification is [`docs/BUILD_PLAN.md`](docs/BUILD_PLAN.md). Design
-decisions and deviations are in [`docs/DECISIONS.md`](docs/DECISIONS.md).
+- **`ios/`** — the native SwiftUI iPhone app: the Paytm-style home screen, the
+  voice journey (record → Saaras → engine → Bulbul → speak), the KFS viewer,
+  OTP, the receipt card and the rescue agent's incoming-call screen.
+- **`backend/`** — FastAPI: the journey engine (a deterministic state machine),
+  the trust layer (hash chain, Ed25519, Merkle anchors, AES-256-GCM
+  transcripts), the Sarvam clients, the Number Guard, the rescue scheduler and
+  KFS ingestion.
+- **`frontend/`** — the laptop-only website: admin sign-in, the live compliance
+  dashboard over SSE, receipt verification with the tamper demo, the ledger,
+  the KFS library and the demo controls.
+
+Phase 13 is the device-and-demo-day setup, which is a human checklist — see
+[Demo day](#demo-day) below.
+
+The full specification is [`docs/BUILD_PLAN.md`](docs/BUILD_PLAN.md); progress
+per phase is [`docs/PROGRESS.md`](docs/PROGRESS.md); design decisions and
+deviations are [`docs/DECISIONS.md`](docs/DECISIONS.md); the security posture is
+[`docs/SECURITY.md`](docs/SECURITY.md); the architecture, with diagrams, is
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); and the script for the five
+minutes on stage is [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
 
 ---
 
@@ -81,10 +97,58 @@ shows your profile and `Backend: OK · DB: OK`. Admins also get **/dashboard**.
 | `make test` | pytest + vitest |
 | `make lint` | ruff + ruff-format + tsc + eslint + prettier |
 | `make format` | Auto-fix all of the above |
-| `make eval` | LLM eval suite _(phase 7)_ |
-| `make tts-cache` | Pre-generate TTS audio _(phase 6)_ |
-| `make demo-reset` | Wipe journey data and re-seed _(phase 2)_ |
-| `make tunnel` | HTTPS tunnel for phone testing _(phase 12)_ |
+| `make eval` | LLM eval suite |
+| `make audit` | `pip-audit` + `npm audit` (§13.12) |
+| `make tts-cache` | Pre-generate the TTS audio the golden path speaks |
+| `make demo-reset` | Wipe journey data, reset the ledger and re-seed |
+| `make golden-path` | Walk the whole journey over HTTP and print every step |
+| `make contracts` | Regenerate `contracts/fixtures/*.json` from the backend |
+| `make tunnel` | HTTPS tunnel, so the phone can reach the laptop |
+| `make ios-gen` / `ios-build` / `ios-test` / `ios-run` | XcodeGen + build + test + launch |
+| `make ios-config` | Write `ios/Config/Secrets.xcconfig` from the current tunnel |
+
+## Running the demo
+
+```bash
+make db-up && make migrate && make seed   # once
+make keys                                 # once: Ed25519 + transcript keys
+make tts-cache                            # once per language change: pre-generates the spoken lines
+make demo-reset                           # before every rehearsal and every run
+make dev                                  # Postgres + FastAPI :8000 + Vite :5173
+```
+
+Then, on the laptop, open **http://localhost:5173/dashboard** and sign in as an
+admin. On the phone, open Spasht from the Loans tile.
+
+With no network at all, set `DEMO_MODE=true` in `backend/.env`: the journey runs
+on templates and the pre-generated audio, and the golden path still completes
+(§10.6).
+
+To check the backend end to end without any UI:
+
+```bash
+make golden-path ARGS=--all      # all three languages, taps
+make golden-path ARGS=--voice    # the utterances a customer would speak
+```
+
+## Demo day
+
+The full checklist is in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md). The short
+version:
+
+1. `make tunnel` (ngrok static domain) → put the URL in `backend/.env`
+   (`PUBLIC_BASE_URL`) and `ios/Config/Secrets.xcconfig` (`API_BASE_URL`), or
+   run `make ios-config`. **Write xcconfig URLs as `https:/$()/host`** — a bare
+   `//` starts a comment.
+2. `make ios-build CONFIG=Debug` and install on each team iPhone through Xcode
+   (Personal Team signing, Developer Mode on, trust the developer). A free team
+   signs for **7 days**, so reinstall the night before.
+3. Mirror the iPhone to the laptop for the projector: QuickTime → File → New
+   Movie Recording → choose the iPhone as the camera.
+4. Phone volume up, Do Not Disturb on, hotspot ready as a backup network, the
+   dashboard already open, `make demo-reset` run, and the backup video recorded.
+5. **Afterwards:** stop the tunnel, and rotate `SARVAM_API_KEY` and
+   `DEMO_AUTH_KEY`.
 
 ## Ports
 
@@ -104,11 +168,14 @@ spashtpaytm/
 ├── scripts/               cross-platform setup + venv runner
 ├── infra/                 docker-compose: postgres 16 + adminer
 ├── docs/                  BUILD_PLAN · PROGRESS · DECISIONS · ARCHITECTURE
+├── contracts/fixtures/    API examples every client must decode
 ├── backend/               FastAPI + SQLAlchemy 2 + Alembic
-│   ├── app/{api,auth,journey,adapters,ai,trust,events,rescue,seed,db}
+│   ├── app/{api,auth,journey,adapters,ai,trust,events,rescue,kfs,seed,db}
 │   └── tests/
-└── frontend/              React 19 + Vite + TS strict + Tailwind v4
-    └── src/{components,features,lib,pages,styles}
+├── frontend/              React 19 + Vite + TS strict + Tailwind v4
+│   └── src/{components,features,lib,pages,styles}
+└── ios/                   SwiftUI, generated from project.yml by XcodeGen
+    └── SpashtPaytm/{App,Core,Features}
 ```
 
 ## Secrets
@@ -117,8 +184,19 @@ Nothing secret is ever committed. `.env`, `backend/secrets/`, signing keys and a
 Firebase service-account JSON are gitignored; only `.env.example` files are tracked.
 `docs/reference/` (Paytm screenshots used for look-matching) is gitignored too.
 
-Keys needed later: `SARVAM_API_KEY` (phase 6) and the Firebase web config
-(phase 1). See `docs/BUILD_PLAN.md` Appendix D.
+Keys needed to run everything:
+
+| Variable | Where | Needed for |
+|---|---|---|
+| `SARVAM_API_KEY` | `backend/.env` | Speech-to-text, text-to-speech, the LLM, KFS extraction. Without it the backend runs in demo mode on templates and cached audio. |
+| `VITE_FIREBASE_*` | `frontend/.env` | Google sign-in on the website |
+| `DASHBOARD_ADMIN_EMAILS` | `backend/.env` | Who may open `/dashboard` |
+| `DEMO_AUTH_KEY` | `backend/.env`, `frontend/.env`, `ios/Config/Secrets.xcconfig` | The dev-only demo session |
+| `TTS_CACHE_SECRET`, `OTP_PEPPER`, `TRANSCRIPT_KEY`, signing keys | `backend/.env`, `backend/secrets/` | Written by `make keys` |
+| `GoogleService-Info.plist` | `ios/Config/` | Google sign-in on the phone (optional; demo sign-in works without it) |
+
+**The Sarvam key lives only in the backend.** No client ever calls Sarvam.
+See `docs/BUILD_PLAN.md` Appendix D.
 
 ## Troubleshooting
 
@@ -132,3 +210,18 @@ whale icon to settle.
 
 **Frontend builds but types fail** — run `npx tsc -b` inside `frontend/` for the
 full error; the project uses TS strict plus `noUncheckedIndexedAccess`.
+
+**The phone cannot reach the backend** — the tunnel URL changed, or the xcconfig
+has a `//` in it (which starts a comment, so the URL silently truncates). Write
+`https:/$()/your-domain.ngrok-free.app` and rebuild. `GET /api/health` from
+Safari on the phone is the fastest check.
+
+**The assistant is silent** — run `make tts-cache`. A missing cache entry is a
+quiet turn by design (§10.2): the caption is always on screen.
+
+**The app asks for the microphone and then does nothing** — Settings → Spasht →
+Microphone. Every voice action has a typing alternative; the keyboard button is
+beside the mic.
+
+**`alembic` says the database is not up to date** — `make migrate`. After
+pulling a new migration, `make demo-reset` re-seeds.
