@@ -1580,10 +1580,10 @@ Update this table after each phase, and fix the slides before the final pitch.
 |---|---|---|
 | Customer app | **Native iPhone app (SwiftUI)**, Phases 4–7 | Say "native iOS app; Android next" |
 | Saaras v4, Bulbul v4, Sarvam-105B | Phases 7–8 | ✓ |
-| Sarvam Vision reads the KFS | Phase 11 (stretch) | If skipped, say "roadmap" |
-| LangGraph | Phase 8 (optional) | If not used, say "state-machine orchestrator" |
+| Sarvam Vision reads the KFS | Phase 11 ✅ | Built: Document Intelligence with an inline field schema, per-field confidence, a `pdfplumber` fallback, and **human verification before publishing**. Verified once against the live API on Bank B's KFS (all 15 fields) |
+| LangGraph | Not used | Say "state-machine orchestrator": `journey/engine.py` is deterministic Python a regulator can read |
 | pgvector RAG | Postgres full-text search | Change to "Postgres search over KFS clauses" |
-| XGBoost drop-off model | Not in the MVP | Change to "rules now, ML on pilot data later" |
+| XGBoost drop-off model | Not in the MVP | Change to "rules now, ML on pilot data later". The rescue agent's rules are idle time + step + the three contact gates |
 | SHA-256 chain, Ed25519, Merkle, AES-256-GCM | Phase 6 | ✓ |
 | DigiLocker, AA, CKYC, UPI AutoPay | Mocked adapters, Phase 3 | "Mocked with synthetic data; production via partner APIs" |
 | WebSockets | HTTP + SSE | Change to "HTTP + Server-Sent Events" |
@@ -1591,7 +1591,7 @@ Update this table after each phase, and fix the slides before the final pitch.
 | PostgreSQL | ✓ | Add Firebase Auth and SwiftUI to the slide |
 | Docker, AWS Mumbai | Docker locally | Keep AWS Mumbai as the deployment target |
 | Langfuse | Optional | Remove if not used |
-| Exotel call-backs | Simulated (Phase 10) | "Simulated in the demo" |
+| Exotel call-backs | Simulated (Phase 10) ✅ | "Simulated in the demo" - an in-app incoming-call screen, labelled as such (D-043). The contact-window, DND and consent rules behind it are real |
 
 ---
 
