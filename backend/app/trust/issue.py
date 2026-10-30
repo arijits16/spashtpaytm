@@ -31,6 +31,7 @@ from app.db.models.catalog import KfsDocument
 from app.db.models.journey import Consent, Journey, TeachbackAttempt
 from app.db.models.persona import Persona
 from app.db.models.trust import Receipt
+from app.events.bus import publish_receipt_created
 from app.journey import events
 from app.journey.cards import ReceiptCard, ReceiptCardData, TeachbackScore
 from app.journey.context import JourneyContext
@@ -271,6 +272,15 @@ def issue_receipt(
             "hash": appended.hash[:16],
             "lender": offer.lender,
         },
+    )
+
+    # The phase-9 acceptance criterion: finishing on the phone shows on the
+    # laptop within two seconds, without a refresh.
+    publish_receipt_created(
+        receipt_no=appended.receipt_no,
+        seq=appended.seq,
+        lender=offer.lender,
+        journey_id=journey.id,
     )
     db.flush()
 

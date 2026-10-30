@@ -28,6 +28,7 @@ from app.ai.reexplain import answer_kfs_question, reexplain
 from app.ai.sarvam_client import demo_mode_active
 from app.config import Settings
 from app.db.models.journey import Journey
+from app.events.bus import publish_guard_blocked
 from app.journey import events
 from app.journey.engine import EngineResult, GenerationRequest
 from app.journey.responses import TurnResponse
@@ -54,6 +55,11 @@ async def polish(
         return response
 
     def on_block(verdict: GuardVerdict) -> None:
+        publish_guard_blocked(
+            journey_id=journey.id,
+            blocked=verdict.blocked_numbers,
+            kind=request.kind,
+        )
         events.record(
             db,
             journey_id=journey.id,

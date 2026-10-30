@@ -198,6 +198,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     applyMe(await fetchMe());
   }, [applyMe]);
 
+  /**
+   * Auth headers for the SSE stream, mirroring the API client's precedence:
+   * a real bearer token always wins over the demo headers, so the stream can
+   * never be watching as a demo admin while the rest of the page acts as the
+   * real one.
+   */
+  const authHeaders = useCallback(async (): Promise<Record<string, string>> => {
+    const user = firebaseUser.current;
+    if (user) {
+      return { Authorization: `Bearer ${await user.getIdToken()}` };
+    }
+    if (hasStoredDemoSession() && DEMO_AUTH_KEY) {
+      return { "X-Demo-User": DEMO_PERSONA, "X-Demo-Key": DEMO_AUTH_KEY };
+    }
+    return {};
+  }, []);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       status,
@@ -208,8 +225,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signInAsDemoUser,
       logout,
       refreshMe,
+      authHeaders,
     }),
-    [status, me, isDemo, error, signInWithGoogle, signInAsDemoUser, logout, refreshMe],
+    [status, me, isDemo, error, signInWithGoogle, signInAsDemoUser, logout, refreshMe, authHeaders],
   );
 
   return <AuthContext value={value}>{children}</AuthContext>;

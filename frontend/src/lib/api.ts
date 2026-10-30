@@ -6,6 +6,20 @@
  * about auth yet. Tokens and personal data never go in the URL (plan 13).
  */
 
+import type {
+  Anchor,
+  CandidateResult,
+  JourneyDetail,
+  JourneyRow,
+  LedgerResponse,
+  Overview,
+  PublicKey,
+  ReceiptDetail,
+  ReceiptRow,
+  RescueRow,
+  VerifyResult,
+} from "@/lib/types";
+
 const BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
 /** Resolves the current auth header value, or null when signed out. */
@@ -169,3 +183,78 @@ export const getMe = (signal?: AbortSignal): Promise<Me> =>
 /** Update the profile. Today only the language is user-editable. */
 export const updateMe = (patch: { preferredLanguage: Lang }): Promise<Me> =>
   apiFetch<Me>("/me", { method: "PATCH", body: patch });
+
+// --- dashboard ---------------------------------------------------------------
+
+/**
+ * The admin-only dashboard endpoints (build plan 12).
+ *
+ * All of them are enforced server-side: the route guards on the website are a
+ * convenience, and bypassing them gains a non-admin nothing but a 403.
+ */
+
+export const getOverview = (signal?: AbortSignal): Promise<Overview> =>
+  apiFetch<Overview>("/dashboard/overview", signal ? { signal } : {});
+
+export const getJourneys = (signal?: AbortSignal): Promise<JourneyRow[]> =>
+  apiFetch<JourneyRow[]>("/dashboard/journeys", signal ? { signal } : {});
+
+export const getJourneyDetail = (id: string, signal?: AbortSignal): Promise<JourneyDetail> =>
+  apiFetch<JourneyDetail>(`/dashboard/journeys/${id}`, signal ? { signal } : {});
+
+export const getDashboardReceipts = (signal?: AbortSignal): Promise<ReceiptRow[]> =>
+  apiFetch<ReceiptRow[]>("/dashboard/receipts", signal ? { signal } : {});
+
+export const getRescueTasks = (signal?: AbortSignal): Promise<RescueRow[]> =>
+  apiFetch<RescueRow[]>("/dashboard/rescue-tasks", signal ? { signal } : {});
+
+export const getLedger = (signal?: AbortSignal): Promise<LedgerResponse> =>
+  apiFetch<LedgerResponse>("/ledger", signal ? { signal } : {});
+
+export const getAnchors = (signal?: AbortSignal): Promise<Anchor[]> =>
+  apiFetch<Anchor[]>("/ledger/anchors", signal ? { signal } : {});
+
+export const getPublicKeys = (signal?: AbortSignal): Promise<PublicKey[]> =>
+  apiFetch<PublicKey[]>("/public-keys", signal ? { signal } : {});
+
+// --- receipts and the tamper demo --------------------------------------------
+
+export const getReceipt = (no: string, signal?: AbortSignal): Promise<ReceiptDetail> =>
+  apiFetch<ReceiptDetail>(`/receipts/${no}`, signal ? { signal } : {});
+
+export const verifyReceipt = (no: string, signal?: AbortSignal): Promise<VerifyResult> =>
+  apiFetch<VerifyResult>(`/receipts/${no}/verify`, signal ? { signal } : {});
+
+/**
+ * Verify an **edited copy** of a receipt (build plan 11.3).
+ *
+ * The database is never touched: the tamper demo's whole point is that the
+ * edited copy fails while the stored receipt keeps verifying.
+ */
+export const verifyCandidate = (
+  no: string,
+  payload: Record<string, unknown>,
+): Promise<CandidateResult> =>
+  apiFetch<CandidateResult>(`/receipts/${no}/verify-candidate`, {
+    method: "POST",
+    body: { payload },
+  });
+
+// --- demo controls (dev only) ------------------------------------------------
+
+export const resetDemo = (): Promise<{ reset: boolean; counts: Record<string, number> }> =>
+  apiFetch("/admin/demo/reset", { method: "POST", body: {} });
+
+export const createAbandonedJourney = (
+  body: { personaId?: string; step?: string; idleSeconds?: number } = {},
+): Promise<{ journeyId: string; step: string; idleSeconds: number }> =>
+  apiFetch("/admin/demo/abandoned-journey", { method: "POST", body });
+
+export const getPersonas = (
+  signal?: AbortSignal,
+): Promise<
+  { id: string; displayNameMasked: string; language: string; city: string; occupation: string }[]
+> => apiFetch("/admin/personas", signal ? { signal } : {});
+
+export const switchPersona = (personaId: string): Promise<Me> =>
+  apiFetch<Me>("/me/persona", { method: "POST", body: { personaId } });

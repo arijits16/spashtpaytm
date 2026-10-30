@@ -22,6 +22,14 @@ export interface AuthContextValue {
   logout: () => Promise<void>;
   /** Re-fetch `/api/me`, e.g. after changing the language. */
   refreshMe: () => Promise<void>;
+  /**
+   * The auth headers for a request this module does not make itself.
+   *
+   * The SSE stream needs them because it uses `fetch` rather than
+   * `EventSource` - which cannot set headers, and would have forced the ID
+   * token into the query string where it would end up in access logs.
+   */
+  authHeaders: () => Promise<Record<string, string>>;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);

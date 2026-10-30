@@ -1,7 +1,14 @@
 import { createBrowserRouter } from "react-router";
 import { SiteLayout } from "@/components/SiteLayout";
 import { DashboardLayout } from "@/features/dashboard/DashboardLayout";
+import { DemoControls } from "@/features/dashboard/DemoControls";
+import { KfsLibrary } from "@/features/dashboard/KfsLibrary";
+import { Ledger } from "@/features/dashboard/Ledger";
+import { LiveJourneys } from "@/features/dashboard/LiveJourneys";
 import { Overview } from "@/features/dashboard/Overview";
+import { ReceiptCheck } from "@/features/dashboard/ReceiptCheck";
+import { Receipts } from "@/features/dashboard/Receipts";
+import { RescueTasks } from "@/features/dashboard/RescueTasks";
 import { IndexRedirect, RedirectIfSignedIn, RequireAdmin } from "@/lib/guards";
 import { LoginPage } from "@/pages/LoginPage";
 import { NotFound } from "@/pages/NotFound";
@@ -28,7 +35,17 @@ export const router = createBrowserRouter([
           {
             path: "/dashboard",
             element: <DashboardLayout />,
-            children: [{ index: true, element: <Overview /> }],
+            children: [
+              { index: true, element: <Overview /> },
+              { path: "journeys", element: <LiveJourneys /> },
+              { path: "receipts", element: <Receipts /> },
+              // The receipt check and its tamper editor (5.8, 11.3).
+              { path: "receipts/:receiptNo", element: <ReceiptCheck /> },
+              { path: "ledger", element: <Ledger /> },
+              { path: "kfs", element: <KfsLibrary /> },
+              { path: "rescue", element: <RescueTasks /> },
+              { path: "demo", element: <DemoControls /> },
+            ],
           },
         ],
       },

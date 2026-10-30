@@ -39,6 +39,7 @@ from app.config import Settings
 from app.db.models.catalog import KfsDocument
 from app.db.models.journey import Consent, Journey, TeachbackAttempt
 from app.db.models.persona import Persona
+from app.events.bus import publish_journey_updated
 from app.journey import events, otp
 from app.journey.cards import (
     AmountCard,
@@ -1008,6 +1009,19 @@ class Engine:
             step=str(step),
             data={},
         )
+
+        # The dashboard's live table updates from this (§12). Published rather
+        # than polled so finishing on the phone shows on the laptop within two
+        # seconds; it never blocks and never raises, so a dashboard nobody has
+        # open costs nothing.
+        publish_journey_updated(
+            self.journey.id,
+            step=str(step),
+            status=self.journey.status,
+            persona_id=self.journey.persona_id,
+            language=self._language,
+        )
+
         self._render_current_step(speak=speak)
 
     def _render_current_step(
