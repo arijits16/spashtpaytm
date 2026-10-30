@@ -117,9 +117,7 @@ async def warm(languages: list[Lang], *, force: bool) -> int:
 
     failures = 0
     for language in languages:
-        name = build_honorific(
-            (persona.name_local if persona else {}) or {}, language
-        )
+        name = build_honorific((persona.name_local if persona else {}) or {}, language)
         items = lines_for(language, facts, name)
         print(f"\n==> {language}: {len(items)} line(s)")
 
@@ -147,9 +145,7 @@ def main() -> int:
         choices=list(LANGUAGES),
         help="only this language (repeatable). Default: all three.",
     )
-    parser.add_argument(
-        "--force", action="store_true", help="re-synthesise even on a cache hit"
-    )
+    parser.add_argument("--force", action="store_true", help="re-synthesise even on a cache hit")
     args = parser.parse_args()
 
     languages: list[Lang] = args.language or list(LANGUAGES)

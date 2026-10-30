@@ -78,7 +78,7 @@ def test_the_customers_own_figures_pass() -> None:
 
 
 def test_small_counts_pass() -> None:
-    """"3 questions", "question 2" - unavoidable and not financial."""
+    """ "3 questions", "question 2" - unavoidable and not financial."""
     assert verdict("आता 3 प्रश्न. हा प्रश्न 2 आहे.").allowed is True
 
 
@@ -90,7 +90,7 @@ def test_text_with_no_numbers_passes() -> None:
 
 
 def test_a_multiplier_cannot_smuggle_a_number_past() -> None:
-    """"4.6 हजार" is 4600 and must be compared as such, not as 4.6."""
+    """ "4.6 हजार" is 4600 and must be compared as such, not as 4.6."""
     assert values("4.6 हजार") == [4_600.0]
     assert verdict("EMI 4.6 हजार आहे.").allowed is True
 

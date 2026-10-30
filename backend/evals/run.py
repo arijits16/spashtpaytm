@@ -82,9 +82,7 @@ class Suite:
 def load(name: str) -> list[dict[str, Any]]:
     path = EVAL_DIR / f"{name}.jsonl"
     return [
-        json.loads(line)
-        for line in path.read_text(encoding="utf-8").splitlines()
-        if line.strip()
+        json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()
     ]
 
 
@@ -178,9 +176,7 @@ def run_grading() -> Suite:
             suite.record(False, {"problems": ["no offers seeded; run `make seed`"]})
             return suite
         facts = min(offers, key=lambda offer: offer.total_cost).facts
-        questions = {
-            question.id: question for question in active_questions(db)
-        }
+        questions = {question.id: question for question in active_questions(db)}
 
         for row in load("teachback"):
             question = questions.get(row["question_id"])
@@ -276,9 +272,7 @@ def run_injection() -> Suite:
         # If a model did repeat the injected number, the guard stops it.
         for fragment in row["must_not_contain"]:
             if any(ch.isdigit() for ch in fragment):
-                verdict = number_guard.check(
-                    f"EMI {fragment} आहे.", offers=[facts]
-                )
+                verdict = number_guard.check(f"EMI {fragment} आहे.", offers=[facts])
                 if verdict.allowed:
                     problems.append(f"the guard would have let '{fragment}' through")
 
@@ -379,7 +373,9 @@ async def main_async(*, use_llm: bool) -> int:
         flag = " " if suite.rate >= TARGET_PASS_RATE else "!"
         print(f"  {flag} {suite.name:22} {suite.passed:>3}/{suite.total:<3} {suite.rate:>5.0%}")
         for failure in suite.failures[:5]:
-            print(f"      - {failure.get('text', '')[:52]}  {'; '.join(failure.get('problems', []))[:60]}")
+            print(
+                f"      - {failure.get('text', '')[:52]}  {'; '.join(failure.get('problems', []))[:60]}"
+            )
 
     below = [suite.name for suite in suites if suite.rate < TARGET_PASS_RATE]
     if below:
