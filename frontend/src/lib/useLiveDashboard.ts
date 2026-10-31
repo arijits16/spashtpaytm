@@ -65,23 +65,35 @@ export function useLiveDashboard<T>({ fetcher, events, pollMs }: Options<T>): Li
   // --- the data -------------------------------------------------------------
 
   useEffect(() => {
+    // A `cancelled` flag, not `controller.abort()`, guards a stale result.
+    // Actually aborting here tears down the in-flight request through Vite's
+    // dev proxy, and React 19 StrictMode's mount -> cleanup -> mount replay
+    // does exactly that within milliseconds on every first load - which the
+    // proxy's pooled connection sometimes surfaces as a transient 503 on the
+    // very next request (reproduced: a tab's first load intermittently 503s
+    // two or three times before the data appears). Letting the stale request
+    // finish in the background and simply ignoring its result costs nothing
+    // and removes that flakiness.
     const controller = new AbortController();
+    let cancelled = false;
 
     void (async () => {
       try {
         const next = await fetcher(controller.signal);
-        if (controller.signal.aborted) return;
+        if (cancelled) return;
         setData(next);
         setError(null);
       } catch (cause) {
-        if (controller.signal.aborted) return;
+        if (cancelled) return;
         setError(cause instanceof Error ? cause.message : "Could not load this view.");
       } finally {
-        if (!controller.signal.aborted) setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     })();
 
-    return () => controller.abort();
+    return () => {
+      cancelled = true;
+    };
   }, [fetcher, refreshToken]);
 
   // --- the stream -----------------------------------------------------------
