@@ -1,0 +1,8 @@
+# Keep LF everywhere, matching .editorconfig and Prettier, regardless of the
+# committer's core.autocrlf. CRLF breaks `prettier --check` and the shell scripts.
+* text=auto eol=lf
+
+*.png binary
+*.pdf binary
+*.woff binary
+*.woff2 binary

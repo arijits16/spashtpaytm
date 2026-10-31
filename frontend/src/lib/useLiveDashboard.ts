@@ -75,7 +75,8 @@ export function useLiveDashboard<T>({
   // Seeded from the cache so a revisited page paints with its last-known data
   // on the very first render, then silently revalidates underneath it - the
   // stale-while-revalidate behaviour, without a flash of the skeleton.
-  const cached = cacheKey === undefined ? undefined : (dashboardCache.get(cacheKey) as T | undefined);
+  const cached =
+    cacheKey === undefined ? undefined : (dashboardCache.get(cacheKey) as T | undefined);
   const [data, setData] = useState<T | null>(cached ?? null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(cached === undefined);
