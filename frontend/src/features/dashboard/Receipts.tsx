@@ -12,6 +12,7 @@ export function Receipts() {
   const { data, error, loading, connection, refresh } = useLiveDashboard<ReceiptRow[]>({
     fetcher,
     events: ["receipt.created", "demo.reset"],
+    cacheKey: "receipts",
   });
 
   if (loading && !data) return <Skeleton rows={6} label="Loading receipts" />;

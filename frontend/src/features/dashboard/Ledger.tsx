@@ -19,6 +19,7 @@ export function Ledger() {
   const { data, error, loading, connection, refresh } = useLiveDashboard<LedgerResponse>({
     fetcher,
     events: ["receipt.created", "demo.reset"],
+    cacheKey: "ledger",
   });
 
   if (loading && !data) return <Skeleton rows={4} label="Walking the chain" />;

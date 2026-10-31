@@ -25,6 +25,56 @@ import type {
 
 const BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
+/**
+ * No request waits forever (session fix, build plan 12).
+ *
+ * A hung backend connection used to leave `fetch` pending indefinitely, which
+ * is how "Checking your session…" could sit on screen with no way out: the
+ * `/api/me` call that resolves it had nothing bounding its wait. Every request
+ * now races a timeout; uploads get a longer one since a PDF over a slow
+ * connection is still legitimate traffic.
+ */
+const DEFAULT_TIMEOUT_MS = 15_000;
+const UPLOAD_TIMEOUT_MS = 60_000;
+
+/**
+ * `fetch`, but aborted after `timeoutMs` and also abortable by `external`.
+ *
+ * Distinguishes "we gave up waiting" from "the caller cancelled us" so the
+ * error message can say which happened, rather than the opaque
+ * `AbortError: signal is aborted` a raw `fetch` throws either way.
+ */
+async function fetchBounded(
+  url: string,
+  init: RequestInit,
+  external: AbortSignal | undefined,
+  timeoutMs: number,
+): Promise<Response> {
+  const controller = new AbortController();
+  let timedOut = false;
+
+  const onExternalAbort = () => controller.abort();
+  external?.addEventListener("abort", onExternalAbort);
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, timeoutMs);
+
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (cause) {
+    if (timedOut) {
+      throw new Error("The request took too long. Check your connection and try again.", {
+        cause,
+      });
+    }
+    throw cause;
+  } finally {
+    clearTimeout(timer);
+    external?.removeEventListener("abort", onExternalAbort);
+  }
+}
+
 /** Resolves the current auth header value, or null when signed out. */
 type TokenProvider = () => Promise<string | null>;
 
@@ -93,12 +143,12 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     headers.set("X-Demo-Key", demoKey);
   }
 
-  const response = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers,
-    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
-    ...(signal ? { signal } : {}),
-  });
+  const response = await fetchBounded(
+    `${BASE_URL}${path}`,
+    { method, headers, ...(body !== undefined ? { body: JSON.stringify(body) } : {}) },
+    signal,
+    DEFAULT_TIMEOUT_MS,
+  );
 
   if (!response.ok) {
     const { code, message } = await readError(response);
@@ -130,7 +180,12 @@ export async function apiUpload<T>(path: string, form: FormData): Promise<T> {
   const headers = await authHeaders();
   headers.set("Accept", "application/json");
 
-  const response = await fetch(`${BASE_URL}${path}`, { method: "POST", headers, body: form });
+  const response = await fetchBounded(
+    `${BASE_URL}${path}`,
+    { method: "POST", headers, body: form },
+    undefined,
+    UPLOAD_TIMEOUT_MS,
+  );
   if (!response.ok) {
     const { code, message } = await readError(response);
     throw new ApiError(response.status, message, code);
@@ -146,7 +201,12 @@ export async function apiUpload<T>(path: string, form: FormData): Promise<T> {
  * fetched here and handed to the iframe as an object URL.
  */
 export async function apiBlob(path: string): Promise<Blob> {
-  const response = await fetch(`${BASE_URL}${path}`, { headers: await authHeaders() });
+  const response = await fetchBounded(
+    `${BASE_URL}${path}`,
+    { headers: await authHeaders() },
+    undefined,
+    DEFAULT_TIMEOUT_MS,
+  );
   if (!response.ok) {
     const { code, message } = await readError(response);
     throw new ApiError(response.status, message, code);

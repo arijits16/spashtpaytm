@@ -14,6 +14,19 @@ import { getMe, setAuthTokenProvider, setDemoUser, type Me } from "@/lib/api";
 import { AuthContext, type AuthContextValue, type AuthStatus } from "@/lib/authContext";
 import { DEMO_AUTH_ENABLED, DEMO_AUTH_KEY, DEMO_PERSONA, DEMO_SESSION_KEY } from "@/lib/env";
 import { getFirebaseAuth, googleProvider, isFirebaseConfigured } from "@/lib/firebase";
+import { clearDashboardCache } from "@/lib/useLiveDashboard";
+
+/**
+ * How long "Checking your session…" is allowed to sit on screen.
+ *
+ * Normally `onAuthStateChanged` fires within a second or two. If it never
+ * fires at all - a blocked IndexedDB read, a Firebase outage, a stuck silent
+ * token refresh - there was previously nothing to end the wait: `status`
+ * simply stayed `"loading"` forever. This bounds it, so a genuine failure
+ * becomes a sign-in screen with an explanation rather than an infinite
+ * spinner.
+ */
+const AUTH_TIMEOUT_MS = 10_000;
 
 /** Outcome of a `/api/me` call. Pure data - no React state is touched here. */
 type MeResult = { ok: true; me: Me } | { ok: false; error: unknown };
@@ -82,6 +95,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [clearDemoSession],
   );
 
+  // --- bounded wait: "loading" must eventually end one way or the other ------
+  useEffect(() => {
+    if (status !== "loading") return;
+    const timer = setTimeout(() => {
+      setError("Could not restore your session. Please sign in again.");
+      clearDemoSession();
+      setStatus("signedOut");
+    }, AUTH_TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, [status, clearDemoSession]);
+
   // --- token provider: consulted by the API client before every request ------
   useEffect(() => {
     setAuthTokenProvider(async () => {
@@ -112,14 +136,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!user) {
         // Do not clobber an active demo session.
         if (hasStoredDemoSession()) return;
+        clearDashboardCache();
         setMe(null);
         setIsDemo(false);
         setStatus("signedOut");
         return;
       }
 
-      // A real token outranks any demo session.
+      // A real token outranks any demo session, and may be a different
+      // person from whoever's dashboard data is cached.
       clearDemoSession();
+      clearDashboardCache();
       void fetchMe().then(applyMe);
     });
 
@@ -164,6 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
     firebaseUser.current = null;
+    clearDashboardCache();
 
     setDemoUser(DEMO_PERSONA, DEMO_AUTH_KEY);
     sessionStorage.setItem(DEMO_SESSION_KEY, DEMO_PERSONA);
@@ -181,6 +209,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     clearDemoSession();
+    clearDashboardCache();
     setMe(null);
     firebaseUser.current = null;
 

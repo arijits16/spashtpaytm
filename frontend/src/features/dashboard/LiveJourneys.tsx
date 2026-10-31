@@ -20,6 +20,7 @@ export function LiveJourneys() {
   const { data, error, loading, connection, refresh } = useLiveDashboard<JourneyRow[]>({
     fetcher,
     events: ["journey.updated", "receipt.created", "demo.reset"],
+    cacheKey: "journeys",
   });
 
   const [selected, setSelected] = useState<string | null>(null);

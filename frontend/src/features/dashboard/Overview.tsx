@@ -19,6 +19,7 @@ export function Overview() {
   const { data, error, loading, connection, refresh } = useLiveDashboard<OverviewData>({
     fetcher,
     events: ["journey.updated", "receipt.created", "guard.blocked", "demo.reset"],
+    cacheKey: "overview",
   });
 
   if (loading && !data) return <Skeleton kpis={4} rows={5} label="Loading the overview" />;

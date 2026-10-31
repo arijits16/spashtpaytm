@@ -18,6 +18,7 @@ export function RescueTasks() {
   const { data, error, loading, connection, refresh } = useLiveDashboard<RescueRow[]>({
     fetcher,
     events: ["rescue.created", "journey.updated", "demo.reset"],
+    cacheKey: "rescue-tasks",
   });
 
   if (loading && !data) return <Skeleton rows={5} label="Loading rescue tasks" />;

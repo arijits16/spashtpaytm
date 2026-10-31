@@ -18,6 +18,27 @@ import { useAuth } from "@/lib/authContext";
 import { POLL_INTERVAL_MS, streamDashboard, type ConnectionState } from "@/lib/sse";
 import type { DashboardEventName } from "@/lib/types";
 
+/**
+ * In-memory, per-tab cache so switching back to an already-visited page shows
+ * its last-known data immediately instead of a skeleton (build plan 12).
+ *
+ * Deliberately a plain module-level `Map`, not `sessionStorage` or
+ * `IndexedDB`: every cached value here is exactly what an admin's own
+ * dashboard request already returned, so persisting it to disk would buy
+ * nothing but a place for a decrypted transcript or a masked field to sit
+ * after the tab closes. A page's React state already holds it for as long as
+ * the tab is open; this only keeps it alive across that page's *component*
+ * unmounting when the operator clicks to another tab and back - never across
+ * a real reload, which re-authenticates and refetches from the backend as
+ * before.
+ */
+const dashboardCache = new Map<string, unknown>();
+
+/** Drop every cached page. Called on logout and on switching identities. */
+export function clearDashboardCache(): void {
+  dashboardCache.clear();
+}
+
 interface Options<T> {
   /** Fetches the view's data. Must be stable (wrap it in `useCallback`). */
   fetcher: (signal: AbortSignal) => Promise<T>;
@@ -25,6 +46,12 @@ interface Options<T> {
   events: DashboardEventName[];
   /** Also refetch on this interval, as a safety net. */
   pollMs?: number;
+  /**
+   * Identifies this page's slot in the in-memory cache, e.g. `"overview"`.
+   * Omit for a view that should always start from a skeleton (the journey
+   * detail drawer, opened for a different journey every time).
+   */
+  cacheKey?: string;
 }
 
 interface LiveResult<T> {
@@ -37,12 +64,21 @@ interface LiveResult<T> {
   refresh: () => void;
 }
 
-export function useLiveDashboard<T>({ fetcher, events, pollMs }: Options<T>): LiveResult<T> {
+export function useLiveDashboard<T>({
+  fetcher,
+  events,
+  pollMs,
+  cacheKey,
+}: Options<T>): LiveResult<T> {
   const { authHeaders } = useAuth();
 
-  const [data, setData] = useState<T | null>(null);
+  // Seeded from the cache so a revisited page paints with its last-known data
+  // on the very first render, then silently revalidates underneath it - the
+  // stale-while-revalidate behaviour, without a flash of the skeleton.
+  const cached = cacheKey === undefined ? undefined : (dashboardCache.get(cacheKey) as T | undefined);
+  const [data, setData] = useState<T | null>(cached ?? null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(cached === undefined);
   const [connection, setConnection] = useState<ConnectionState>("connecting");
   const [pulse, setPulse] = useState(0);
 
@@ -81,6 +117,7 @@ export function useLiveDashboard<T>({ fetcher, events, pollMs }: Options<T>): Li
       try {
         const next = await fetcher(controller.signal);
         if (cancelled) return;
+        if (cacheKey !== undefined) dashboardCache.set(cacheKey, next);
         setData(next);
         setError(null);
       } catch (cause) {
@@ -94,7 +131,7 @@ export function useLiveDashboard<T>({ fetcher, events, pollMs }: Options<T>): Li
     return () => {
       cancelled = true;
     };
-  }, [fetcher, refreshToken]);
+  }, [fetcher, refreshToken, cacheKey]);
 
   // --- the stream -----------------------------------------------------------
 
